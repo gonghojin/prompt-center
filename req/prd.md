@@ -35,26 +35,10 @@
 
 ## 🏗️ 시스템 아키텍처 (System Architecture)
 
-- **프론트엔드**:  
-  - Next.js + TypeScript  
-  - TailwindCSS 기반 UI 컴포넌트  
-  - React Query or SWR for API 호출 캐싱
+자세한 아키텍처 내용은 각각의 기술 스택 문서를 참조하세요:
+- 백엔드: `backend.md`
+- 프론트엔드: `frontend.md`
 
-- **백엔드**:  
- - FastAPI (Python 3.11)
- - Pydantic 기반 데이터 검증
- - JWT 인증, OAuth 연동 가능
- - Dependency Injection 기반 라우팅 구조
-
-- **데이터베이스**:  
-  - PostgreSQL (템플릿, 사용자, 권한, 태그 등 저장)  
-  - Elasticsearch (키워드/태그 기반 검색 최적화, 후순위 도입 가능)
-  - SQLAlchemy 2.0 ORM 또는 Tortoise ORM
-  - Redis (세션 캐시 및 추천 프롬프트 캐시)
-- **인프라/배포**:  
-  - Docker / GitLab CI  
-  - 사내 쿠버네티스 클러스터 or EC2 기반 배포
-  - Uvicorn + Gunicorn for deployment
 ---
 
 ## 🧪 테스트 전략 (Testing Strategy)
