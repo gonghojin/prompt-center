@@ -13,6 +13,11 @@
   <property name="severity" value="warning"/>
   <property name="fileExtensions" value="java"/>
 
+  <!-- 테스트 코드 제외 설정 -->
+  <module name="BeforeExecutionExclusionFileFilter">
+    <property name="fileNamePattern" value=".*[/\\]src[/\\]test[/\\].*\.java$"/>
+  </module>
+
   <!-- 탭 문자 대신 스페이스 사용 확인 -->
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>
