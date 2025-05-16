@@ -1,37 +1,24 @@
 import { Prompt } from '@/types/prompt';
-import Link from 'next/link';
+import { PromptCard } from '@/components/prompt/PromptCard';
 
 interface PromptListProps {
   prompts: Prompt[];
 }
 
-export default function PromptList({ prompts }: PromptListProps) {
+export function PromptList({ prompts }: PromptListProps) {
+  if (prompts.length === 0) {
+    return (
+      <div className="text-center py-10">
+        <p className="text-gray-500 dark:text-gray-400">등록된 프롬프트가 없습니다.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {prompts.map((prompt) => (
-        <Link 
-          href={`/prompts/${prompt.id}`} 
-          key={prompt.id}
-          className="card p-6"
-        >
-          <h3 className="text-xl font-semibold mb-2 text-gray-800">{prompt.title}</h3>
-          <p className="text-gray-600 mb-4 line-clamp-2">{prompt.description}</p>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {prompt.tags.map((tag) => (
-              <span 
-                key={tag} 
-                className="tag"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-          <div className="flex justify-between items-center text-sm text-gray-500">
-            <span>{prompt.author.username}</span>
-            <span>{new Date(prompt.updatedAt).toLocaleDateString()}</span>
-          </div>
-        </Link>
+        <PromptCard key={prompt.id} prompt={prompt} />
       ))}
     </div>
   );
-} 
+}

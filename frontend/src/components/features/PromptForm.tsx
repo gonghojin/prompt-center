@@ -1,13 +1,15 @@
+'use client';
+
 import React, { useState } from 'react';
-import { PromptTemplate } from '@/types';
+import { Prompt } from '@/types/prompt';
 
 interface PromptFormProps {
   mode: 'new' | 'edit';
   id?: string;
 }
 
-const PromptForm: React.FC<PromptFormProps> = ({ mode, id }) => {
-  const [formData, setFormData] = useState<Partial<PromptTemplate>>({
+export function PromptForm({ mode, id }: PromptFormProps) {
+  const [formData, setFormData] = useState<Partial<Prompt>>({
     title: '',
     content: '',
     description: '',
@@ -108,6 +110,7 @@ const PromptForm: React.FC<PromptFormProps> = ({ mode, id }) => {
       </button>
     </form>
   );
-};
+}
 
-export default PromptForm; 
+// 호환성을 위한 default export
+export default PromptForm;

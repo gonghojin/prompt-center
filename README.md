@@ -42,7 +42,9 @@ gradle wrapper
 ```bash
 cd frontend
 npm install
+npm run dev   # 개발 서버 실행 (http://localhost:3000)
 ```
+- 개발 서버가 정상적으로 실행되면 브라우저에서 [http://localhost:3000](http://localhost:3000) 으로 접속하여 프론트엔드 화면을 확인할 수 있습니다.
 
 4. 환경 변수 설정
 ```bash
