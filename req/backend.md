@@ -3,7 +3,7 @@
 ## 기술 스택
 - **언어**: Java 17
 - **프레임워크**: Spring Boot
-- **라이브러리**: 
+- **라이브러리**:
   - Lombok
   - JPA
   - Spring Security
@@ -39,21 +39,37 @@
 ├── application/
 │   ├── port/
 │   │   ├── in/                   # UseCase 정의 (인터페이스)
+│   │   │   ├── command/          # UseCase 커맨드 객체
+│   │   │   │   └── RegisterPromptCommand.java
+│   │   │   ├── query/            # UseCase 쿼리 객체
+│   │   │   │   └── SearchPromptQuery.java
 │   │   │   └── RegisterPromptUseCase.java
 │   │   └── out/                  # 외부 시스템 의존 인터페이스
+│   │       ├── command/          # 아웃바운드 포트 커맨드 객체
+│   │       │   └── SavePromptCommand.java
+│   │       ├── query/            # 아웃바운드 포트 쿼리 객체
+│   │       │   └── FindPromptQuery.java
 │   │       └── LoadPromptPort.java
-│   └── usecase/                  # UseCase 구현체
+│   └── service/                  # UseCase 구현체
 │       └── RegisterPromptService.java
 │
 ├── adapter/
 │   ├── in/
-│   │   └── rest/                 # API Controller 등 수신 어댑터
-│   │       └── PromptController.java
+│   │   ├── rest/                 # API Controller 등 수신 어댑터
+│   │   │   └── PromptController.java
+│   │   └── dto/                  # 외부 요청/응답 DTO
+│   │       ├── request/          # Request DTO
+│   │       │   └── PromptRequest.java
+│   │       └── response/         # Response DTO
+│   │           └── PromptResponse.java
 │   └── out/
 │       ├── persistence/         # DB 저장소 어댑터
-│       │   └── PromptJpaEntity.java
-│       │   └── PromptJpaRepository.java
-│       │   └── PromptPersistenceAdapter.java
+│       │   ├── entity/          # JPA 엔티티
+│       │   │   └── PromptJpaEntity.java
+│       │   ├── repository/      # JPA 리포지토리
+│       │   │   └── PromptJpaRepository.java
+│       │   └── adapter/         # 영속성 어댑터
+│       │       └── PromptPersistenceAdapter.java
 │       └── client/              # 외부 API 연동 어댑터
 │           └── NotionClient.java
 │
@@ -63,21 +79,39 @@
 │   └── PersistenceConfig.java
 │
 ├── common/                      # 전역 공통 요소
-│   ├── exception/
-│   └── response/
-│   └── logging/
+│   ├── exception/               # 예외 처리
+│   │   ├── ApplicationException.java
+│   │   └── GlobalExceptionHandler.java
+│   ├── response/                # 표준 응답 형식
+│   │   └── ApiResponse.java
+│   └── logging/                 # 로깅 관련
+│       └── LoggingAspect.java
 │
 └── PromptServerApplication.java
 ```
 
 ## 테스트 전략
-- **단위 테스트**: 
+- **단위 테스트**:
   - DTO 및 도메인 서비스 단위 검증
   - JUnit5 + Mockito
 
-- **통합 테스트**: 
+- **통합 테스트**:
   - REST API 레벨 통합 테스트
   - Testcontainers 사용
 
-- **자동화 도구**: 
+- **자동화 도구**:
   - GitLab CI 기반 테스트 자동 실행 및 배포 전 체크
+
+## 코드 컨벤션
+- **문서화**:
+  - 모든 공개 API와 메소드에 JavaDoc 작성
+  - 주석은 한글로 작성하여 도메인 용어 이해도 향상
+
+- **명명 규칙**:
+  - 클래스: PascalCase (예: PromptTemplate)
+  - 메소드/변수: camelCase (예: registerPrompt)
+  - 상수: SNAKE_CASE (예: MAX_PROMPT_LENGTH)
+
+- **코드 스타일**:
+  - 롬복 활용: `@Data` 대신 세부 어노테이션 사용 (`@Getter`, `@Builder` 등)
+  - 커맨드 객체: 유스케이스 파라미터를 커맨드 객체로 캡슐화

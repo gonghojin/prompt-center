@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.3'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'checkstyle'
+    id 'jacoco'
 }
 
 group = 'com.promptcenter'
@@ -70,6 +71,7 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 tasks.withType(JavaCompile) {
@@ -89,5 +91,79 @@ tasks.withType(Checkstyle) {
     reports {
         xml.required = false
         html.required = true
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        csv.required = false
+        html.required = true
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco')
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'CLASS'
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.0
+            }
+            excludes = [
+                'com.gongdel.promptserver.PromptServerApplication',
+                'com.gongdel.promptserver.config.*'
+            ]
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn jacocoTestReport, jacocoTestCoverageVerification
+}
+
+// 개별 클래스별 커버리지 리포트 생성
+tasks.register('jacocoDetailedReport') {
+    dependsOn jacocoTestReport
+    doLast {
+        def coverageData = []
+        def jacocoReportDir = new File("${buildDir}/reports/jacoco/test/html")
+
+        if (jacocoReportDir.exists()) {
+            println "\n코드 커버리지 분석 결과:"
+            println "=" * 80
+            println "| %-40s | %-10s | %-10s | %-10s |".format("클래스", "라인", "브랜치", "복잡도")
+            println "=" * 80
+
+            def indexFile = new File(jacocoReportDir, "index.html")
+            if (indexFile.exists()) {
+                def html = indexFile.text
+                def pattern = /<tr>.*?<td class=".*?">(.*?)<\/td>.*?<td class=".*?">(.*?)<\/td>.*?<td class=".*?">(.*?)<\/td>.*?<td class=".*?">(.*?)<\/td>.*?<\/tr>/
+                def matcher = (html =~ pattern)
+
+                matcher.each { match ->
+                    def packageOrClass = match[1].replaceAll(/<.*?>/, "").trim()
+                    if (!packageOrClass.contains("Total")) {
+                        def linesCoverage = match[2].replaceAll(/<.*?>/, "").trim()
+                        def branchCoverage = match[3].replaceAll(/<.*?>/, "").trim()
+                        def complexityCoverage = match[4].replaceAll(/<.*?>/, "").trim()
+
+                        println "| %-40s | %-10s | %-10s | %-10s |".format(
+                            packageOrClass, linesCoverage, branchCoverage, complexityCoverage)
+                    }
+                }
+            }
+            println "=" * 80
+            println "\n전체 리포트 위치: ${jacocoReportDir.absolutePath}\n"
+        } else {
+            println "JaCoCo 리포트가 생성되지 않았습니다. 먼저 테스트를 실행해주세요."
+        }
     }
 }
