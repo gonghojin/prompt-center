@@ -38,6 +38,95 @@
 ./gradlew check
 ```
 
+## 예외 처리 가이드라인
+
+프로젝트의 예외 처리는 헥사고날 아키텍처의 원칙과 객체지향 설계 원칙을 준수하여 다음과 같은 규칙을 따릅니다.
+
+### 예외 클래스 계층 구조
+
+```
+BaseException (추상 클래스)
+├── 도메인 예외
+│   ├── PromptValidationException
+│   ├── PersistenceException
+│   └── BusinessException
+└── 애플리케이션 예외
+    ├── PromptRegistrationException
+    └── PromptSearchException
+```
+
+### 예외 처리 원칙
+
+1. **계층별 책임 분리**
+   - 도메인 계층: 순수한 도메인 로직과 관련된 예외 발생
+   - 애플리케이션 계층: 도메인 예외를 애플리케이션 컨텍스트에 맞게 변환
+   - 어댑터 계층: 기술적 예외를 도메인 예외로 변환하여 포트 명세 준수
+
+2. **의존성 방향 준수**
+   - 어댑터는 도메인 예외에만 의존 (애플리케이션 예외에 의존하지 않음)
+   - 도메인 계층은 외부에 의존하지 않음
+   - 애플리케이션 계층은 도메인 예외를 처리하고, 필요시 애플리케이션 예외로 변환
+
+3. **예외 유형 사용 규칙**
+   - `PromptValidationException`: 도메인 모델 유효성 검증 실패 시
+   - `PersistenceException`: 데이터 저장/조회 관련 문제 발생 시
+   - `BusinessException`: 비즈니스 규칙 위반 시
+   - `PromptRegistrationException`: 프롬프트 등록 과정의 오류 시 (애플리케이션 계층)
+
+### 예외 발생 및 처리 예시
+
+```java
+// 어댑터 계층 (외부 → 내부)
+@Override
+public PromptTemplate savePrompt(PromptTemplate promptTemplate) {
+    try {
+        // 외부 기술 사용
+        return repository.save(entity).toDomain();
+    } catch (DataAccessException e) {
+        // 기술적 예외를 도메인 예외로 변환
+        throw new PersistenceException("저장 실패", e);
+    }
+}
+
+// 애플리케이션 계층
+@Override
+public PromptTemplate registerPrompt(PromptTemplate promptTemplate) {
+    try {
+        validate(promptTemplate);
+        return savePromptPort.savePrompt(promptTemplate);
+    } catch (PersistenceException e) {
+        // 도메인 예외를 애플리케이션 예외로 변환
+        throw new PromptRegistrationException(PromptErrorType.PERSISTENCE_ERROR, e.getMessage(), e);
+    } catch (PromptValidationException e) {
+        throw new PromptRegistrationException(PromptErrorType.VALIDATION_ERROR, e.getMessage(), e);
+    }
+}
+```
+
+### 로깅 전략
+
+1. **예외 발생 위치에서 로깅**
+   - 예외가 최초 발생한 위치에서 적절한 컨텍스트와 함께 로깅
+
+2. **로그 레벨 사용**
+   - ERROR: 예외 및 중요 오류 (시스템 기능 정지 수준)
+   - WARN: 잠재적 문제 (기능은 작동하나 주의 필요)
+   - INFO: 중요 이벤트 기록
+   - DEBUG: 상세 정보 (개발/디버깅용)
+
+3. **구조화된 예외 처리**
+   - GlobalExceptionHandler를 통한 일관된 예외 응답 생성
+   - ErrorResponse DTO로 클라이언트에 표준화된 오류 정보 제공
+
+### 테스트 요구사항
+
+각 계층의 예외 처리 로직은 다음을 테스트해야 합니다:
+
+1. 정상 케이스 외에 예외 발생 케이스에 대한 단위 테스트 작성
+2. 어댑터 계층에서는 외부 예외가 적절한 도메인 예외로 변환되는지 확인
+3. 애플리케이션 계층에서는 도메인 예외를 적절히 처리하는지 확인
+4. 통합 테스트에서는 예외 발생 시 클라이언트에게 적절한 응답이 전달되는지 확인
+
 ## 커버리지 설정 변경
 
 기본적으로 코드 커버리지 기준은 최소 0%로 설정되어 있습니다.
