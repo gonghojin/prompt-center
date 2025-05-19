@@ -38,6 +38,26 @@
 ./gradlew check
 ```
 
+## API 문서(Swagger)
+
+- 개발 환경: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+- 운영/스테이징 환경: (배포 후 실제 URL 기입)
+
+## 카테고리 API 지원 기능
+
+| 구분         | HTTP Method | 엔드포인트                                      | 설명                                 | 주요 응답 코드 | 예외/특이사항                |
+|--------------|-------------|------------------------------------------------|--------------------------------------|---------------|------------------------------|
+| 카테고리 생성 | POST        | `/api/v1/categories`                           | 새로운 카테고리 생성                 | 201, 409, 400 | 이름 중복 시 409(CONFLICT)    |
+| 카테고리 수정 | PUT         | `/api/v1/categories/{id}`                      | 기존 카테고리 정보 수정              | 200, 404, 400 | 미존재 시 404(NOT FOUND)      |
+| 카테고리 삭제 | DELETE      | `/api/v1/categories/{id}`                      | 카테고리 삭제                        | 204, 404      | 미존재 시 404(NOT FOUND)      |
+| 단건 조회     | GET         | `/api/v1/categories/{id}`                      | ID로 카테고리 조회                   | 200, 404      | 미존재 시 404(NOT FOUND)      |
+| 목록 조회     | GET         | `/api/v1/categories?name&isSystem`             | 조건(이름/시스템여부)별 목록 조회    | 200           | 결과 없으면 빈 배열 반환       |
+| 루트 목록     | GET         | `/api/v1/categories/roots`                     | 최상위(루트) 카테고리 목록 조회      | 200           |                              |
+| 하위 목록     | GET         | `/api/v1/categories/{parentId}/subcategories`  | 특정 카테고리의 하위 목록 조회       | 200, 404      | 상위 미존재 시 404(NOT FOUND) |
+
+- 모든 API는 표준화된 예외 처리 및 로깅 전략을 따릅니다.
+- 상세 요청/응답 구조는 Swagger 문서 또는 코드 참고.
+
 ## 예외 처리 가이드라인
 
 프로젝트의 예외 처리는 헥사고날 아키텍처의 원칙과 객체지향 설계 원칙을 준수하여 다음과 같은 규칙을 따릅니다.
