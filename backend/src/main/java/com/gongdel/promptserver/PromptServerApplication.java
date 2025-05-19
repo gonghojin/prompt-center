@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @SpringBootApplication
-@EnableJpaAuditing
 @EnableElasticsearchRepositories
 public class PromptServerApplication {
 

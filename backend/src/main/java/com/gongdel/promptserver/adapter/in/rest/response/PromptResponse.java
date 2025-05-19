@@ -37,19 +37,59 @@ public class PromptResponse {
    */
   public static PromptResponse from(PromptTemplate promptTemplate) {
     return PromptResponse.builder()
-        .id(promptTemplate.getId())
+        .id(promptTemplate.getUuid())
         .title(promptTemplate.getTitle())
         .description(promptTemplate.getDescription())
-        .content(promptTemplate.getContent())
-        .author(UserResponse.from(promptTemplate.getAuthor()))
-        .tags(promptTemplate.getTags().stream()
-            .map(TagResponse::from)
-            .collect(Collectors.toSet()))
+        .content(getPromptContent(promptTemplate))
+        .author(createAuthorResponse(promptTemplate))
+        .tags(getTags(promptTemplate))
         .isPublic(promptTemplate.isPublic())
         .createdAt(promptTemplate.getCreatedAt())
         .updatedAt(promptTemplate.getUpdatedAt())
-        .viewCount(promptTemplate.getViewCount())
-        .favoriteCount(promptTemplate.getFavoriteCount())
+        .viewCount(0) // 기본값 설정 또는 필요시 추가 메서드 구현
+        .favoriteCount(0) // 기본값 설정 또는 필요시 추가 메서드 구현
         .build();
+  }
+
+  /**
+   * 프롬프트 템플릿의 내용을 가져옵니다.
+   * 실제 구현에서는 현재 버전 ID를 사용하여
+   * 프롬프트 버전 저장소에서 가져와야 합니다.
+   *
+   * @param promptTemplate 프롬프트 템플릿
+   * @return 프롬프트 내용
+   */
+  private static String getPromptContent(PromptTemplate promptTemplate) {
+    // 실제 구현에서는 현재 버전 ID를 사용하여
+    // 프롬프트 버전 저장소에서 내용을 가져옵니다.
+    return ""; // 우선 빈 문자열 반환, 실제 구현 필요
+  }
+
+  /**
+   * 작성자 정보를 생성합니다.
+   * 실제 구현에서는 createdById를 사용하여
+   * 사용자 저장소에서 작성자 정보를 가져와야 합니다.
+   *
+   * @param promptTemplate 프롬프트 템플릿
+   * @return 작성자 응답 DTO
+   */
+  private static UserResponse createAuthorResponse(PromptTemplate promptTemplate) {
+    // 실제 구현에서는 createdById를 사용하여
+    // 사용자 저장소에서 작성자 정보를 가져옵니다.
+    return null; // 우선 null 반환, 실제 구현 필요
+  }
+
+  /**
+   * 태그 정보를 가져옵니다.
+   * 실제 구현에서는 태그 저장소에서 템플릿에 연결된
+   * 태그 정보를 가져와야 합니다.
+   *
+   * @param promptTemplate 프롬프트 템플릿
+   * @return 태그 응답 DTO 세트
+   */
+  private static Set<TagResponse> getTags(PromptTemplate promptTemplate) {
+    // 실제 구현에서는 태그 저장소에서 템플릿에 연결된
+    // 태그 정보를 가져옵니다.
+    return Set.of(); // 우선 빈 세트 반환, 실제 구현 필요
   }
 }

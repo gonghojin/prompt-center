@@ -1,7 +1,6 @@
 package com.gongdel.promptserver.adapter.in.rest.response;
 
 import com.gongdel.promptserver.domain.model.Tag;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,7 +12,7 @@ import lombok.Getter;
 @Builder
 public class TagResponse {
 
-    private final UUID id;
+    private final Long id;
     private final String name;
 
     /**
