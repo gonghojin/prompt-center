@@ -47,12 +47,21 @@
 ```
 BaseException (추상 클래스)
 ├── 도메인 예외
-│   ├── PromptValidationException
-│   ├── PersistenceException
-│   └── BusinessException
+│   ├── CategoryDomainException
+│   │   ├── CategoryNotFoundDomainException
+│   │   ├── CategoryDuplicateNameDomainException
+│   │   └── CategoryOperationException
+│   ├── PromptDomainException
+│   │   ├── PromptValidationException
+│   │   └── PromptNotFoundException
 └── 애플리케이션 예외
-    ├── PromptRegistrationException
-    └── PromptSearchException
+    ├── CategoryException
+    │   ├── CategoryNotFoundException
+    │   ├── CategoryDuplicateNameException
+    │   └── CategoryOperationFailedException
+    └── PromptException
+        ├── PromptRegistrationException
+        └── PromptSearchException
 ```
 
 ### 예외 처리 원칙
@@ -67,38 +76,64 @@ BaseException (추상 클래스)
    - 도메인 계층은 외부에 의존하지 않음
    - 애플리케이션 계층은 도메인 예외를 처리하고, 필요시 애플리케이션 예외로 변환
 
-3. **예외 유형 사용 규칙**
-   - `PromptValidationException`: 도메인 모델 유효성 검증 실패 시
-   - `PersistenceException`: 데이터 저장/조회 관련 문제 발생 시
-   - `BusinessException`: 비즈니스 규칙 위반 시
-   - `PromptRegistrationException`: 프롬프트 등록 과정의 오류 시 (애플리케이션 계층)
+3. **예외 변환 유틸리티**
+   - 도메인 예외를 애플리케이션 예외로 변환하는 유틸리티 클래스 사용
+   - 일관된 예외 변환 패턴 적용
+   - 중복 코드 제거
 
 ### 예외 발생 및 처리 예시
 
 ```java
 // 어댑터 계층 (외부 → 내부)
 @Override
-public PromptTemplate savePrompt(PromptTemplate promptTemplate) {
+public Category saveCategory(Category category) {
     try {
         // 외부 기술 사용
         return repository.save(entity).toDomain();
     } catch (DataAccessException e) {
         // 기술적 예외를 도메인 예외로 변환
-        throw new PersistenceException("저장 실패", e);
+        throw new CategoryOperationException(CategoryErrorType.PERSISTENCE_ERROR, "저장 실패", e);
     }
 }
 
 // 애플리케이션 계층
 @Override
-public PromptTemplate registerPrompt(PromptTemplate promptTemplate) {
+public Category createCategory(CreateCategoryCommand command) {
     try {
-        validate(promptTemplate);
-        return savePromptPort.savePrompt(promptTemplate);
-    } catch (PersistenceException e) {
+        // 비즈니스 로직 수행...
+        return saveCategoryPort.saveCategory(category);
+    } catch (CategoryDomainException e) {
         // 도메인 예외를 애플리케이션 예외로 변환
-        throw new PromptRegistrationException(PromptErrorType.PERSISTENCE_ERROR, e.getMessage(), e);
-    } catch (PromptValidationException e) {
-        throw new PromptRegistrationException(PromptErrorType.VALIDATION_ERROR, e.getMessage(), e);
+        throw CategoryExceptionConverter.convertToApplicationException(e, command.getName());
+    } catch (Exception e) {
+        throw new CategoryOperationFailedException("카테고리 생성 실패", e);
+    }
+}
+```
+
+### 예외 변환 유틸리티 패턴
+
+```java
+// 예외 변환 유틸리티
+public final class CategoryExceptionConverter {
+
+    private CategoryExceptionConverter() {
+        // 유틸리티 클래스이므로 인스턴스화 방지
+    }
+
+    public static RuntimeException convertToApplicationException(CategoryDomainException e, Object identifier) {
+        if (e instanceof CategoryNotFoundDomainException) {
+            if (identifier instanceof Long) {
+                return new CategoryNotFoundException((Long) identifier);
+            } else {
+                return new CategoryNotFoundException(identifier.toString());
+            }
+        } else if (e instanceof CategoryDuplicateNameDomainException) {
+            return new CategoryDuplicateNameException(identifier.toString());
+        } else {
+            return new CategoryOperationFailedException(
+                    "Error occurred during category operation: " + e.getMessage(), e);
+        }
     }
 }
 ```
