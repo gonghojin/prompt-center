@@ -6,6 +6,7 @@ import com.gongdel.promptserver.domain.model.Tag;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  * TagResponse DTO 클래스에 대한 단위 테스트
@@ -16,13 +17,13 @@ class TagResponseTest {
     @DisplayName("Tag 도메인 객체로부터 TagResponse DTO를 생성할 수 있다")
     void fromShouldCreateDtoFromDomain() {
         // given
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         String name = "테스트 태그";
 
-        Tag tag = Tag.builder()
-                .id(id)
-                .name(name)
-                .build();
+        // Tag 객체를 Mock으로 생성
+        Tag tag = Mockito.mock(Tag.class);
+        Mockito.when(tag.getId()).thenReturn(id);
+        Mockito.when(tag.getName()).thenReturn(name);
 
         // when
         TagResponse tagResponse = TagResponse.from(tag);
@@ -37,7 +38,7 @@ class TagResponseTest {
     @DisplayName("TagResponse 빌더를 사용하여 DTO 객체를 생성할 수 있다")
     void builderShouldCreateDto() {
         // given
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         String name = "빌더 테스트";
 
         // when
