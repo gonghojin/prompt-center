@@ -17,10 +17,12 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   # 현재는 jpa-ddl-auto: validate 사용중 - local.yml 에서 설정
-  # flyway: # 나중에 도입할 때 활성화
-  #   enabled: true
-  #   baseline-on-migrate: true
-  #   locations: classpath:db/migration
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
+    validate-on-migrate: true
   redis:
     host: localhost
     port: 6379
@@ -54,7 +56,3 @@ management:
   endpoint:
     health:
       show-details: never
-
-init:
-  category:
-    data: true
