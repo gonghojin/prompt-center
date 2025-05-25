@@ -1,4 +1,4 @@
-package com.gongdel.promptserver.application.usecase;
+package com.gongdel.promptserver.application.usecase.command;
 
 import com.gongdel.promptserver.application.exception.CategoryDuplicateNameException;
 import com.gongdel.promptserver.application.exception.CategoryExceptionConverter;

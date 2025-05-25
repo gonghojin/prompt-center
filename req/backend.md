@@ -24,7 +24,7 @@
 - Docker / GitLab CI
 - 사내 쿠버네티스 클러스터 or EC2 기반 배포
 
-## 폴더 구조 (Hexagonal / Clean Architecture 기반)
+## 폴더 구조 (Hexagonal / Clean Architecture 기반 + CQRS 패턴)
 ```
 /src/main/java/com/gongdel/promptserver
 │
@@ -39,37 +39,54 @@
 ├── application/
 │   ├── port/
 │   │   ├── in/                   # UseCase 정의 (인터페이스)
-│   │   │   ├── command/          # UseCase 커맨드 객체
-│   │   │   │   └── RegisterPromptCommand.java
-│   │   │   ├── query/            # UseCase 쿼리 객체
-│   │   │   │   └── SearchPromptQuery.java
-│   │   │   └── RegisterPromptUseCase.java
-│   │   └── out/                  # 외부 시스템 의존 인터페이스
-│   │       ├── command/          # 아웃바운드 포트 커맨드 객체
-│   │       │   └── SavePromptCommand.java
-│   │       ├── query/            # 아웃바운드 포트 쿼리 객체
-│   │       │   └── FindPromptQuery.java
-│   │       └── LoadPromptPort.java
-│   └── service/                  # UseCase 구현체
-│       └── RegisterPromptService.java
+│   │   │   ├── command/          # UseCase 커맨드 객체 및 인터페이스
+│   │   │   │   ├── RegisterPromptCommand.java
+│   │   │   │   └── RegisterPromptUseCase.java
+│   │   │   └── query/            # UseCase 쿼리 객체 및 인터페이스
+│   │   │       ├── SearchPromptQuery.java
+│   │   │       └── GetPromptUseCase.java
+│   │   └── out/                  # 외부 시스템 의존 인터페이스 (CQRS 기반 분리)
+│   │       ├── command/          # 명령(CUD) 포트
+│   │       │   ├── SavePromptPort.java
+│   │   │   ├── UpdatePromptPort.java
+│   │   │   └── DeletePromptPort.java
+│   │       └── query/            # 조회(R) 포트
+│   │           ├── LoadPromptPort.java        # 단일 엔티티 조회
+│   │           ├── FindPromptsPort.java       # 필터링된 목록 조회
+│   │           └── SearchPromptsPort.java     # 검색 관련 조회
+│   └── usecase/                  # UseCase 구현체
+│       ├── command/              # 명령 서비스
+│       │   └── PromptCommandService.java
+│       └── query/                # 조회 서비스
+│           └── PromptQueryService.java
 │
 ├── adapter/
 │   ├── in/
-│   │   ├── rest/                 # API Controller 등 수신 어댑터
-│   │   │   └── PromptController.java
+│   │   ├── rest/                 # API Controller 등 수신 어댑터 (CQRS 기반 분리)
+│   │   │   ├── command/          # 명령(CUD) 컨트롤러
+│   │   │   │   └── PromptCommandController.java
+│   │   │   └── query/            # 조회(R) 컨트롤러
+│   │   │       └── PromptQueryController.java
 │   │   └── dto/                  # 외부 요청/응답 DTO
 │   │       ├── request/          # Request DTO
-│   │       │   └── PromptRequest.java
+│   │       │   ├── command/      # 명령 요청 DTO
+│   │       │   │   └── PromptCommandRequest.java
+│   │       │   └── query/        # 조회 요청 DTO
+│   │       │       └── PromptQueryRequest.java
 │   │       └── response/         # Response DTO
 │   │           └── PromptResponse.java
 │   └── out/
-│       ├── persistence/         # DB 저장소 어댑터
+│       ├── persistence/         # DB 저장소 어댑터 (CQRS 기반 분리)
 │       │   ├── entity/          # JPA 엔티티
-│       │   │   └── PromptJpaEntity.java
-│       │   ├── repository/      # JPA 리포지토리
-│       │   │   └── PromptJpaRepository.java
-│       │   └── adapter/         # 영속성 어댑터
-│       │       └── PromptPersistenceAdapter.java
+│   │   │   └── PromptTemplateEntity.java
+│   │   ├── repository/      # JPA 리포지토리
+│   │   │   └── PromptTemplateJpaRepository.java
+│   │   └── adapter/         # 영속성 어댑터
+│   │       ├── command/     # 명령(CUD) 어댑터
+│   │       │   └── PromptCommandAdapter.java
+│   │       └── query/       # 조회(R) 어댑터
+│   │           └── PromptQueryAdapter.java
+│   └── out/
 │       └── client/              # 외부 API 연동 어댑터
 │           └── NotionClient.java
 │
@@ -115,3 +132,24 @@
 - **코드 스타일**:
   - 롬복 활용: `@Data` 대신 세부 어노테이션 사용 (`@Getter`, `@Builder` 등)
   - 커맨드 객체: 유스케이스 파라미터를 커맨드 객체로 캡슐화
+
+## CQRS 패턴 적용
+- **명령/조회 분리**:
+  - 명령(Command): 데이터 변경 작업(CUD)
+  - 조회(Query): 데이터 읽기 작업(R)
+
+- **분리 기준**:
+  - 포트(인터페이스) 수준에서 분리
+  - 서비스 구현체 수준에서 분리
+  - 컨트롤러 수준에서 분리
+  - 영속성 어댑터 수준에서 분리
+
+- **조회 최적화**:
+  - 읽기 전용 트랜잭션 사용 (`@Transactional(readOnly = true)`)
+  - 캐싱 적용 가능
+  - 검색 엔진 통합 가능
+
+- **명령 안정성**:
+  - 읽기 작업과 무관한 트랜잭션 관리
+  - 도메인 이벤트 발행 가능
+  - 명령 로깅 및 감사 추적

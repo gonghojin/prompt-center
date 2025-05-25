@@ -1,4 +1,4 @@
-package com.gongdel.promptserver.application.usecase;
+package com.gongdel.promptserver.application.usecase.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
