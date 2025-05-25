@@ -42,14 +42,14 @@ public class UpdateCategoryCommand {
      * @return 업데이트 명령
      */
     public static UpdateCategoryCommand create(
-            @NonNull Long id,
-            @NonNull String displayName,
-            String description) {
+        @NonNull Long id,
+        @NonNull String displayName,
+        String description) {
         return UpdateCategoryCommand.builder()
-                .id(id)
-                .displayName(displayName)
-                .description(description)
-                .build();
+            .id(id)
+            .displayName(displayName)
+            .description(description)
+            .build();
     }
 
     /**
@@ -62,15 +62,15 @@ public class UpdateCategoryCommand {
      * @return 업데이트 명령
      */
     public static UpdateCategoryCommand createWithParent(
-            @NonNull Long id,
-            @NonNull String displayName,
-            String description,
-            Long parentCategoryId) {
+        @NonNull Long id,
+        @NonNull String displayName,
+        String description,
+        Long parentCategoryId) {
         return UpdateCategoryCommand.builder()
-                .id(id)
-                .displayName(displayName)
-                .description(description)
-                .parentCategoryId(parentCategoryId)
-                .build();
+            .id(id)
+            .displayName(displayName)
+            .description(description)
+            .parentCategoryId(parentCategoryId)
+            .build();
     }
 }
