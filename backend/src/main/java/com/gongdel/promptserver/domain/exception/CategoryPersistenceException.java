@@ -1,7 +1,5 @@
 package com.gongdel.promptserver.domain.exception;
 
-import lombok.Getter;
-
 /**
  * 카테고리 영속성 작업 중 발생하는 예외를 처리하는 클래스입니다.
  */

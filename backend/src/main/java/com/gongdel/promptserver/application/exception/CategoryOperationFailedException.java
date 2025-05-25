@@ -14,8 +14,8 @@ public class CategoryOperationFailedException extends ApplicationException {
      */
     public CategoryOperationFailedException(String message) {
         super(message,
-                ApplicationErrorCode.CATEGORY_OPERATION_FAILED,
-                HttpStatus.INTERNAL_SERVER_ERROR);
+            ApplicationErrorCode.CATEGORY_OPERATION_FAILED,
+            HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -26,8 +26,8 @@ public class CategoryOperationFailedException extends ApplicationException {
      */
     public CategoryOperationFailedException(String message, Throwable cause) {
         super(message,
-                cause,
-                ApplicationErrorCode.CATEGORY_OPERATION_FAILED,
-                HttpStatus.INTERNAL_SERVER_ERROR);
+            cause,
+            ApplicationErrorCode.CATEGORY_OPERATION_FAILED,
+            HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

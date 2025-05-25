@@ -38,10 +38,10 @@ public class GlobalExceptionHandler {
 
         ErrorCode errorCode = ex.getErrorCode();
         Map<String, Object> errorResponse = createErrorResponse(
-                errorCode.getClass().getSimpleName(),
-                ex.getMessage(),
-                errorCode.name(),
-                errorCode.getMessage());
+            errorCode.getClass().getSimpleName(),
+            ex.getMessage(),
+            errorCode.name(),
+            errorCode.getMessage());
 
         return new ResponseEntity<>(errorResponse, determineHttpStatus(ex));
     }
@@ -59,10 +59,10 @@ public class GlobalExceptionHandler {
 
 
         Map<String, Object> errorResponse = createErrorResponse(
-                ex.getErrorCode().getClass().getSimpleName(),
-                ex.getMessage(),
-                ex.getErrorCodeName(),
-                ex.getErrorCodeMessage());
+            ex.getErrorCode().getClass().getSimpleName(),
+            ex.getMessage(),
+            ex.getErrorCodeName(),
+            ex.getErrorCodeMessage());
 
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
     }
@@ -79,10 +79,10 @@ public class GlobalExceptionHandler {
         logException("Unexpected exception occurred", ex);
 
         Map<String, Object> errorResponse = createErrorResponse(
-                "INTERNAL_SERVER_ERROR",
-                "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
-                "SYSTEM_ERROR",
-                "서버 내부 오류");
+            "INTERNAL_SERVER_ERROR",
+            "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+            "SYSTEM_ERROR",
+            "서버 내부 오류");
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -115,7 +115,7 @@ public class GlobalExceptionHandler {
      * @return 오류 응답 맵
      */
     private Map<String, Object> createErrorResponse(String code, String message, String errorType,
-            String errorTypeDescription) {
+                                                    String errorTypeDescription) {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("timestamp", LocalDateTime.now().toString());
         errorResponse.put("code", code);

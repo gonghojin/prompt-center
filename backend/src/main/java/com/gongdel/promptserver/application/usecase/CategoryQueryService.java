@@ -60,8 +60,8 @@ public class CategoryQueryService implements CategoryQueryUseCase {
         } catch (Exception e) {
             log.error("Unexpected error while querying category by ID: {}", id, e);
             throw new CategoryOperationFailedException(
-                    "Error occurred during category operation: " + e.getMessage(),
-                    e);
+                "Error occurred during category operation: " + e.getMessage(),
+                e);
         }
     }
 
@@ -94,8 +94,8 @@ public class CategoryQueryService implements CategoryQueryUseCase {
         } catch (Exception e) {
             log.error("Unexpected error while querying category by name: {}", name, e);
             throw new CategoryOperationFailedException(
-                    "Error occurred during category operation: " + e.getMessage(),
-                    e);
+                "Error occurred during category operation: " + e.getMessage(),
+                e);
         }
     }
 
@@ -119,8 +119,8 @@ public class CategoryQueryService implements CategoryQueryUseCase {
         } catch (Exception e) {
             log.error("Unexpected error while querying all categories", e);
             throw new CategoryOperationFailedException(
-                    "Error occurred during category operation: " + e.getMessage(),
-                    e);
+                "Error occurred during category operation: " + e.getMessage(),
+                e);
         }
     }
 
@@ -145,8 +145,8 @@ public class CategoryQueryService implements CategoryQueryUseCase {
         } catch (Exception e) {
             log.error("Unexpected error while querying categories by system flag: {}", isSystem, e);
             throw new CategoryOperationFailedException(
-                    "Error occurred during category operation: " + e.getMessage(),
-                    e);
+                "Error occurred during category operation: " + e.getMessage(),
+                e);
         }
     }
 
@@ -170,8 +170,8 @@ public class CategoryQueryService implements CategoryQueryUseCase {
         } catch (Exception e) {
             log.error("Unexpected error while querying root categories", e);
             throw new CategoryOperationFailedException(
-                    "Error occurred during category operation: " + e.getMessage(),
-                    e);
+                "Error occurred during category operation: " + e.getMessage(),
+                e);
         }
     }
 
@@ -204,8 +204,8 @@ public class CategoryQueryService implements CategoryQueryUseCase {
         } catch (Exception e) {
             log.error("Unexpected error while querying subcategories for parent ID: {}", parentId, e);
             throw new CategoryOperationFailedException(
-                    "Error occurred during category operation: " + e.getMessage(),
-                    e);
+                "Error occurred during category operation: " + e.getMessage(),
+                e);
         }
     }
 }

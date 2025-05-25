@@ -1,16 +1,12 @@
 package com.gongdel.promptserver.domain.model;
 
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 /**
  * 팀 정보를 나타내는 도메인 모델 클래스입니다. 사용자 그룹을 관리합니다.

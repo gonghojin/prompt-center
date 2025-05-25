@@ -1,14 +1,11 @@
 package com.gongdel.promptserver.application.port.in;
 
-import com.gongdel.promptserver.domain.model.Category;
-import com.gongdel.promptserver.domain.model.PromptStatus;
-import com.gongdel.promptserver.domain.model.PromptTemplate;
-import com.gongdel.promptserver.domain.model.User;
-import com.gongdel.promptserver.domain.model.Visibility;
-import java.util.Optional;
-import java.util.UUID;
+import com.gongdel.promptserver.domain.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * 프롬프트 목록 조회를 위한 유스케이스 인터페이스
@@ -42,7 +39,7 @@ public interface PromptsQueryUseCase {
      * @return 프롬프트 템플릿 페이지
      */
     Page<PromptTemplate> findPromptsByVisibilityAndStatus(Visibility visibility, PromptStatus status,
-            Pageable pageable);
+                                                          Pageable pageable);
 
     /**
      * 카테고리와 상태로 프롬프트 템플릿 목록을 페이지네이션하여 조회합니다.
@@ -71,6 +68,6 @@ public interface PromptsQueryUseCase {
      * @return 프롬프트 템플릿 페이지
      */
     Page<PromptTemplate> searchPromptsByKeyword(
-            String keyword, PromptStatus status,
-            Pageable pageable);
+        String keyword, PromptStatus status,
+        Pageable pageable);
 }

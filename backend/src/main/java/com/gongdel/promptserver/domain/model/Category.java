@@ -68,7 +68,7 @@ public class Category extends BaseTimeEntity {
      * @param updatedAt      수정 일시
      */
     public Category(Long id, String name, String displayName, String description, Category parentCategory,
-            boolean isSystem, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                    boolean isSystem, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(createdAt, updatedAt);
         validateName(name);
         validateDisplayName(displayName);

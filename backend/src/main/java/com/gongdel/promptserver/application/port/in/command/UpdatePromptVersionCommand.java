@@ -1,13 +1,14 @@
 package com.gongdel.promptserver.application.port.in.command;
 
 import com.gongdel.promptserver.domain.model.PromptVersionActionType;
-import java.util.Map;
-import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * 프롬프트 버전 업데이트 요청을 전달하는 커맨드 객체입니다.

@@ -17,8 +17,8 @@ public class CategoryDuplicateNameException extends ApplicationException {
      */
     public CategoryDuplicateNameException(String name) {
         super("동일한 이름('" + name + "')의 카테고리가 이미 존재합니다.",
-                ApplicationErrorCode.CATEGORY_DUPLICATE_NAME,
-                HttpStatus.CONFLICT);
+            ApplicationErrorCode.CATEGORY_DUPLICATE_NAME,
+            HttpStatus.CONFLICT);
         this.domainException = new CategoryDuplicateNameDomainException(name);
     }
 

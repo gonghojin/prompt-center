@@ -2,16 +2,9 @@ package com.gongdel.promptserver.adapter.in.rest.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.*;
 
 /**
  * 새로운 프롬프트 생성 요청을 위한 DTO 클래스입니다.

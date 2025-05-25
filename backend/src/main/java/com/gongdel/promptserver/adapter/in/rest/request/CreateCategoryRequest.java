@@ -1,13 +1,9 @@
 package com.gongdel.promptserver.adapter.in.rest.request;
 
 import com.gongdel.promptserver.application.port.in.command.CreateCategoryCommand;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 /**
  * 카테고리 생성 요청 DTO
@@ -59,11 +55,11 @@ public class CreateCategoryRequest {
      */
     public CreateCategoryCommand toCommand() {
         return CreateCategoryCommand.builder()
-                .name(name)
-                .displayName(displayName)
-                .description(description)
-                .parentCategoryId(parentCategoryId)
-                .isSystem(isSystem)
-                .build();
+            .name(name)
+            .displayName(displayName)
+            .description(description)
+            .parentCategoryId(parentCategoryId)
+            .isSystem(isSystem)
+            .build();
     }
 }

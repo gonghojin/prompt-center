@@ -1,9 +1,10 @@
 package com.gongdel.promptserver.adapter.in.rest.response;
 
 import com.gongdel.promptserver.domain.model.User;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.UUID;
 
 /**
  * 사용자 정보를 클라이언트에 응답하기 위한 DTO 클래스입니다.
@@ -25,9 +26,9 @@ public class UserResponse {
      */
     public static UserResponse from(User user) {
         return UserResponse.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .build();
+            .id(user.getId())
+            .email(user.getEmail())
+            .name(user.getName())
+            .build();
     }
 }

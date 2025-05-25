@@ -11,11 +11,7 @@ import com.gongdel.promptserver.application.port.out.command.DeleteCategoryPort;
 import com.gongdel.promptserver.application.port.out.command.SaveCategoryPort;
 import com.gongdel.promptserver.application.port.out.command.UpdateCategoryPort;
 import com.gongdel.promptserver.application.port.out.query.LoadCategoryPort;
-import com.gongdel.promptserver.domain.exception.CategoryDomainException;
-import com.gongdel.promptserver.domain.exception.CategoryDuplicateNameDomainException;
-import com.gongdel.promptserver.domain.exception.CategoryErrorType;
-import com.gongdel.promptserver.domain.exception.CategoryNotFoundDomainException;
-import com.gongdel.promptserver.domain.exception.CategoryOperationException;
+import com.gongdel.promptserver.domain.exception.*;
 import com.gongdel.promptserver.domain.model.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,16 +62,16 @@ public class CategoryCommandService implements CategoryCommandUseCase {
                 Category parentCategory = findCategoryById(command.getParentCategoryId());
                 // 새 카테고리와 부모 카테고리 연결을 위한 새로운 객체 생성
                 categoryToSave = new Category(
-                        initialCategory.getName(),
-                        initialCategory.getDisplayName(),
-                        initialCategory.getDescription(),
-                        parentCategory);
+                    initialCategory.getName(),
+                    initialCategory.getDisplayName(),
+                    initialCategory.getDescription(),
+                    parentCategory);
             }
 
             // 카테고리 저장
             Category savedCategory = saveCategoryPort.saveCategory(categoryToSave);
             log.info("Category created successfully. ID: {}, Name: {}",
-                    savedCategory.getId(), savedCategory.getName());
+                savedCategory.getId(), savedCategory.getName());
             return savedCategory;
         } catch (CategoryDomainException e) {
             // 도메인 예외를 애플리케이션 예외로 변환
@@ -83,8 +79,8 @@ public class CategoryCommandService implements CategoryCommandUseCase {
         } catch (Exception e) {
             log.error("Failed to create category: {}", command.getName(), e);
             throw new CategoryOperationFailedException(
-                    "Error occurred during category operation: " + e.getMessage(),
-                    e);
+                "Error occurred during category operation: " + e.getMessage(),
+                e);
         }
     }
 
@@ -120,7 +116,7 @@ public class CategoryCommandService implements CategoryCommandUseCase {
             // 업데이트된 카테고리 저장
             Category updatedCategory = updateCategoryPort.updateCategory(existingCategory);
             log.info("Category updated successfully. ID: {}, Name: {}",
-                    updatedCategory.getId(), updatedCategory.getName());
+                updatedCategory.getId(), updatedCategory.getName());
 
             return updatedCategory;
         } catch (CategoryDomainException e) {
@@ -130,8 +126,8 @@ public class CategoryCommandService implements CategoryCommandUseCase {
             // 그 외 예외는 CategoryOperationFailedException으로 변환
             log.error("Failed to update category. ID: {}", command.getId(), e);
             throw new CategoryOperationFailedException(
-                    "Error occurred during category operation: " + e.getMessage(),
-                    e);
+                "Error occurred during category operation: " + e.getMessage(),
+                e);
         }
     }
 
@@ -161,8 +157,8 @@ public class CategoryCommandService implements CategoryCommandUseCase {
             // 그 외 예외는 CategoryOperationFailedException으로 변환
             log.error("Failed to delete category. ID: {}", id, e);
             throw new CategoryOperationFailedException(
-                    "Error occurred during category operation: " + e.getMessage(),
-                    e);
+                "Error occurred during category operation: " + e.getMessage(),
+                e);
         }
     }
 
@@ -191,18 +187,18 @@ public class CategoryCommandService implements CategoryCommandUseCase {
     // 카테고리 ID로 카테고리 조회
     private Category findCategoryById(Long id) {
         return loadCategoryPort.loadCategoryById(id)
-                .orElseThrow(() -> {
-                    log.warn("Category not found. ID: {}", id);
-                    return new CategoryNotFoundDomainException(id);
-                });
+            .orElseThrow(() -> {
+                log.warn("Category not found. ID: {}", id);
+                return new CategoryNotFoundDomainException(id);
+            });
     }
 
     // 순환 참조 검증
     private void validateNonCircularReference(Long categoryId, Long parentCategoryId) {
         if (categoryId.equals(parentCategoryId)) {
             throw new CategoryOperationException(
-                    CategoryErrorType.CIRCULAR_REFERENCE,
-                    "A category cannot have itself as parent category");
+                CategoryErrorType.CIRCULAR_REFERENCE,
+                "A category cannot have itself as parent category");
         }
     }
 }
