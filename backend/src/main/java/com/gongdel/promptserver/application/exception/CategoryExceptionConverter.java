@@ -37,8 +37,8 @@ public final class CategoryExceptionConverter {
         } else {
             // 기타 도메인 예외는 CategoryOperationFailedException으로 변환
             return new CategoryOperationFailedException(
-                    "Error occurred during category operation: " + e.getMessage(),
-                    e);
+                "Error occurred during category operation: " + e.getMessage(),
+                e);
         }
     }
 }

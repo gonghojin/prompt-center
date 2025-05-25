@@ -3,11 +3,13 @@ package com.gongdel.promptserver.application.exception;
 import com.gongdel.promptserver.domain.exception.PromptVersionDomainException;
 import com.gongdel.promptserver.domain.exception.PromptVersionNotFoundDomainException;
 import com.gongdel.promptserver.domain.exception.PromptVersionValidationDomainException;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.UUID;
+
 /**
- * 프롬프트 버전 도메인 예외를 애플리케이션 예외로 변환하는 유틸리티 클래스입니다. 헥사고날 아키텍처에서 도메인 계층의 예외를 애플리케이션 계층의 예외로 변환하는 책임을 담당합니다.
+ * 프롬프트 버전 도메인 예외를 애플리케이션 예외로 변환하는 유틸리티 클래스입니다.
+ * 헥사고날 아키텍처에서 도메인 계층의 예외를 애플리케이션 계층의 예외로 변환하는 책임을 담당합니다.
  */
 @Slf4j
 public final class PromptVersionExceptionConverter {

@@ -17,8 +17,8 @@ public class CategoryNotFoundException extends ApplicationException {
      */
     public CategoryNotFoundException(Long id) {
         super("ID가 " + id + "인 카테고리를 찾을 수 없습니다.",
-                ApplicationErrorCode.CATEGORY_NOT_FOUND,
-                HttpStatus.NOT_FOUND);
+            ApplicationErrorCode.CATEGORY_NOT_FOUND,
+            HttpStatus.NOT_FOUND);
         this.domainException = new CategoryNotFoundDomainException(id);
     }
 
@@ -29,8 +29,8 @@ public class CategoryNotFoundException extends ApplicationException {
      */
     public CategoryNotFoundException(String name) {
         super("이름이 '" + name + "'인 카테고리를 찾을 수 없습니다.",
-                ApplicationErrorCode.CATEGORY_NOT_FOUND,
-                HttpStatus.NOT_FOUND);
+            ApplicationErrorCode.CATEGORY_NOT_FOUND,
+            HttpStatus.NOT_FOUND);
         this.domainException = new CategoryNotFoundDomainException(name);
     }
 

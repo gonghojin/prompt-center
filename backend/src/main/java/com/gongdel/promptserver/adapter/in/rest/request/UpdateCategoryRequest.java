@@ -1,14 +1,10 @@
 package com.gongdel.promptserver.adapter.in.rest.request;
 
 import com.gongdel.promptserver.application.port.in.command.UpdateCategoryCommand;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
 /**
  * 카테고리 업데이트 요청 DTO
@@ -48,10 +44,10 @@ public class UpdateCategoryRequest {
      */
     public UpdateCategoryCommand toCommand(@NotNull Long id) {
         return UpdateCategoryCommand.builder()
-                .id(id)
-                .displayName(displayName)
-                .description(description)
-                .parentCategoryId(parentCategoryId)
-                .build();
+            .id(id)
+            .displayName(displayName)
+            .description(description)
+            .parentCategoryId(parentCategoryId)
+            .build();
     }
 }

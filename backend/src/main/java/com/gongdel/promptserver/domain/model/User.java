@@ -1,12 +1,9 @@
 package com.gongdel.promptserver.domain.model;
 
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 /**
  * 시스템 사용자를 나타내는 도메인 모델입니다. 사용자 식별 정보와 인증 정보, 역할을 포함합니다.

@@ -3,11 +3,11 @@ package com.gongdel.promptserver.adapter.in.rest.response;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gongdel.promptserver.domain.model.Category;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
@@ -88,18 +88,18 @@ public class CategoryResponse {
         }
 
         CategoryResponseBuilder builder = CategoryResponse.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .displayName(category.getDisplayName())
-                .description(category.getDescription())
-                .isSystem(category.isSystem())
-                .createdAt(category.getCreatedAt())
-                .updatedAt(category.getUpdatedAt());
+            .id(category.getId())
+            .name(category.getName())
+            .displayName(category.getDisplayName())
+            .description(category.getDescription())
+            .isSystem(category.isSystem())
+            .createdAt(category.getCreatedAt())
+            .updatedAt(category.getUpdatedAt());
 
         // 상위 카테고리가 있는 경우 ID와 이름을 설정
         if (category.getParentCategory() != null) {
             builder.parentCategoryId(category.getParentCategory().getId())
-                    .parentCategoryName(category.getParentCategory().getDisplayName());
+                .parentCategoryName(category.getParentCategory().getDisplayName());
         }
 
         return builder.build();

@@ -1,28 +1,16 @@
 package com.gongdel.promptserver.adapter.in.rest;
 
-import static com.gongdel.promptserver.application.constant.DevelopmentConstants.TEMP_USER_EMAIL;
-import static com.gongdel.promptserver.application.constant.DevelopmentConstants.TEMP_USER_NAME;
-import static com.gongdel.promptserver.application.constant.DevelopmentConstants.TEMP_USER_UUID;
-
 import com.gongdel.promptserver.adapter.in.rest.request.CreatePromptRequest;
 import com.gongdel.promptserver.adapter.in.rest.response.PromptResponse;
 import com.gongdel.promptserver.application.port.in.RegisterPromptUseCase;
 import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
 import com.gongdel.promptserver.application.util.PromptSchemaConverter;
-import com.gongdel.promptserver.domain.model.PromptStatus;
-import com.gongdel.promptserver.domain.model.PromptTemplate;
-import com.gongdel.promptserver.domain.model.User;
-import com.gongdel.promptserver.domain.model.UserRole;
-import com.gongdel.promptserver.domain.model.Visibility;
+import com.gongdel.promptserver.domain.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,6 +19,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import static com.gongdel.promptserver.application.constant.DevelopmentConstants.*;
 
 /**
  * 프롬프트 생성 등 명령성 작업을 처리하는 REST 컨트롤러입니다.
@@ -52,8 +47,8 @@ public class PromptCommandController {
      */
     @Operation(summary = "프롬프트 생성", description = "새로운 프롬프트를 생성합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "프롬프트 생성 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+        @ApiResponse(responseCode = "201", description = "프롬프트 생성 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청")
     })
     @PostMapping
     public ResponseEntity<PromptResponse> createPrompt(@Valid @RequestBody CreatePromptRequest request) {
@@ -71,11 +66,11 @@ public class PromptCommandController {
      */
     private User createTemporaryUser() {
         return User.builder()
-                .id(UUID.fromString(TEMP_USER_UUID))
-                .name(TEMP_USER_NAME)
-                .email(TEMP_USER_EMAIL)
-                .role(UserRole.ROLE_USER)
-                .build();
+            .id(UUID.fromString(TEMP_USER_UUID))
+            .name(TEMP_USER_NAME)
+            .email(TEMP_USER_EMAIL)
+            .role(UserRole.ROLE_USER)
+            .build();
     }
 
     /**
@@ -86,22 +81,22 @@ public class PromptCommandController {
      */
     private RegisterPromptCommand buildRegisterPromptCommand(CreatePromptRequest request) {
         User author = (request.getCreatedBy() != null)
-                ? toDomainUser(request.getCreatedBy())
-                : createTemporaryUser();
+            ? toDomainUser(request.getCreatedBy())
+            : createTemporaryUser();
         Map<String, Object> standardSchema = PromptSchemaConverter.convertToStandardSchema(
-                request.getVariablesSchema());
+            request.getVariablesSchema());
         return RegisterPromptCommand.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .content(request.getContent())
-                .createdBy(author)
-                .tags(request.getTags() != null ? request.getTags() : convertTagIdsToTags(request.getTagIds()))
-                .inputVariables(request.getInputVariables())
-                .variablesSchema(standardSchema)
-                .categoryId(request.getCategoryId())
-                .visibility(parseVisibility(request.getVisibility(), request.isPublic(), author))
-                .status(parseStatus(request.getStatus()))
-                .build();
+            .title(request.getTitle())
+            .description(request.getDescription())
+            .content(request.getContent())
+            .createdBy(author)
+            .tags(request.getTags() != null ? request.getTags() : convertTagIdsToTags(request.getTagIds()))
+            .inputVariables(request.getInputVariables())
+            .variablesSchema(standardSchema)
+            .categoryId(request.getCategoryId())
+            .visibility(parseVisibility(request.getVisibility(), request.isPublic(), author))
+            .status(parseStatus(request.getStatus()))
+            .build();
     }
 
     /**
@@ -112,11 +107,11 @@ public class PromptCommandController {
      */
     private User toDomainUser(CreatePromptRequest.UserDto userDto) {
         return User.builder()
-                .id(userDto.getId() != null ? UUID.fromString(userDto.getId()) : UUID.randomUUID())
-                .email(userDto.getEmail())
-                .name(userDto.getName())
-                .role(UserRole.ROLE_USER)
-                .build();
+            .id(userDto.getId() != null ? UUID.fromString(userDto.getId()) : UUID.randomUUID())
+            .email(userDto.getEmail())
+            .name(userDto.getName())
+            .role(UserRole.ROLE_USER)
+            .build();
     }
 
     /**
@@ -170,7 +165,7 @@ public class PromptCommandController {
             return Collections.emptySet();
         }
         return tagIds.stream()
-                .map(UUID::toString)
-                .collect(java.util.stream.Collectors.toSet());
+            .map(UUID::toString)
+            .collect(java.util.stream.Collectors.toSet());
     }
 }

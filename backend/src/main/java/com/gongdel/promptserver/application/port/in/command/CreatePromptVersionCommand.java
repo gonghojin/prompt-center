@@ -1,11 +1,12 @@
 package com.gongdel.promptserver.application.port.in.command;
 
 import com.gongdel.promptserver.domain.model.PromptVersionActionType;
-import java.util.Map;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * 프롬프트 버전 생성 명령 객체

@@ -32,7 +32,7 @@ public abstract class ApplicationException extends RuntimeException {
      * @param httpStatus HTTP 상태 코드
      */
     protected ApplicationException(String message, Throwable cause, ApplicationErrorCode errorCode,
-            HttpStatus httpStatus) {
+                                   HttpStatus httpStatus) {
         super(message, cause);
         this.errorCode = errorCode;
         this.httpStatus = httpStatus;

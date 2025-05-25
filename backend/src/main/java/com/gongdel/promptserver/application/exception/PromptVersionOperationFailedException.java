@@ -16,8 +16,8 @@ public class PromptVersionOperationFailedException extends ApplicationException 
      */
     public PromptVersionOperationFailedException(String message) {
         super(message,
-                ApplicationErrorCode.PROMPT_VERSION_OPERATION_FAILED,
-                HttpStatus.INTERNAL_SERVER_ERROR);
+            ApplicationErrorCode.PROMPT_VERSION_OPERATION_FAILED,
+            HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -28,8 +28,8 @@ public class PromptVersionOperationFailedException extends ApplicationException 
      */
     public PromptVersionOperationFailedException(String message, Throwable cause) {
         super(message,
-                cause,
-                ApplicationErrorCode.PROMPT_VERSION_OPERATION_FAILED,
-                HttpStatus.INTERNAL_SERVER_ERROR);
+            cause,
+            ApplicationErrorCode.PROMPT_VERSION_OPERATION_FAILED,
+            HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

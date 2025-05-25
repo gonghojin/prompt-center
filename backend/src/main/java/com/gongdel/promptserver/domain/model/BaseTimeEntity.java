@@ -1,7 +1,8 @@
 package com.gongdel.promptserver.domain.model;
 
-import java.time.LocalDateTime;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
 
 /**
  * 모든 도메인 모델의 기본 클래스
