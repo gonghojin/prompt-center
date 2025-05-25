@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { PromptTemplate } from '@/types';
 
@@ -110,4 +112,4 @@ const PromptForm: React.FC<PromptFormProps> = ({ mode, id }) => {
   );
 };
 
-export default PromptForm; 
+export default PromptForm;

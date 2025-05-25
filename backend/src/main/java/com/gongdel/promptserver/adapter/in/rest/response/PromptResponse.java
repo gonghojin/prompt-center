@@ -48,8 +48,8 @@ public class PromptResponse {
             .isPublic(promptTemplate.isPublic())
             .createdAt(promptTemplate.getCreatedAt())
             .updatedAt(promptTemplate.getUpdatedAt())
-            .viewCount(0) // 기본값 설정 또는 필요시 추가 메서드 구현
-            .favoriteCount(0) // 기본값 설정 또는 필요시 추가 메서드 구현
+            .viewCount(promptTemplate.getStats().getViewCount())
+            .favoriteCount(promptTemplate.getStats().getFavoriteCount())
             .categoryId(promptTemplate.getCategoryId())
             .visibility(promptTemplate.getVisibility().name())
             .status(promptTemplate.getStatus().name())

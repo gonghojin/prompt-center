@@ -17,6 +17,8 @@ export interface PromptTemplate {
   updatedAt: string;
   version: number;
   isPublic: boolean;
+  favoriteCount: number;
+  viewCount: number;
 }
 
 export interface Category {
@@ -28,4 +30,4 @@ export interface Category {
 export interface Tag {
   id: string;
   name: string;
-} 
+}
