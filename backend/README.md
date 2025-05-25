@@ -210,3 +210,34 @@ jacocoTestCoverageVerification {
 ## 테스트 제외 설정
 
 특정 클래스나 패키지를 테스트 커버리지 측정에서 제외하려면 `build.gradle` 파일의 `jacocoTestCoverageVerification` 태스크에서 `excludes` 목록을 수정하세요.
+
+## Backend Server
+
+### 개발 환경 설정
+
+#### 임시 사용자 설정
+현재 사용자 관리 시스템이 개발 중이므로, 개발 환경에서는 임시 시스템 사용자를 사용합니다:
+- ID: 1
+- UUID: 00000000-0000-0000-0000-000000000000
+- Email: temp@system.local
+- Name: System User
+
+이 임시 사용자는 자동으로 데이터베이스에 생성되며, 프롬프트 템플릿 생성 시 기본 사용자로 사용됩니다.
+
+> **주의**: 이 임시 사용자는 개발 환경에서만 사용되어야 합니다. 운영 환경 배포 전에 반드시 실제 사용자 관리 시스템으로 교체해야 합니다.
+
+### 실행 방법
+
+## 🛠️ 마이그레이션 체크섬 오류(Checksum mismatch) 해결
+
+Flyway 마이그레이션 파일을 수정한 경우, 아래 명령어로 체크섬 오류를 복구할 수 있습니다.
+
+```bash
+./gradlew flywayRepair \
+  -Dflyway.url=jdbc:postgresql://localhost:5432/prompt_center \
+  -Dflyway.user=<DB_USER> \
+  -Dflyway.password=<DB_PASSWORD>
+```
+
+- `<DB_USER>`, `<DB_PASSWORD>`는 환경에 맞게 입력하세요.
+- Docker Compose 기본값은 `postgres` / `postgres` 입니다.

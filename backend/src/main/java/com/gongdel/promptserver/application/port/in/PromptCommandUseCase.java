@@ -8,7 +8,7 @@ import com.gongdel.promptserver.domain.model.PromptTemplate;
  * 이 인터페이스는 헥사고널 아키텍처의 인바운드 포트로서,
  * 외부 어댑터가 애플리케이션 코어와 상호작용하기 위해 사용됩니다.
  */
-public interface RegisterPromptUseCase {
+public interface PromptCommandUseCase {
 
     /**
      * 새로운 프롬프트 템플릿을 등록합니다.

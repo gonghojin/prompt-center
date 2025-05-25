@@ -1,9 +1,9 @@
-package com.gongdel.promptserver.application.usecase;
+package com.gongdel.promptserver.application.usecase.command;
 
 import com.gongdel.promptserver.application.constant.DevelopmentConstants;
 import com.gongdel.promptserver.application.exception.PromptErrorType;
 import com.gongdel.promptserver.application.exception.PromptRegistrationException;
-import com.gongdel.promptserver.application.port.in.RegisterPromptUseCase;
+import com.gongdel.promptserver.application.port.in.PromptCommandUseCase;
 import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
 import com.gongdel.promptserver.application.port.out.PromptTemplateTagRelationPort;
 import com.gongdel.promptserver.application.port.out.SavePromptPort;
@@ -31,7 +31,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(rollbackFor = {PromptRegistrationException.class, Exception.class})
-public class RegisterPromptService implements RegisterPromptUseCase {
+public class PromptCommandService implements PromptCommandUseCase {
 
     private final SavePromptPort savePromptPort;
     private final SavePromptVersionPort savePromptVersionPort;
