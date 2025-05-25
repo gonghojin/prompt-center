@@ -1,4 +1,4 @@
-package com.gongdel.promptserver.application.usecase;
+package com.gongdel.promptserver.application.usecase.query;
 
 import com.gongdel.promptserver.application.port.out.query.FindCategoriesPort;
 import com.gongdel.promptserver.application.port.out.query.LoadCategoryPort;
@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

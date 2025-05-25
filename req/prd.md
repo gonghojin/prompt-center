@@ -43,63 +43,18 @@
 
 ## 🧪 테스트 전략 (Testing Strategy)
 
-- 🧱 기본 폴더 구조 (Hexagonal / Clean Architecture 기반)
-/src/main/java/com/gongdel/promptserver
-│
-├── domain/
-│   ├── model/                     # Entity, VO, Enum 등 순수 도메인 모델
-│   │   └── PromptTemplate.java
-│   │   └── PromptCategory.java
-│   │   └── User.java
-│   └── service/                  # 도메인 로직 정의 (비즈니스 정책)
-│       └── PromptDomainService.java
-│
-├── application/
-│   ├── port/
-│   │   ├── in/                   # UseCase 정의 (인터페이스)
-│   │   │   └── RegisterPromptUseCase.java
-│   │   └── out/                  # 외부 시스템 의존 인터페이스
-│   │       └── LoadPromptPort.java
-│   └── usecase/                  # UseCase 구현체
-│       └── RegisterPromptService.java
-│
-├── adapter/
-│   ├── in/
-│   │   └── rest/                 # API Controller 등 수신 어댑터
-│   │       └── PromptController.java
-│   └── out/
-│       ├── persistence/         # DB 저장소 어댑터
-│       │   └── PromptJpaEntity.java
-│       │   └── PromptJpaRepository.java
-│       │   └── PromptPersistenceAdapter.java
-│       └── client/              # 외부 API 연동 어댑터 (예: Notion, Slack)
-│           └── NotionClient.java
-│
-├── config/                      # 설정 클래스, 의존성 주입, Security, Swagger 등
-│   └── WebSecurityConfig.java
-│   └── OpenApiConfig.java
-│   └── PersistenceConfig.java
-│
-├── common/                      # 전역 공통 요소 (에러 처리, Response Wrapper 등)
-│   ├── exception/
-│   └── response/
-│   └── logging/
-│
-└── PromptServerApplication.java
-
-
-- **단위 테스트**:  
-  - DTO 및 도메인 서비스 단위 검증  
+- **단위 테스트**:
+  - DTO 및 도메인 서비스 단위 검증
   - JUnit5 + Mockito
 
-- **통합 테스트**:  
-  - REST API 레벨 통합 테스트  
+- **통합 테스트**:
+  - REST API 레벨 통합 테스트
   - Testcontainers 사용 예정
 
-- **E2E 테스트**:  
+- **E2E 테스트**:
   - Cypress 기반 사용자 시나리오 자동화 테스트
 
-- **자동화 도구**:  
+- **자동화 도구**:
   - GitLab CI 기반 테스트 자동 실행 및 배포 전 체크
 
 ---
@@ -112,6 +67,3 @@
 - **기타 도구**: Swagger (OpenAPI), GitLab, Docker, Redis (세션 캐시)
 
 ---
-
-## 📁 폴더 구조 (File Structure)
-

@@ -1,4 +1,4 @@
-package com.gongdel.promptserver.application.usecase;
+package com.gongdel.promptserver.application.usecase.query;
 
 import com.gongdel.promptserver.application.exception.PromptVersionExceptionConverter;
 import com.gongdel.promptserver.application.exception.PromptVersionOperationFailedException;

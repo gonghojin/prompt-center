@@ -1,11 +1,9 @@
-package com.gongdel.promptserver.application.usecase;
+package com.gongdel.promptserver.application.usecase.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -17,8 +15,6 @@ import com.gongdel.promptserver.application.port.out.SavePromptPort;
 import com.gongdel.promptserver.application.port.out.SaveTagPort;
 import com.gongdel.promptserver.application.port.out.TagPort;
 import com.gongdel.promptserver.application.port.out.command.SavePromptVersionPort;
-import com.gongdel.promptserver.application.usecase.command.PromptCommandService;
-import com.gongdel.promptserver.domain.exception.PromptValidationException;
 import com.gongdel.promptserver.domain.model.PromptTemplate;
 import com.gongdel.promptserver.domain.model.PromptVersion;
 import com.gongdel.promptserver.domain.model.Tag;
