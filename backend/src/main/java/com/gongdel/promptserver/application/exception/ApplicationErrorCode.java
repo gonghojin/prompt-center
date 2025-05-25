@@ -13,6 +13,8 @@ public enum ApplicationErrorCode implements ErrorCode {
     PROMPT_PERSISTENCE_ERROR(1001, "프롬프트 저장 실패"),
     PROMPT_TAG_PROCESSING_ERROR(1002, "프롬프트 태그 처리 실패"),
     PROMPT_INSUFFICIENT_PERMISSION(1003, "프롬프트 관련 권한 부족"),
+    PROMPT_VERSION_NOT_FOUND(1004, "프롬프트 버전을 찾을 수 없습니다"),
+    PROMPT_VERSION_OPERATION_FAILED(1005, "프롬프트 버전 작업을 수행할 수 없습니다"),
     PROMPT_UNKNOWN_ERROR(1999, "알 수 없는 프롬프트 관련 오류"),
 
     // 카테고리 관련 오류 (2000-2999)
