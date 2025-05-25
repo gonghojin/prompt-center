@@ -2,7 +2,7 @@ package com.gongdel.promptserver.adapter.in.rest;
 
 import com.gongdel.promptserver.adapter.in.rest.request.CreatePromptRequest;
 import com.gongdel.promptserver.adapter.in.rest.response.PromptResponse;
-import com.gongdel.promptserver.application.port.in.RegisterPromptUseCase;
+import com.gongdel.promptserver.application.port.in.PromptCommandUseCase;
 import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
 import com.gongdel.promptserver.application.util.PromptSchemaConverter;
 import com.gongdel.promptserver.domain.model.*;
@@ -37,7 +37,7 @@ import static com.gongdel.promptserver.application.constant.DevelopmentConstants
 @RequiredArgsConstructor
 public class PromptCommandController {
 
-    private final RegisterPromptUseCase registerPromptUseCase;
+    private final PromptCommandUseCase registerPromptUseCase;
 
     /**
      * 새로운 프롬프트를 생성합니다.
