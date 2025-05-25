@@ -1,53 +1,28 @@
-import PromptList from '@/components/prompt/PromptList';
-
-// 임시 데이터 (나중에 API 연동으로 대체)
-const mockPrompts = [
-  {
-    id: 1,
-    title: "ChatGPT 프롬프트 템플릿",
-    description: "ChatGPT를 위한 효과적인 프롬프트 작성 가이드",
-    content: "당신은 전문가입니다...",
-    category: "AI",
-    tags: ["ChatGPT", "AI", "프롬프트"],
-    createdAt: "2024-03-15T00:00:00Z",
-    updatedAt: "2024-03-15T00:00:00Z",
-    author: {
-      id: 1,
-      username: "admin"
-    }
-  },
-  {
-    id: 2,
-    title: "Claude 프롬프트 템플릿",
-    description: "Claude AI를 위한 최적화된 프롬프트 모음",
-    content: "당신은 Claude AI입니다...",
-    category: "AI",
-    tags: ["Claude", "AI", "프롬프트"],
-    createdAt: "2024-03-15T00:00:00Z",
-    updatedAt: "2024-03-15T00:00:00Z",
-    author: {
-      id: 1,
-      username: "admin"
-    }
-  }
-];
+import PromptPage from '@/components/features/PromptPage';
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-4xl font-bold text-center mb-8 text-gray-900">
-          Prompt Center
-        </h1>
-        <p className="text-center text-lg mb-12 text-gray-600">
-          프롬프트 템플릿 중앙화 서버
-        </p>
-        
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-800">최근 프롬프트</h2>
-          <PromptList prompts={mockPrompts} />
+        <div className="relative flex flex-col items-center mb-8">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-4xl select-none" aria-hidden="true">💡</span>
+          <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
+            Prompt Center
+          </h1>
+          <p className="text-center text-lg mt-4 bg-gray-100 rounded-lg px-4 py-2 text-blue-700 shadow-sm">
+            프롬프트 템플릿 중앙화 서버
+          </p>
+        </div>
+
+        <div className="mb-8 bg-white rounded-xl shadow p-6">
+          <div className="flex items-center mb-4">
+            <span className="text-2xl mr-2" aria-hidden="true">🕒</span>
+            <h2 className="text-2xl font-semibold text-gray-800">최근 프롬프트</h2>
+          </div>
+          <div className="h-1 w-16 bg-gradient-to-r from-blue-400 to-purple-400 rounded mb-6" />
+          <PromptPage />
         </div>
       </div>
     </main>
   );
-} 
+}

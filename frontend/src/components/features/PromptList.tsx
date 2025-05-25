@@ -1,37 +1,45 @@
-import React from 'react';
+"use client";
+import React, { useEffect, useState } from 'react';
 import PromptCard from './PromptCard';
 // import usePrompt from '@/hooks/usePrompt';
 import { PromptTemplate } from '@/types';
+import { fetchPrompts } from '@/api/prompts';
 
-// 임시 mock 데이터
-const mockPrompts: PromptTemplate[] = [
-  {
-    id: '1',
-    title: 'API 설계 프롬프트',
-    content: 'RESTful API 설계 가이드라인을 작성하세요.',
-    description: '백엔드 개발자를 위한 API 설계 템플릿',
-    category: '백엔드',
-    tags: ['API', 'REST'],
-    author: { id: '1', email: 'admin@example.com', name: '관리자', role: 'ADMIN' },
-    createdAt: '2024-05-15T12:00:00Z',
-    updatedAt: '2024-05-15T12:00:00Z',
-    version: 1,
-    isPublic: true,
-  },
-  // 추가 mock 데이터 가능
-];
+interface PromptListProps {
+  onSelect: (id: string) => void;
+}
 
-const PromptList: React.FC = () => {
-  // const { prompts, loading } = usePrompt();
-  // if (loading) return <div>로딩 중...</div>;
+const PromptList: React.FC<PromptListProps> = ({ onSelect }) => {
+  const [prompts, setPrompts] = useState<PromptTemplate[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchPrompts();
+        setPrompts(data);
+      } catch (err: any) {
+        setError(err.message || '알 수 없는 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  if (loading) return <div>로딩 중...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
 
   return (
     <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-      {mockPrompts.map((prompt) => (
-        <PromptCard key={prompt.id} prompt={prompt} />
+      {prompts.map((prompt) => (
+        <PromptCard key={prompt.id} prompt={prompt} onSelect={onSelect} />
       ))}
     </div>
   );
 };
 
-export default PromptList; 
+export default PromptList;
