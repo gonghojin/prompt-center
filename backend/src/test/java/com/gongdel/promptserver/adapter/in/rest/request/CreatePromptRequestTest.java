@@ -45,8 +45,6 @@ class CreatePromptRequestTest {
                 .title(title)
                 .description(description)
                 .content(content)
-                .tagIds(tagIds)
-                .isPublic(isPublic)
                 .build();
 
         // then
@@ -54,8 +52,6 @@ class CreatePromptRequestTest {
         assertThat(request.getTitle()).isEqualTo(title);
         assertThat(request.getDescription()).isEqualTo(description);
         assertThat(request.getContent()).isEqualTo(content);
-        assertThat(request.getTagIds()).isEqualTo(tagIds);
-        assertThat(request.isPublic()).isEqualTo(isPublic);
 
         // 유효성 검증
         Set<ConstraintViolation<CreatePromptRequest>> violations = validator.validate(request);
@@ -78,16 +74,12 @@ class CreatePromptRequestTest {
         request.setTitle(title);
         request.setDescription(description);
         request.setContent(content);
-        request.setTagIds(tagIds);
-        request.setPublic(isPublic);
 
         // then
         assertThat(request).isNotNull();
         assertThat(request.getTitle()).isEqualTo(title);
         assertThat(request.getDescription()).isEqualTo(description);
         assertThat(request.getContent()).isEqualTo(content);
-        assertThat(request.getTagIds()).isEqualTo(tagIds);
-        assertThat(request.isPublic()).isEqualTo(isPublic);
 
         // 유효성 검증
         Set<ConstraintViolation<CreatePromptRequest>> violations = validator.validate(request);
@@ -104,8 +96,6 @@ class CreatePromptRequestTest {
                 .build();
 
         // then
-        assertThat(request.getTagIds()).isNotNull();
-        assertThat(request.getTagIds()).isEmpty();
     }
 
     @Nested

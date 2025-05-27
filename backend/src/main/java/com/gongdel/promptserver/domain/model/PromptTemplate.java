@@ -1,5 +1,6 @@
 package com.gongdel.promptserver.domain.model;
 
+import com.gongdel.promptserver.adapter.in.rest.request.CreatePromptRequest.CreatePromptRequestBuilder;
 import com.gongdel.promptserver.domain.exception.PromptValidationException;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
@@ -10,10 +11,11 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * 프롬프트 템플릿을 나타내는 도메인 모델 클래스입니다. 모델 문서에 정의된 엔티티 구조에 맞춰 구현되었으며, 프롬프트 템플릿의 생성, 수정, 상태 관리 기능을 제공합니다.
+ * 프롬프트 템플릿을 나타내는 도메인 모델 클래스입니다. 모델 문서에 정의된 엔티티 구조에 맞춰 구현되었으며, 프롬프트 템플릿의 생성, 수정,
+ * 상태 관리 기능을 제공합니다.
  */
 @Getter
-@ToString(exclude = {"description"})
+@ToString(exclude = { "description" })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id")
 public class PromptTemplate extends BaseTimeEntity {
@@ -34,7 +36,6 @@ public class PromptTemplate extends BaseTimeEntity {
     private Visibility visibility;
     private PromptStatus status;
     private String description;
-    private List<String> inputVariables;
 
     // 관계 도메인 객체 필드 추가
     private User createdBy;
@@ -43,47 +44,24 @@ public class PromptTemplate extends BaseTimeEntity {
     private PromptVersion version;
     private PromptStats stats;
 
-    /**
-     * 모든 필드를 초기화하는 생성자입니다.
-     *
-     * @param id               프롬프트 고유 식별자
-     * @param uuid             외부 노출용 UUID
-     * @param title            프롬프트 제목
-     * @param currentVersionId 현재 사용 중인 버전 ID
-     * @param categoryId       카테고리 ID
-     * @param createdById      생성자 ID
-     * @param visibility       가시성(공개/팀/비공개)
-     * @param status           템플릿 상태
-     * @param description      프롬프트 설명
-     * @param inputVariables   입력 변수 목록
-     * @param createdAt        생성 일시
-     * @param updatedAt        수정 일시
-     * @param createdBy        생성자 객체
-     * @param category         카테고리 객체
-     * @param tags             태그 목록
-     * @param version          현재 프롬프트 버전
-     * @param stats            프롬프트 통계 객체
-     * @throws PromptValidationException 유효성 검증에 실패한 경우
-     */
     @Builder
     public PromptTemplate(
-        Long id,
-        UUID uuid,
-        String title,
-        Long currentVersionId,
-        Long categoryId,
-        Long createdById,
-        Visibility visibility,
-        PromptStatus status,
-        String description,
-        List<String> inputVariables,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        User createdBy,
-        Category category,
-        List<Tag> tags,
-        PromptVersion version,
-        PromptStats stats) throws PromptValidationException {
+            Long id,
+            UUID uuid,
+            String title,
+            Long currentVersionId,
+            Long categoryId,
+            Long createdById,
+            Visibility visibility,
+            PromptStatus status,
+            String description,
+            User createdBy,
+            Category category,
+            List<Tag> tags,
+            PromptVersion version,
+            PromptStats stats,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt) {
         super(createdAt, updatedAt);
 
         // 각 필드에 대한 유효성 검증 수행
@@ -101,7 +79,6 @@ public class PromptTemplate extends BaseTimeEntity {
         this.visibility = initializeVisibility(visibility);
         this.status = initializeStatus(status);
         this.description = description;
-        this.inputVariables = initializeInputVariables(inputVariables);
 
         // 관계 도메인 객체 초기화
         this.createdBy = createdBy;
@@ -111,7 +88,7 @@ public class PromptTemplate extends BaseTimeEntity {
         this.stats = stats != null ? stats : new PromptStats();
 
         log.debug("Created prompt template: id={}, title={}, createdById={}, hasVersion={}",
-            this.id, this.title, this.createdById, this.currentVersionId != null);
+                this.id, this.title, this.createdById, this.currentVersionId != null);
     }
 
     /**
@@ -123,17 +100,15 @@ public class PromptTemplate extends BaseTimeEntity {
      * @param visibility       업데이트할 가시성
      * @param status           업데이트할 상태
      * @param description      업데이트할 설명
-     * @param inputVariables   업데이트할 입력 변수 목록
      * @throws PromptValidationException 유효성 검증에 실패한 경우
      */
     public void update(
-        String title,
-        Long currentVersionId,
-        Long categoryId,
-        Visibility visibility,
-        PromptStatus status,
-        String description,
-        List<String> inputVariables) throws PromptValidationException {
+            String title,
+            Long currentVersionId,
+            Long categoryId,
+            Visibility visibility,
+            PromptStatus status,
+            String description) throws PromptValidationException {
 
         // 유효성 검증은 각 필드별로 개별적으로 수행
         validateTitle(title);
@@ -146,12 +121,11 @@ public class PromptTemplate extends BaseTimeEntity {
         this.visibility = initializeVisibility(visibility);
         this.status = initializeStatus(status);
         this.description = description;
-        updateInputVariables(inputVariables);
 
         updateModifiedTime();
 
         log.debug("Updated prompt template: id={}, title={}, status={}, versionId={}, categoryId={}",
-            this.id, this.title, this.status, this.currentVersionId, this.categoryId);
+                this.id, this.title, this.status, this.currentVersionId, this.categoryId);
     }
 
     /**
@@ -185,18 +159,6 @@ public class PromptTemplate extends BaseTimeEntity {
     }
 
     /**
-     * 입력 변수 목록을 초기화합니다. null인 경우 빈 리스트를 생성합니다.
-     *
-     * @param inputVariables 초기화할 입력 변수 목록
-     * @return 초기화된 입력 변수 목록
-     */
-    private List<String> initializeInputVariables(List<String> inputVariables) {
-        return inputVariables != null
-            ? new ArrayList<>(inputVariables)
-            : new ArrayList<>();
-    }
-
-    /**
      * 제목의 유효성을 검증합니다.
      *
      * @param title 검증할 제목
@@ -209,7 +171,7 @@ public class PromptTemplate extends BaseTimeEntity {
 
         if (title.length() > MAX_TITLE_LENGTH) {
             throw new PromptValidationException(
-                String.format("제목은 %d자를 초과할 수 없습니다", MAX_TITLE_LENGTH));
+                    String.format("제목은 %d자를 초과할 수 없습니다", MAX_TITLE_LENGTH));
         }
     }
 
@@ -257,29 +219,8 @@ public class PromptTemplate extends BaseTimeEntity {
     private void validateDescription(String description) throws PromptValidationException {
         if (description != null && description.length() > MAX_DESCRIPTION_LENGTH) {
             throw new PromptValidationException(
-                String.format("설명은 %d자를 초과할 수 없습니다", MAX_DESCRIPTION_LENGTH));
+                    String.format("설명은 %d자를 초과할 수 없습니다", MAX_DESCRIPTION_LENGTH));
         }
-    }
-
-    /**
-     * 입력 변수 목록을 업데이트합니다.
-     *
-     * @param inputVariables 업데이트할 입력 변수 목록
-     */
-    private void updateInputVariables(List<String> inputVariables) {
-        this.inputVariables.clear();
-        if (inputVariables != null) {
-            this.inputVariables.addAll(inputVariables);
-        }
-    }
-
-    /**
-     * 프롬프트 템플릿의 입력 변수 목록을 불변 리스트로 반환합니다.
-     *
-     * @return 입력 변수 목록
-     */
-    public List<String> getInputVariables() {
-        return Collections.unmodifiableList(inputVariables);
     }
 
     /**

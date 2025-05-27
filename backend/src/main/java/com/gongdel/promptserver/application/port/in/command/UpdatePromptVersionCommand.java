@@ -1,5 +1,6 @@
 package com.gongdel.promptserver.application.port.in.command;
 
+import com.gongdel.promptserver.domain.model.InputVariable;
 import com.gongdel.promptserver.domain.model.PromptVersionActionType;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,7 +8,7 @@ import lombok.Getter;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -52,7 +53,8 @@ public class UpdatePromptVersionCommand {
     /**
      * 프롬프트 변수 정의(JSON 스키마, 선택)
      */
-    private final Map<String, Object> variables;
+    private List<InputVariable> inputVariables;
+
     /**
      * 프롬프트 버전 작업 유형 (필수)
      */
@@ -98,7 +100,7 @@ public class UpdatePromptVersionCommand {
         @NotBlank String content,
         String changes,
         @NotNull Long createdById,
-        Map<String, Object> variables,
+        List<InputVariable> inputVariables,
         @NotNull PromptVersionActionType actionType,
         @NotNull UUID uuid) {
         return UpdatePromptVersionCommand.builder()
@@ -108,7 +110,7 @@ public class UpdatePromptVersionCommand {
             .content(content)
             .changes(changes)
             .createdById(createdById)
-            .variables(variables)
+            .inputVariables(inputVariables)
             .actionType(actionType)
             .uuid(uuid)
             .build();

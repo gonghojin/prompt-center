@@ -1,10 +1,10 @@
 package com.gongdel.promptserver.adapter.in.rest;
 
 import com.gongdel.promptserver.adapter.in.rest.request.CreatePromptRequest;
+import com.gongdel.promptserver.adapter.in.rest.request.InputVariableDto;
 import com.gongdel.promptserver.adapter.in.rest.response.PromptResponse;
 import com.gongdel.promptserver.application.port.in.PromptCommandUseCase;
 import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
-import com.gongdel.promptserver.application.util.PromptSchemaConverter;
 import com.gongdel.promptserver.domain.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -83,18 +83,22 @@ public class PromptCommandController {
         User author = (request.getCreatedBy() != null)
             ? toDomainUser(request.getCreatedBy())
             : createTemporaryUser();
-        Map<String, Object> standardSchema = PromptSchemaConverter.convertToStandardSchema(
-            request.getVariablesSchema());
+        List<InputVariable> inputVariables = request
+            .getInputVariables() != null
+            ? request.getInputVariables().stream()
+            .map(InputVariableDto::toDomain)
+            .toList()
+            : List.of();
+
         return RegisterPromptCommand.builder()
             .title(request.getTitle())
             .description(request.getDescription())
             .content(request.getContent())
             .createdBy(author)
-            .tags(request.getTags() != null ? request.getTags() : convertTagIdsToTags(request.getTagIds()))
-            .inputVariables(request.getInputVariables())
-            .variablesSchema(standardSchema)
+            .tags(request.getTags())
+            .inputVariables(inputVariables)
             .categoryId(request.getCategoryId())
-            .visibility(parseVisibility(request.getVisibility(), request.isPublic(), author))
+            .visibility(parseVisibility(request.getVisibility(), author))
             .status(parseStatus(request.getStatus()))
             .build();
     }
@@ -107,7 +111,7 @@ public class PromptCommandController {
      */
     private User toDomainUser(CreatePromptRequest.UserDto userDto) {
         return User.builder()
-            .id(userDto.getId() != null ? UUID.fromString(userDto.getId()) : UUID.randomUUID())
+            .id(userDto.getId() != null ? userDto.getId() : UUID.randomUUID())
             .email(userDto.getEmail())
             .name(userDto.getName())
             .role(UserRole.ROLE_USER)
@@ -118,11 +122,10 @@ public class PromptCommandController {
      * 가시성 파싱 (문자열, isPublic, 팀 여부 등)
      *
      * @param visibility 가시성 문자열
-     * @param isPublic   공개 여부
      * @param author     작성자
      * @return Visibility 열거형
      */
-    private Visibility parseVisibility(String visibility, boolean isPublic, User author) {
+    private Visibility parseVisibility(String visibility, User author) {
         if (visibility != null && !visibility.isBlank()) {
             try {
                 return Visibility.valueOf(visibility.toUpperCase());
@@ -130,8 +133,6 @@ public class PromptCommandController {
                 // 무시하고 기본값 처리
             }
         }
-        if (isPublic)
-            return Visibility.PUBLIC;
         if (author.getTeam() != null)
             return Visibility.TEAM;
         return Visibility.PRIVATE;

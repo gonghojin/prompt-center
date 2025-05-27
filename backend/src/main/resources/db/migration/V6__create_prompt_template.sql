@@ -10,8 +10,7 @@ CREATE TABLE prompt_templates (
     updated_at TIMESTAMP NOT NULL DEFAULT now(),
     visibility VARCHAR(32) NOT NULL,
     status VARCHAR(32) NOT NULL,
-    description TEXT,
-    input_variables TEXT
+    description TEXT
     -- FK는 나중에 추가
 );
 
