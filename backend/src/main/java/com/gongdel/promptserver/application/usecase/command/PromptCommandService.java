@@ -30,7 +30,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(rollbackFor = {PromptRegistrationException.class, Exception.class})
+@Transactional(rollbackFor = { PromptRegistrationException.class, Exception.class })
 public class PromptCommandService implements PromptCommandUseCase {
 
     private final SavePromptPort savePromptPort;
@@ -47,7 +47,6 @@ public class PromptCommandService implements PromptCommandUseCase {
      * @return 등록된 프롬프트 템플릿
      * @throws PromptRegistrationException 프롬프트 등록 과정에서 오류가 발생한 경우
      */
-    @SuppressWarnings("checkstyle:Indentation")
     @Override
     public PromptTemplate registerPrompt(RegisterPromptCommand command) {
         log.debug("Registering new prompt with title: {}", command.getTitle());
@@ -82,39 +81,38 @@ public class PromptCommandService implements PromptCommandUseCase {
 
             final UUID uuid = savedPrompt.getUuid();
             PromptTemplate finedPrompt = loadPromptPort.loadPromptByUuid(uuid)
-                .orElseThrow(() -> new PromptRegistrationException(
-                    PromptErrorType.NOT_FOUND,
-                    "프롬프트 템플릿을 찾을 수 없습니다: " + uuid));
+                    .orElseThrow(() -> new PromptRegistrationException(
+                            PromptErrorType.NOT_FOUND,
+                            "프롬프트 템플릿을 찾을 수 없습니다: " + uuid));
 
             return PromptTemplate.builder()
-                .id(finedPrompt.getId())
-                .uuid(finedPrompt.getUuid())
-                .title(finedPrompt.getTitle())
-                .currentVersionId(finedPrompt.getCurrentVersionId())
-                .categoryId(finedPrompt.getCategoryId())
-                .createdById(finedPrompt.getCreatedById())
-                .visibility(finedPrompt.getVisibility())
-                .status(finedPrompt.getStatus())
-                .description(finedPrompt.getDescription())
-                .inputVariables(finedPrompt.getInputVariables())
-                .createdAt(finedPrompt.getCreatedAt())
-                .updatedAt(finedPrompt.getUpdatedAt())
-                .createdBy(finedPrompt.getCreatedBy())
-                .category(finedPrompt.getCategory())
-                .tags(new ArrayList<>(tags))
-                .version(finedPrompt.getVersion())
-                .status(finedPrompt.getStatus())
-                .build();
+                    .id(finedPrompt.getId())
+                    .uuid(finedPrompt.getUuid())
+                    .title(finedPrompt.getTitle())
+                    .currentVersionId(finedPrompt.getCurrentVersionId())
+                    .categoryId(finedPrompt.getCategoryId())
+                    .createdById(finedPrompt.getCreatedById())
+                    .visibility(finedPrompt.getVisibility())
+                    .status(finedPrompt.getStatus())
+                    .description(finedPrompt.getDescription())
+                    .createdAt(finedPrompt.getCreatedAt())
+                    .updatedAt(finedPrompt.getUpdatedAt())
+                    .createdBy(finedPrompt.getCreatedBy())
+                    .category(finedPrompt.getCategory())
+                    .tags(new ArrayList<>(tags))
+                    .version(finedPrompt.getVersion())
+                    .status(finedPrompt.getStatus())
+                    .build();
         } catch (PromptValidationException e) {
             log.error("Failed to create prompt template: {}", e.getMessage());
             throw new PromptRegistrationException(
-                PromptErrorType.VALIDATION_ERROR,
-                e.getMessage(), e);
+                    PromptErrorType.VALIDATION_ERROR,
+                    e.getMessage(), e);
         } catch (Exception e) {
             log.error("Unexpected error during prompt registration: {}", e.getMessage());
             throw new PromptRegistrationException(
-                PromptErrorType.UNKNOWN_ERROR,
-                e.getMessage(), e);
+                    PromptErrorType.UNKNOWN_ERROR,
+                    e.getMessage(), e);
         }
     }
 
@@ -127,23 +125,23 @@ public class PromptCommandService implements PromptCommandUseCase {
      * @throws PromptValidationException 프롬프트 버전 유효성 검증에 실패한 경우
      */
     private PromptVersion createInitialVersion(PromptTemplate promptTemplate, RegisterPromptCommand command)
-        throws PromptValidationException {
+            throws PromptValidationException {
         String initialChangesMessage = "프롬프트 템플릿 최초 생성";
 
         // 버전 생성 전 유효성 검증
         validateVersionCreation(promptTemplate, command);
 
         PromptVersion promptVersion = PromptVersion.builder()
-            .promptTemplateId(promptTemplate.getId())
-            .uuid(UUID.randomUUID())
-            .versionNumber(1)
-            .content(command.getContent())
-            .changes(initialChangesMessage)
-            .createdById(promptTemplate.getCreatedById())
-            .createdAt(LocalDateTime.now())
-            .variables(command.getVariablesSchema())
-            .actionType(PromptVersionActionType.CREATE)
-            .build();
+                .promptTemplateId(promptTemplate.getId())
+                .uuid(UUID.randomUUID())
+                .versionNumber(1)
+                .content(command.getContent())
+                .changes(initialChangesMessage)
+                .createdById(promptTemplate.getCreatedById())
+                .createdAt(LocalDateTime.now())
+                .inputVariables(command.getInputVariables())
+                .actionType(PromptVersionActionType.CREATE)
+                .build();
 
         return promptVersion;
     }
@@ -156,7 +154,7 @@ public class PromptCommandService implements PromptCommandUseCase {
      * @throws PromptValidationException 유효성 검증에 실패한 경우
      */
     private void validateVersionCreation(PromptTemplate promptTemplate, RegisterPromptCommand command)
-        throws PromptValidationException {
+            throws PromptValidationException {
         if (command.getContent() == null || command.getContent().trim().isEmpty()) {
             throw new PromptValidationException("프롬프트 내용은 필수입니다.");
         }
@@ -165,32 +163,6 @@ public class PromptCommandService implements PromptCommandUseCase {
         }
         if (promptTemplate.getCreatedById() == null) {
             throw new PromptValidationException("생성자 ID가 없습니다.");
-        }
-        if (command.getVariablesSchema() != null) {
-            validateVariablesSchema(command.getVariablesSchema());
-        }
-    }
-
-    /**
-     * 변수 스키마의 유효성을 검증합니다.
-     *
-     * @param variablesSchema 검증할 변수 스키마
-     * @throws PromptValidationException 유효성 검증에 실패한 경우
-     */
-    private void validateVariablesSchema(java.util.Map<String, Object> variablesSchema)
-        throws PromptValidationException {
-        if (variablesSchema.isEmpty()) {
-            return;
-        }
-        for (java.util.Map.Entry<String, Object> entry : variablesSchema.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            if (key == null || key.trim().isEmpty()) {
-                throw new PromptValidationException("변수 이름은 비어있을 수 없습니다.");
-            }
-            if (value == null) {
-                throw new PromptValidationException("변수 '" + key + "'의 값은 null일 수 없습니다.");
-            }
         }
     }
 
@@ -202,20 +174,19 @@ public class PromptCommandService implements PromptCommandUseCase {
      * @throws PromptValidationException 프롬프트 템플릿 유효성 검증에 실패한 경우
      */
     private PromptTemplate createPromptTemplateFromCommand(RegisterPromptCommand command)
-        throws PromptValidationException {
+            throws PromptValidationException {
         // TODO : 임시 사용자 ID 사용 (추후 실제 사용자 관리 시스템으로 교체 필요)
         Long createdById = DevelopmentConstants.TEMP_USER_ID;
 
         return PromptTemplate.builder()
-            .title(command.getTitle())
-            .description(command.getDescription())
-            .createdById(createdById)
-            .visibility(command.getVisibility() != null ? command.getVisibility()
-                : (command.getCreatedBy().getTeam() != null ? Visibility.TEAM : Visibility.PRIVATE))
-            .categoryId(command.getCategoryId())
-            .inputVariables(command.getInputVariables())
-            .status(command.getStatus())
-            .build();
+                .title(command.getTitle())
+                .description(command.getDescription())
+                .createdById(createdById)
+                .visibility(command.getVisibility() != null ? command.getVisibility()
+                        : (command.getCreatedBy().getTeam() != null ? Visibility.TEAM : Visibility.PRIVATE))
+                .categoryId(command.getCategoryId())
+                .status(command.getStatus())
+                .build();
     }
 
     /**
@@ -241,11 +212,11 @@ public class PromptCommandService implements PromptCommandUseCase {
             // TODO: 로직 보완 필요
             // 기존 태그가 있는지 확인하고 없으면 새로 생성
             Tag tag = tagPort.findByName(trimmedTagName)
-                .orElseGet(() -> {
-                    log.debug("Creating new tag: {}", trimmedTagName);
-                    Tag newTag = Tag.create(trimmedTagName);
-                    return saveTagPort.saveTag(newTag);
-                });
+                    .orElseGet(() -> {
+                        log.debug("Creating new tag: {}", trimmedTagName);
+                        Tag newTag = Tag.create(trimmedTagName);
+                        return saveTagPort.saveTag(newTag);
+                    });
 
             tags.add(tag);
         }

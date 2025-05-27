@@ -4,7 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * 새로운 프롬프트 생성 요청을 위한 DTO 클래스입니다.
@@ -38,7 +41,7 @@ public class CreatePromptRequest {
     private String content;
 
     /**
-     * 작성자 정보 (User DTO, 선택)
+     * 작성자 정보 (User DTO)
      */
     private UserDto createdBy;
 
@@ -49,23 +52,13 @@ public class CreatePromptRequest {
     private Set<String> tags = new HashSet<>();
 
     /**
-     * 태그 ID 목록 (기존 호환용, 선택)
-     */
-    @Builder.Default
-    private Set<UUID> tagIds = new HashSet<>();
-
-    /**
      * 입력 변수 목록 (선택)
      */
-    private List<String> inputVariables;
+    private List<InputVariableDto> inputVariables;
+
 
     /**
-     * 변수 스키마 (선택)
-     */
-    private Map<String, Object> variablesSchema;
-
-    /**
-     * 카테고리 ID (선택)
+     * 카테고리 ID
      */
     private Long categoryId;
 
@@ -77,18 +70,11 @@ public class CreatePromptRequest {
     private String visibility;
 
     /**
-     * 상태 (ACTIVE, DRAFT 등, 선택)
+     * 상태 (DRAFT, PUBLISHED, ARCHIVED, DELETED 등, 선택)
      * 예시: "ARCHIVED", "DRAFT"
      * 실제 enum: com.gongdel.promptserver.domain.model.PromptStatus
      */
     private String status;
-
-    /**
-     * 공개 여부 (기존 호환용, 선택)
-     */
-    private boolean isPublic;
-
-    // TODO : 임시 사용자 정보 전달용 내부 DTO
 
     /**
      * 작성자 정보 전달용 내부 DTO
@@ -99,8 +85,7 @@ public class CreatePromptRequest {
     @AllArgsConstructor
     @Builder
     public static class UserDto {
-
-        private String id;
+        private UUID id;
         private String email;
         private String name;
     }

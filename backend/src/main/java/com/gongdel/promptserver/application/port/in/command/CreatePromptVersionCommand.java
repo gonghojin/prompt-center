@@ -1,11 +1,12 @@
 package com.gongdel.promptserver.application.port.in.command;
 
+import com.gongdel.promptserver.domain.model.InputVariable;
 import com.gongdel.promptserver.domain.model.PromptVersionActionType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -45,9 +46,10 @@ public class CreatePromptVersionCommand {
     private final Long createdById;
 
     /**
-     * 변수 맵
+     * 변수
      */
-    private final Map<String, Object> variables;
+    private List<InputVariable> inputVariables;
+
 
     /**
      * 액션 타입
@@ -86,7 +88,7 @@ public class CreatePromptVersionCommand {
         @NonNull Integer versionNumber,
         @NonNull String content,
         String changes,
-        Map<String, Object> variables,
+        List<InputVariable> inputVariables,
         @NonNull Long createdById,
         @NonNull PromptVersionActionType actionType) {
         return CreatePromptVersionCommand.builder()
@@ -94,7 +96,7 @@ public class CreatePromptVersionCommand {
             .versionNumber(versionNumber)
             .content(content)
             .changes(changes)
-            .variables(variables)
+            .inputVariables(inputVariables)
             .createdById(createdById)
             .actionType(actionType)
             .build();

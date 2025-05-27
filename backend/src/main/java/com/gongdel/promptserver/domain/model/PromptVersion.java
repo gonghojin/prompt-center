@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.HashSet;
 
 /**
  * 프롬프트 템플릿 버전 정보를 담는 도메인 모델입니다. 프롬프트 템플릿의 버전별 내용과 메타데이터를 관리합니다.
@@ -28,7 +30,7 @@ public class PromptVersion {
     private String changes;
     private Long createdById;
     private LocalDateTime createdAt;
-    private Map<String, Object> variables;
+    private List<InputVariable> inputVariables;
     private PromptVersionActionType actionType;
     private UUID uuid;
 
@@ -41,7 +43,7 @@ public class PromptVersion {
      * @param content          버전 내용
      * @param changes          변경 사항
      * @param createdById      생성자 ID
-     * @param variables        변수 정의 (JSON 스키마)
+     * @param inputVariables   변수 정의 (JSON 스키마)
      * @param actionType       작업 유형
      * @param createdAt        생성 시간
      * @param uuid             고유 식별자
@@ -49,16 +51,16 @@ public class PromptVersion {
      */
     @Builder
     public PromptVersion(
-        Long id,
-        Long promptTemplateId,
-        Integer versionNumber,
-        String content,
-        String changes,
-        Long createdById,
-        Map<String, Object> variables,
-        PromptVersionActionType actionType,
-        LocalDateTime createdAt,
-        UUID uuid) throws PromptValidationException {
+            Long id,
+            Long promptTemplateId,
+            Integer versionNumber,
+            String content,
+            String changes,
+            Long createdById,
+            List<InputVariable> inputVariables,
+            PromptVersionActionType actionType,
+            LocalDateTime createdAt,
+            UUID uuid) throws PromptValidationException {
 
         // 필수 필드 유효성 검증
         validatePromptTemplateId(promptTemplateId);
@@ -67,6 +69,7 @@ public class PromptVersion {
         validateVersionNumber(versionNumber);
         validateActionType(actionType);
         validateUuid(uuid);
+        validateInputVariables(inputVariables);
 
         this.id = id;
         this.promptTemplateId = promptTemplateId;
@@ -74,13 +77,14 @@ public class PromptVersion {
         this.content = content;
         this.changes = changes;
         this.createdById = createdById;
-        this.variables = variables;
+        this.inputVariables = inputVariables != null ? new java.util.ArrayList<>(inputVariables)
+                : new java.util.ArrayList<>();
         this.actionType = actionType;
         this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
         this.uuid = uuid;
 
         log.debug("Created prompt version: id={}, promptTemplateId={}, versionNumber={}",
-            this.id, this.promptTemplateId, this.versionNumber);
+                this.id, this.promptTemplateId, this.versionNumber);
     }
 
     /**
@@ -108,7 +112,7 @@ public class PromptVersion {
 
         if (content.length() < MIN_CONTENT_LENGTH) {
             throw new PromptValidationException(
-                String.format("버전 내용은 최소 %d자 이상이어야 합니다", MIN_CONTENT_LENGTH));
+                    String.format("버전 내용은 최소 %d자 이상이어야 합니다", MIN_CONTENT_LENGTH));
         }
     }
 
@@ -157,6 +161,27 @@ public class PromptVersion {
     private void validateUuid(UUID uuid) throws PromptValidationException {
         if (uuid == null) {
             throw new PromptValidationException("uuid는 필수입니다");
+        }
+    }
+
+    /**
+     * 입력 변수 목록의 유효성을 검증합니다.
+     *
+     * @param inputVariables 입력 변수 목록
+     * @throws PromptValidationException 유효성 검증에 실패한 경우
+     */
+    private void validateInputVariables(List<InputVariable> inputVariables) throws PromptValidationException {
+        if (inputVariables != null) {
+            java.util.Set<String> names = new HashSet<>();
+            for (InputVariable variable : inputVariables) {
+                if (!names.add(variable.getName())) {
+                    throw new PromptValidationException("중복된 변수명이 있습니다: " + variable.getName());
+                }
+                if (org.apache.commons.lang3.StringUtils.isBlank(variable.getName())) {
+                    throw new PromptValidationException("변수명은 비어 있을 수 없습니다.");
+                }
+                // 필요하다면 추가 검증(타입, 필수 여부 등)
+            }
         }
     }
 }

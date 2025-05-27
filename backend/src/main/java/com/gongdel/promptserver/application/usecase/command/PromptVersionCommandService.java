@@ -50,7 +50,7 @@ public class PromptVersionCommandService implements PromptVersionCommandUseCase 
                 .content(command.getContent())
                 .changes(command.getChanges())
                 .createdById(command.getCreatedById())
-                .variables(command.getVariables())
+                .inputVariables(command.getInputVariables())
                 .actionType(command.getActionType())
                 .uuid(command.getUuid())
                 .build();
@@ -89,7 +89,7 @@ public class PromptVersionCommandService implements PromptVersionCommandUseCase 
                 .content(command.getContent())
                 .changes(command.getChanges())
                 .createdById(command.getCreatedById())
-                .variables(command.getVariables())
+                .inputVariables(command.getInputVariables())
                 .actionType(command.getActionType())
                 .uuid(command.getUuid())
                 .build();

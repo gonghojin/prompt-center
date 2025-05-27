@@ -8,7 +8,7 @@ CREATE TABLE prompt_versions (
     changes TEXT,
     created_by_id BIGINT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
-    variables JSON,
+    input_variables JSONB,
     action_type VARCHAR(32) NOT NULL
     -- FK는 나중에 추가
 );
