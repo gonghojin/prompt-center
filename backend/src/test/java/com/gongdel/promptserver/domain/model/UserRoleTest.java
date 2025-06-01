@@ -1,9 +1,9 @@
 package com.gongdel.promptserver.domain.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * UserRole 열거형 테스트
@@ -45,8 +45,8 @@ class UserRoleTest {
         UserRole[] roles = UserRole.values();
 
         // then
-        assertThat(roles).hasSize(2);
-        assertThat(roles).contains(UserRole.ROLE_USER, UserRole.ROLE_ADMIN);
+        assertThat(roles).hasSize(5);
+        assertThat(roles).contains(UserRole.ROLE_USER, UserRole.ROLE_ADMIN, UserRole.ROLE_DESIGNER, UserRole.ROLE_DEVELOPER, UserRole.ROLE_DATA_SCIENTIST);
     }
 
     @Test

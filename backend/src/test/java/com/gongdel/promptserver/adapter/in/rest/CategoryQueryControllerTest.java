@@ -1,7 +1,6 @@
 package com.gongdel.promptserver.adapter.in.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gongdel.promptserver.adapter.in.rest.response.CategoryResponse;
 import com.gongdel.promptserver.application.exception.CategoryNotFoundException;
 import com.gongdel.promptserver.application.port.in.CategoryQueryUseCase;
 import com.gongdel.promptserver.domain.model.Category;
@@ -11,18 +10,14 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CategoryQueryController.class)
 class CategoryQueryControllerTest {

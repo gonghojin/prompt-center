@@ -7,10 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 프롬프트 템플릿 버전 정보를 담는 도메인 모델입니다. 프롬프트 템플릿의 버전별 내용과 메타데이터를 관리합니다.
@@ -51,16 +50,16 @@ public class PromptVersion {
      */
     @Builder
     public PromptVersion(
-            Long id,
-            Long promptTemplateId,
-            Integer versionNumber,
-            String content,
-            String changes,
-            Long createdById,
-            List<InputVariable> inputVariables,
-            PromptVersionActionType actionType,
-            LocalDateTime createdAt,
-            UUID uuid) throws PromptValidationException {
+        Long id,
+        Long promptTemplateId,
+        Integer versionNumber,
+        String content,
+        String changes,
+        Long createdById,
+        List<InputVariable> inputVariables,
+        PromptVersionActionType actionType,
+        LocalDateTime createdAt,
+        UUID uuid) throws PromptValidationException {
 
         // 필수 필드 유효성 검증
         validatePromptTemplateId(promptTemplateId);
@@ -78,13 +77,13 @@ public class PromptVersion {
         this.changes = changes;
         this.createdById = createdById;
         this.inputVariables = inputVariables != null ? new java.util.ArrayList<>(inputVariables)
-                : new java.util.ArrayList<>();
+            : new java.util.ArrayList<>();
         this.actionType = actionType;
         this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
         this.uuid = uuid;
 
         log.debug("Created prompt version: id={}, promptTemplateId={}, versionNumber={}",
-                this.id, this.promptTemplateId, this.versionNumber);
+            this.id, this.promptTemplateId, this.versionNumber);
     }
 
     /**
@@ -112,7 +111,7 @@ public class PromptVersion {
 
         if (content.length() < MIN_CONTENT_LENGTH) {
             throw new PromptValidationException(
-                    String.format("버전 내용은 최소 %d자 이상이어야 합니다", MIN_CONTENT_LENGTH));
+                String.format("버전 내용은 최소 %d자 이상이어야 합니다", MIN_CONTENT_LENGTH));
         }
     }
 
