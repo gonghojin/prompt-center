@@ -1,9 +1,9 @@
 package com.gongdel.promptserver.domain.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Visibility 열거형에 대한 단위 테스트

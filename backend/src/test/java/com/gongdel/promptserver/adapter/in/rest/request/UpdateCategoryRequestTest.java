@@ -1,19 +1,20 @@
 package com.gongdel.promptserver.adapter.in.rest.request;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gongdel.promptserver.application.port.in.command.UpdateCategoryCommand;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * UpdateCategoryRequest DTO 클래스에 대한 테스트
@@ -38,10 +39,10 @@ class UpdateCategoryRequestTest {
 
         // when
         UpdateCategoryRequest request = UpdateCategoryRequest.builder()
-                .displayName(displayName)
-                .description(description)
-                .parentCategoryId(parentCategoryId)
-                .build();
+            .displayName(displayName)
+            .description(description)
+            .parentCategoryId(parentCategoryId)
+            .build();
 
         // then
         assertThat(request).isNotNull();
@@ -89,10 +90,10 @@ class UpdateCategoryRequestTest {
         Long parentCategoryId = 2L;
 
         UpdateCategoryRequest request = UpdateCategoryRequest.builder()
-                .displayName(displayName)
-                .description(description)
-                .parentCategoryId(parentCategoryId)
-                .build();
+            .displayName(displayName)
+            .description(description)
+            .parentCategoryId(parentCategoryId)
+            .build();
 
         // when
         UpdateCategoryCommand command = request.toCommand(categoryId);
@@ -114,9 +115,9 @@ class UpdateCategoryRequestTest {
         void displayNameShouldNotBeNull() {
             // given
             UpdateCategoryRequest request = UpdateCategoryRequest.builder()
-                    .displayName(null)
-                    .description("테스트 설명")
-                    .build();
+                .displayName(null)
+                .description("테스트 설명")
+                .build();
 
             // when
             Set<ConstraintViolation<UpdateCategoryRequest>> violations = validator.validate(request);
@@ -124,18 +125,18 @@ class UpdateCategoryRequestTest {
             // then
             assertThat(violations).isNotEmpty();
             assertThat(violations).anyMatch(violation -> violation.getPropertyPath().toString().equals("displayName") &&
-                    violation.getMessage().equals("카테고리 표시 이름은 필수입니다"));
+                violation.getMessage().equals("카테고리 표시 이름은 필수입니다"));
         }
 
         @ParameterizedTest
-        @ValueSource(strings = { "", " ", "   " })
+        @ValueSource(strings = {"", " ", "   "})
         @DisplayName("표시 이름이 비어있거나 공백만 있으면 유효성 검증에 실패한다")
         void displayNameShouldNotBeBlank(String blankDisplayName) {
             // given
             UpdateCategoryRequest request = UpdateCategoryRequest.builder()
-                    .displayName(blankDisplayName)
-                    .description("테스트 설명")
-                    .build();
+                .displayName(blankDisplayName)
+                .description("테스트 설명")
+                .build();
 
             // when
             Set<ConstraintViolation<UpdateCategoryRequest>> violations = validator.validate(request);
@@ -143,7 +144,7 @@ class UpdateCategoryRequestTest {
             // then
             assertThat(violations).isNotEmpty();
             assertThat(violations).anyMatch(violation -> violation.getPropertyPath().toString().equals("displayName") &&
-                    violation.getMessage().equals("카테고리 표시 이름은 필수입니다"));
+                violation.getMessage().equals("카테고리 표시 이름은 필수입니다"));
         }
 
         @Test
@@ -151,9 +152,9 @@ class UpdateCategoryRequestTest {
         void descriptionCanBeNull() {
             // given
             UpdateCategoryRequest request = UpdateCategoryRequest.builder()
-                    .displayName("업데이트된 카테고리")
-                    .description(null)
-                    .build();
+                .displayName("업데이트된 카테고리")
+                .description(null)
+                .build();
 
             // when
             Set<ConstraintViolation<UpdateCategoryRequest>> violations = validator.validate(request);
@@ -167,9 +168,9 @@ class UpdateCategoryRequestTest {
         void parentCategoryIdCanBeNull() {
             // given
             UpdateCategoryRequest request = UpdateCategoryRequest.builder()
-                    .displayName("업데이트된 카테고리")
-                    .parentCategoryId(null)
-                    .build();
+                .displayName("업데이트된 카테고리")
+                .parentCategoryId(null)
+                .build();
 
             // when
             Set<ConstraintViolation<UpdateCategoryRequest>> violations = validator.validate(request);
@@ -183,8 +184,8 @@ class UpdateCategoryRequestTest {
         void toCommandShouldHandleNullId() {
             // given
             UpdateCategoryRequest request = UpdateCategoryRequest.builder()
-                    .displayName("업데이트된 카테고리")
-                    .build();
+                .displayName("업데이트된 카테고리")
+                .build();
 
             // when
             UpdateCategoryCommand command = request.toCommand(1L);

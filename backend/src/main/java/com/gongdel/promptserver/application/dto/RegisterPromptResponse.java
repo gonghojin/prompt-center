@@ -1,5 +1,7 @@
 package com.gongdel.promptserver.application.dto;
 
+import com.gongdel.promptserver.domain.model.PromptTemplate;
+import com.gongdel.promptserver.domain.model.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,9 +12,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.gongdel.promptserver.domain.model.PromptTemplate;
-import com.gongdel.promptserver.domain.model.Tag;
 
 /**
  * 프롬프트 등록 결과를 반환하는 응답 DTO입니다.
@@ -44,18 +43,18 @@ public class RegisterPromptResponse {
      */
     public static RegisterPromptResponse from(PromptTemplate prompt, Set<Tag> tags) {
         return RegisterPromptResponse.builder()
-                .id(prompt.getId())
-                .uuid(prompt.getUuid())
-                .title(prompt.getTitle())
-                .currentVersionId(prompt.getCurrentVersionId())
-                .categoryId(prompt.getCategoryId())
-                .createdById(prompt.getCreatedById())
-                .visibility(prompt.getVisibility() != null ? prompt.getVisibility().name() : null)
-                .status(prompt.getStatus() != null ? prompt.getStatus().name() : null)
-                .description(prompt.getDescription())
-                .createdAt(prompt.getCreatedAt())
-                .updatedAt(prompt.getUpdatedAt())
-                .tags(tags != null ? tags.stream().map(Tag::getName).collect(Collectors.toList()) : null)
-                .build();
+            .id(prompt.getId())
+            .uuid(prompt.getUuid())
+            .title(prompt.getTitle())
+            .currentVersionId(prompt.getCurrentVersionId())
+            .categoryId(prompt.getCategoryId())
+            .createdById(prompt.getCreatedById())
+            .visibility(prompt.getVisibility() != null ? prompt.getVisibility().name() : null)
+            .status(prompt.getStatus() != null ? prompt.getStatus().name() : null)
+            .description(prompt.getDescription())
+            .createdAt(prompt.getCreatedAt())
+            .updatedAt(prompt.getUpdatedAt())
+            .tags(tags != null ? tags.stream().map(Tag::getName).collect(Collectors.toList()) : null)
+            .build();
     }
 }

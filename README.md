@@ -106,6 +106,17 @@ cd frontend
 npm test
 ```
 
+## 🧩 API 통합 테스트 자동화
+
+`test_prompt_api.sh` 스크립트로 카테고리/프롬프트 API의 통합 테스트를 자동화할 수 있습니다.
+
+- curl, jq가 필요합니다 (macOS: `brew install jq`)
+- 백엔드 서버가 기동된 상태에서 실행하세요.
+
+```bash
+bash test_prompt_api.sh
+```
+
 ## 📚 문서
 - [API 문서](http://localhost:8080/swagger-ui.html)
 - [아키텍처 문서](req/architecture.md)
@@ -119,4 +130,4 @@ npm test
 5. Open a Pull Request
 
 ## 📄 라이선스
-이 프로젝트는 MIT 라이선스 하에 있습니다. 
+이 프로젝트는 MIT 라이선스 하에 있습니다.

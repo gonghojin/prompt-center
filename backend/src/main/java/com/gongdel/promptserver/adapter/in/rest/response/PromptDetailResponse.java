@@ -79,36 +79,36 @@ public class PromptDetailResponse {
      * @return 프롬프트 상세 응답 DTO
      */
     public static PromptDetailResponse from(
-            UUID id,
-            String title,
-            String description,
-            String content,
-            UserResponse author,
-            Set<String> tags,
-            boolean isPublic,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt,
-            int viewCount,
-            int favoriteCount,
-            Long categoryId,
-            String visibility,
-            String status) {
+        UUID id,
+        String title,
+        String description,
+        String content,
+        UserResponse author,
+        Set<String> tags,
+        boolean isPublic,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
+        int viewCount,
+        int favoriteCount,
+        Long categoryId,
+        String visibility,
+        String status) {
         return PromptDetailResponse.builder()
-                .id(id)
-                .title(title)
-                .description(description)
-                .content(content)
-                .author(author)
-                .tags(tags)
-                .isPublic(isPublic)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
-                .viewCount(viewCount)
-                .favoriteCount(favoriteCount)
-                .categoryId(categoryId)
-                .visibility(visibility)
-                .status(status)
-                .build();
+            .id(id)
+            .title(title)
+            .description(description)
+            .content(content)
+            .author(author)
+            .tags(tags)
+            .isPublic(isPublic)
+            .createdAt(createdAt)
+            .updatedAt(updatedAt)
+            .viewCount(viewCount)
+            .favoriteCount(favoriteCount)
+            .categoryId(categoryId)
+            .visibility(visibility)
+            .status(status)
+            .build();
     }
 
     /**
@@ -121,19 +121,19 @@ public class PromptDetailResponse {
      */
     public static PromptDetailResponse from(PromptDetail detail) {
         return new PromptDetailResponse(
-                detail.getId(),
-                detail.getTitle(),
-                detail.getDescription(),
-                detail.getContent(),
-                UserResponse.from(detail.getAuthor()),
-                detail.getTags(),
-                detail.isPublic(),
-                detail.getCreatedAt(),
-                detail.getUpdatedAt(),
-                detail.getViewCount(),
-                detail.getFavoriteCount(),
-                detail.getCategoryId(),
-                detail.getVisibility(),
-                detail.getStatus());
+            detail.getId(),
+            detail.getTitle(),
+            detail.getDescription(),
+            detail.getContent(),
+            UserResponse.from(detail.getAuthor()),
+            detail.getTags(),
+            detail.isPublic(),
+            detail.getCreatedAt(),
+            detail.getUpdatedAt(),
+            detail.getViewCount(),
+            detail.getFavoriteCount(),
+            detail.getCategoryId(),
+            detail.getVisibility(),
+            detail.getStatus());
     }
 }

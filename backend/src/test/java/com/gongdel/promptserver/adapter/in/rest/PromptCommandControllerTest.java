@@ -42,41 +42,41 @@ class PromptCommandControllerTest {
     void create_prompt_success_with_all_required_fields() throws Exception {
         // given
         CreatePromptRequest request = CreatePromptRequest.builder()
-                .title("테스트 프롬프트")
-                .description("설명")
-                .content("내용")
-                .createdBy(UserDto.builder()
-                        .id(UUID.randomUUID())
-                        .name("홍길동")
-                        .email("hong@test.com")
-                        .build())
-                .tags(Set.of("tag1", "tag2"))
-                .inputVariables(List.of(InputVariableDto.builder().name("var1").description("desc").build()))
-                .categoryId(1L)
-                .visibility("PRIVATE")
-                .status("DRAFT")
-                .build();
+            .title("테스트 프롬프트")
+            .description("설명")
+            .content("내용")
+            .createdBy(UserDto.builder()
+                .id(UUID.randomUUID())
+                .name("홍길동")
+                .email("hong@test.com")
+                .build())
+            .tags(Set.of("tag1", "tag2"))
+            .inputVariables(List.of(InputVariableDto.builder().name("var1").description("desc").build()))
+            .categoryId(1L)
+            .visibility("PRIVATE")
+            .status("DRAFT")
+            .build();
 
         RegisterPromptResponse response = RegisterPromptResponse.builder()
-                .uuid(UUID.randomUUID())
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .categoryId(request.getCategoryId())
-                .visibility(request.getVisibility())
-                .status(request.getStatus())
-                .tags(List.copyOf(request.getTags()))
-                .build();
+            .uuid(UUID.randomUUID())
+            .title(request.getTitle())
+            .description(request.getDescription())
+            .categoryId(request.getCategoryId())
+            .visibility(request.getVisibility())
+            .status(request.getStatus())
+            .tags(List.copyOf(request.getTags()))
+            .build();
 
         when(registerPromptUseCase.registerPrompt(ArgumentMatchers.any(RegisterPromptCommand.class)))
-                .thenReturn(response);
+            .thenReturn(response);
 
         // when & then
         mockMvc.perform(post("/api/v1/prompts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value(request.getTitle()))
-                .andExpect(jsonPath("$.description").value(request.getDescription()));
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.title").value(request.getTitle()))
+            .andExpect(jsonPath("$.description").value(request.getDescription()));
     }
 
     @Test
@@ -84,15 +84,15 @@ class PromptCommandControllerTest {
     void create_prompt_fail_missing_title() throws Exception {
         // given: title이 누락된 요청
         CreatePromptRequest request = CreatePromptRequest.builder()
-                .description("설명")
-                .content("내용")
-                .build();
+            .description("설명")
+            .content("내용")
+            .build();
 
         // when & then
         mockMvc.perform(post("/api/v1/prompts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -100,41 +100,41 @@ class PromptCommandControllerTest {
     void create_prompt_success_with_null_input_variables_and_tags() throws Exception {
         // given
         CreatePromptRequest request = CreatePromptRequest.builder()
-                .title("테스트 프롬프트")
-                .description("설명")
-                .content("내용")
-                .createdBy(UserDto.builder()
-                        .id(UUID.randomUUID())
-                        .name("홍길동")
-                        .email("hong@test.com")
-                        .build())
-                .inputVariables(null)
-                .tags(null)
-                .categoryId(1L)
-                .visibility("PRIVATE")
-                .status("DRAFT")
-                .build();
+            .title("테스트 프롬프트")
+            .description("설명")
+            .content("내용")
+            .createdBy(UserDto.builder()
+                .id(UUID.randomUUID())
+                .name("홍길동")
+                .email("hong@test.com")
+                .build())
+            .inputVariables(null)
+            .tags(null)
+            .categoryId(1L)
+            .visibility("PRIVATE")
+            .status("DRAFT")
+            .build();
 
         RegisterPromptResponse response = RegisterPromptResponse.builder()
-                .uuid(UUID.randomUUID())
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .categoryId(request.getCategoryId())
-                .visibility(request.getVisibility())
-                .status(request.getStatus())
-                .tags(null)
-                .build();
+            .uuid(UUID.randomUUID())
+            .title(request.getTitle())
+            .description(request.getDescription())
+            .categoryId(request.getCategoryId())
+            .visibility(request.getVisibility())
+            .status(request.getStatus())
+            .tags(null)
+            .build();
 
         when(registerPromptUseCase.registerPrompt(ArgumentMatchers.any(RegisterPromptCommand.class)))
-                .thenReturn(response);
+            .thenReturn(response);
 
         // when & then
         mockMvc.perform(post("/api/v1/prompts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value(request.getTitle()))
-                .andExpect(jsonPath("$.description").value(request.getDescription()));
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.title").value(request.getTitle()))
+            .andExpect(jsonPath("$.description").value(request.getDescription()));
     }
 
     @Test
@@ -142,40 +142,40 @@ class PromptCommandControllerTest {
     void create_prompt_success_with_empty_input_variables_and_tags() throws Exception {
         // given
         CreatePromptRequest request = CreatePromptRequest.builder()
-                .title("테스트 프롬프트")
-                .description("설명")
-                .content("내용")
-                .createdBy(UserDto.builder()
-                        .id(UUID.randomUUID())
-                        .name("홍길동")
-                        .email("hong@test.com")
-                        .build())
-                .inputVariables(List.of())
-                .tags(Set.of())
-                .categoryId(1L)
-                .visibility("PRIVATE")
-                .status("DRAFT")
-                .build();
+            .title("테스트 프롬프트")
+            .description("설명")
+            .content("내용")
+            .createdBy(UserDto.builder()
+                .id(UUID.randomUUID())
+                .name("홍길동")
+                .email("hong@test.com")
+                .build())
+            .inputVariables(List.of())
+            .tags(Set.of())
+            .categoryId(1L)
+            .visibility("PRIVATE")
+            .status("DRAFT")
+            .build();
 
         RegisterPromptResponse response = RegisterPromptResponse.builder()
-                .uuid(UUID.randomUUID())
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .categoryId(request.getCategoryId())
-                .visibility(request.getVisibility())
-                .status(request.getStatus())
-                .tags(List.of())
-                .build();
+            .uuid(UUID.randomUUID())
+            .title(request.getTitle())
+            .description(request.getDescription())
+            .categoryId(request.getCategoryId())
+            .visibility(request.getVisibility())
+            .status(request.getStatus())
+            .tags(List.of())
+            .build();
 
         when(registerPromptUseCase.registerPrompt(ArgumentMatchers.any(RegisterPromptCommand.class)))
-                .thenReturn(response);
+            .thenReturn(response);
 
         // when & then
         mockMvc.perform(post("/api/v1/prompts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value(request.getTitle()))
-                .andExpect(jsonPath("$.description").value(request.getDescription()));
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.title").value(request.getTitle()))
+            .andExpect(jsonPath("$.description").value(request.getDescription()));
     }
 }

@@ -1,12 +1,11 @@
 package com.gongdel.promptserver.adapter.in.rest.response;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gongdel.promptserver.domain.model.Tag;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * TagResponse DTO 클래스에 대한 단위 테스트
@@ -43,9 +42,9 @@ class TagResponseTest {
 
         // when
         TagResponse tagResponse = TagResponse.builder()
-                .id(id)
-                .name(name)
-                .build();
+            .id(id)
+            .name(name)
+            .build();
 
         // then
         assertThat(tagResponse).isNotNull();

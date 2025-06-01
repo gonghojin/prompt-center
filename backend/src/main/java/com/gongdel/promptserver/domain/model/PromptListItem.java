@@ -48,17 +48,17 @@ public class PromptListItem {
         Assert.notNull(template.getUpdatedAt(), "PromptTemplate.updatedAt must not be null");
 
         return PromptListItem.builder()
-                .id(template.getId())
-                .uuid(template.getUuid())
-                .title(template.getTitle())
-                .description(template.getDescription())
-                .createdById(template.getCreatedById())
-                .visibility(template.getVisibility())
-                .status(template.getStatus())
-                .categoryId(template.getCategoryId())
-                .currentVersionId(template.getCurrentVersionId())
-                .createdAt(template.getCreatedAt())
-                .updatedAt(template.getUpdatedAt())
-                .build();
+            .id(template.getId())
+            .uuid(template.getUuid())
+            .title(template.getTitle())
+            .description(template.getDescription())
+            .createdById(template.getCreatedById())
+            .visibility(template.getVisibility())
+            .status(template.getStatus())
+            .categoryId(template.getCategoryId())
+            .currentVersionId(template.getCurrentVersionId())
+            .createdAt(template.getCreatedAt())
+            .updatedAt(template.getUpdatedAt())
+            .build();
     }
 }

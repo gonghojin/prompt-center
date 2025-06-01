@@ -36,17 +36,17 @@ public class CreatePromptResponse {
      */
     public static CreatePromptResponse from(RegisterPromptResponse response) {
         return CreatePromptResponse.builder()
-                .id(response.getUuid())
-                .title(response.getTitle())
-                .description(response.getDescription())
-                .content(null)
-                .author(null)
-                .tags(response.getTags() != null ? response.getTags().stream().collect(Collectors.toSet()) : Set.of())
-                .createdAt(response.getCreatedAt())
-                .updatedAt(response.getUpdatedAt())
-                .categoryId(response.getCategoryId())
-                .visibility(response.getVisibility())
-                .status(response.getStatus())
-                .build();
+            .id(response.getUuid())
+            .title(response.getTitle())
+            .description(response.getDescription())
+            .content(null)
+            .author(null)
+            .tags(response.getTags() != null ? response.getTags().stream().collect(Collectors.toSet()) : Set.of())
+            .createdAt(response.getCreatedAt())
+            .updatedAt(response.getUpdatedAt())
+            .categoryId(response.getCategoryId())
+            .visibility(response.getVisibility())
+            .status(response.getStatus())
+            .build();
     }
 }

@@ -18,16 +18,6 @@ import java.util.Map;
 @Builder
 public class InputVariable {
     /**
-     * JSON 스키마 변환 시 사용할 필드명 상수
-     */
-    public static final class Schema {
-        public static final String TYPE = "type";
-        public static final String DESCRIPTION = "description";
-        public static final String REQUIRED = "required";
-        public static final String DEFAULT_VALUE = "defaultValue";
-    }
-
-    /**
      * 변수명
      */
     private final String name;
@@ -59,5 +49,15 @@ public class InputVariable {
             Schema.DESCRIPTION, this.description,
             Schema.REQUIRED, this.required,
             Schema.DEFAULT_VALUE, this.defaultValue);
+    }
+
+    /**
+     * JSON 스키마 변환 시 사용할 필드명 상수
+     */
+    public static final class Schema {
+        public static final String TYPE = "type";
+        public static final String DESCRIPTION = "description";
+        public static final String REQUIRED = "required";
+        public static final String DEFAULT_VALUE = "defaultValue";
     }
 }

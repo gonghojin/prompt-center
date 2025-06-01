@@ -31,7 +31,7 @@ public class PageResponse<T> {
 
     @Builder
     public PageResponse(List<T> content, int page, int size, long totalElements, int totalPages, boolean hasNext,
-            boolean hasPrevious) {
+                        boolean hasPrevious) {
         this.content = content;
         this.page = page;
         this.size = size;
@@ -50,13 +50,13 @@ public class PageResponse<T> {
      */
     public static <T> PageResponse<T> from(Page<T> page) {
         return PageResponse.<T>builder()
-                .content(page.getContent())
-                .page(page.getNumber())
-                .size(page.getSize())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .hasNext(page.hasNext())
-                .hasPrevious(page.hasPrevious())
-                .build();
+            .content(page.getContent())
+            .page(page.getNumber())
+            .size(page.getSize())
+            .totalElements(page.getTotalElements())
+            .totalPages(page.getTotalPages())
+            .hasNext(page.hasNext())
+            .hasPrevious(page.hasPrevious())
+            .build();
     }
 }

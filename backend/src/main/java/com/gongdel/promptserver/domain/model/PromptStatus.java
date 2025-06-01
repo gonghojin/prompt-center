@@ -34,16 +34,6 @@ public enum PromptStatus {
     }
 
     /**
-     * 문자열 표현을 반환합니다.
-     *
-     * @return 상태의 표시 이름
-     */
-    @Override
-    public String toString() {
-        return displayName;
-    }
-
-    /**
      * 문자열을 PromptStatus로 안전하게 변환합니다. 잘못된 값이면 기본값을 반환합니다.
      *
      * @param value        파싱할 문자열
@@ -56,5 +46,15 @@ public enum PromptStatus {
         } catch (IllegalArgumentException | NullPointerException e) {
             return defaultValue;
         }
+    }
+
+    /**
+     * 문자열 표현을 반환합니다.
+     *
+     * @return 상태의 표시 이름
+     */
+    @Override
+    public String toString() {
+        return displayName;
     }
 }

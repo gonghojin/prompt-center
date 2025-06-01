@@ -1,19 +1,20 @@
 package com.gongdel.promptserver.adapter.in.rest.request;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gongdel.promptserver.application.port.in.command.CreateCategoryCommand;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * CreateCategoryRequest DTO 클래스에 대한 테스트
@@ -40,12 +41,12 @@ class CreateCategoryRequestTest {
 
         // when
         CreateCategoryRequest request = CreateCategoryRequest.builder()
-                .name(name)
-                .displayName(displayName)
-                .description(description)
-                .parentCategoryId(parentCategoryId)
-                .isSystem(isSystem)
-                .build();
+            .name(name)
+            .displayName(displayName)
+            .description(description)
+            .parentCategoryId(parentCategoryId)
+            .isSystem(isSystem)
+            .build();
 
         // then
         assertThat(request).isNotNull();
@@ -102,12 +103,12 @@ class CreateCategoryRequestTest {
         boolean isSystem = true;
 
         CreateCategoryRequest request = CreateCategoryRequest.builder()
-                .name(name)
-                .displayName(displayName)
-                .description(description)
-                .parentCategoryId(parentCategoryId)
-                .isSystem(isSystem)
-                .build();
+            .name(name)
+            .displayName(displayName)
+            .description(description)
+            .parentCategoryId(parentCategoryId)
+            .isSystem(isSystem)
+            .build();
 
         // when
         CreateCategoryCommand command = request.toCommand();
@@ -130,9 +131,9 @@ class CreateCategoryRequestTest {
         void nameShouldNotBeNull() {
             // given
             CreateCategoryRequest request = CreateCategoryRequest.builder()
-                    .name(null)
-                    .displayName("테스트 카테고리")
-                    .build();
+                .name(null)
+                .displayName("테스트 카테고리")
+                .build();
 
             // when
             Set<ConstraintViolation<CreateCategoryRequest>> violations = validator.validate(request);
@@ -140,18 +141,18 @@ class CreateCategoryRequestTest {
             // then
             assertThat(violations).isNotEmpty();
             assertThat(violations).anyMatch(violation -> violation.getPropertyPath().toString().equals("name") &&
-                    violation.getMessage().equals("카테고리 이름은 필수입니다"));
+                violation.getMessage().equals("카테고리 이름은 필수입니다"));
         }
 
         @ParameterizedTest
-        @ValueSource(strings = { "", " ", "   " })
+        @ValueSource(strings = {"", " ", "   "})
         @DisplayName("이름이 비어있거나 공백만 있으면 유효성 검증에 실패한다")
         void nameShouldNotBeBlank(String blankName) {
             // given
             CreateCategoryRequest request = CreateCategoryRequest.builder()
-                    .name(blankName)
-                    .displayName("테스트 카테고리")
-                    .build();
+                .name(blankName)
+                .displayName("테스트 카테고리")
+                .build();
 
             // when
             Set<ConstraintViolation<CreateCategoryRequest>> violations = validator.validate(request);
@@ -159,7 +160,7 @@ class CreateCategoryRequestTest {
             // then
             assertThat(violations).isNotEmpty();
             assertThat(violations).anyMatch(violation -> violation.getPropertyPath().toString().equals("name") &&
-                    violation.getMessage().equals("카테고리 이름은 필수입니다"));
+                violation.getMessage().equals("카테고리 이름은 필수입니다"));
         }
 
         @Test
@@ -167,9 +168,9 @@ class CreateCategoryRequestTest {
         void displayNameShouldNotBeNull() {
             // given
             CreateCategoryRequest request = CreateCategoryRequest.builder()
-                    .name("test-category")
-                    .displayName(null)
-                    .build();
+                .name("test-category")
+                .displayName(null)
+                .build();
 
             // when
             Set<ConstraintViolation<CreateCategoryRequest>> violations = validator.validate(request);
@@ -177,18 +178,18 @@ class CreateCategoryRequestTest {
             // then
             assertThat(violations).isNotEmpty();
             assertThat(violations).anyMatch(violation -> violation.getPropertyPath().toString().equals("displayName") &&
-                    violation.getMessage().equals("카테고리 표시 이름은 필수입니다"));
+                violation.getMessage().equals("카테고리 표시 이름은 필수입니다"));
         }
 
         @ParameterizedTest
-        @ValueSource(strings = { "", " ", "   " })
+        @ValueSource(strings = {"", " ", "   "})
         @DisplayName("표시 이름이 비어있거나 공백만 있으면 유효성 검증에 실패한다")
         void displayNameShouldNotBeBlank(String blankDisplayName) {
             // given
             CreateCategoryRequest request = CreateCategoryRequest.builder()
-                    .name("test-category")
-                    .displayName(blankDisplayName)
-                    .build();
+                .name("test-category")
+                .displayName(blankDisplayName)
+                .build();
 
             // when
             Set<ConstraintViolation<CreateCategoryRequest>> violations = validator.validate(request);
@@ -196,7 +197,7 @@ class CreateCategoryRequestTest {
             // then
             assertThat(violations).isNotEmpty();
             assertThat(violations).anyMatch(violation -> violation.getPropertyPath().toString().equals("displayName") &&
-                    violation.getMessage().equals("카테고리 표시 이름은 필수입니다"));
+                violation.getMessage().equals("카테고리 표시 이름은 필수입니다"));
         }
 
         @Test
@@ -204,10 +205,10 @@ class CreateCategoryRequestTest {
         void descriptionCanBeNull() {
             // given
             CreateCategoryRequest request = CreateCategoryRequest.builder()
-                    .name("test-category")
-                    .displayName("테스트 카테고리")
-                    .description(null)
-                    .build();
+                .name("test-category")
+                .displayName("테스트 카테고리")
+                .description(null)
+                .build();
 
             // when
             Set<ConstraintViolation<CreateCategoryRequest>> violations = validator.validate(request);
@@ -221,10 +222,10 @@ class CreateCategoryRequestTest {
         void parentCategoryIdCanBeNull() {
             // given
             CreateCategoryRequest request = CreateCategoryRequest.builder()
-                    .name("test-category")
-                    .displayName("테스트 카테고리")
-                    .parentCategoryId(null)
-                    .build();
+                .name("test-category")
+                .displayName("테스트 카테고리")
+                .parentCategoryId(null)
+                .build();
 
             // when
             Set<ConstraintViolation<CreateCategoryRequest>> violations = validator.validate(request);

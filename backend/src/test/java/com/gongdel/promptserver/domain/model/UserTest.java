@@ -1,11 +1,12 @@
 package com.gongdel.promptserver.domain.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * User 도메인 모델 테스트
@@ -24,12 +25,12 @@ class UserTest {
 
         // when
         User user = User.builder()
-                .id(id)
-                .email(email)
-                .name(name)
-                .password(password)
-                .role(role)
-                .build();
+            .id(id)
+            .email(email)
+            .name(name)
+            .password(password)
+            .role(role)
+            .build();
 
         // then
         assertThat(user.getId()).isEqualTo(id);
@@ -52,12 +53,12 @@ class UserTest {
 
         // when
         User user = User.builder()
-                .id(id)
-                .email(email)
-                .name(name)
-                .password(password)
-                .role(null)
-                .build();
+            .id(id)
+            .email(email)
+            .name(name)
+            .password(password)
+            .role(null)
+            .build();
 
         // then
         assertThat(user.getRole()).isEqualTo(UserRole.ROLE_USER);
@@ -68,12 +69,12 @@ class UserTest {
     void updateUser() {
         // given
         User user = User.builder()
-                .id(UUID.randomUUID())
-                .email("test@example.com")
-                .name("원래 이름")
-                .password("원래 비밀번호")
-                .role(UserRole.ROLE_USER)
-                .build();
+            .id(UUID.randomUUID())
+            .email("test@example.com")
+            .name("원래 이름")
+            .password("원래 비밀번호")
+            .role(UserRole.ROLE_USER)
+            .build();
 
         LocalDateTime originalUpdatedAt = user.getUpdatedAt();
 
@@ -100,12 +101,12 @@ class UserTest {
     void updateUserRole() {
         // given
         User user = User.builder()
-                .id(UUID.randomUUID())
-                .email("test@example.com")
-                .name("테스트 사용자")
-                .password("password1234")
-                .role(UserRole.ROLE_USER)
-                .build();
+            .id(UUID.randomUUID())
+            .email("test@example.com")
+            .name("테스트 사용자")
+            .password("password1234")
+            .role(UserRole.ROLE_USER)
+            .build();
 
         LocalDateTime originalUpdatedAt = user.getUpdatedAt();
 
@@ -133,12 +134,12 @@ class UserTest {
         String name = "테스트 사용자";
         String password = "password1234";
         User user = User.builder()
-                .id(id)
-                .email(email)
-                .name(name)
-                .password(password)
-                .role(UserRole.ROLE_USER)
-                .build();
+            .id(id)
+            .email(email)
+            .name(name)
+            .password(password)
+            .role(UserRole.ROLE_USER)
+            .build();
 
         // when
         String userString = user.toString();

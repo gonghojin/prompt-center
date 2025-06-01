@@ -44,23 +44,19 @@ public class CreatePromptVersionCommand {
      */
     @NonNull
     private final Long createdById;
-
-    /**
-     * 변수
-     */
-    private List<InputVariable> inputVariables;
-
-
     /**
      * 액션 타입
      */
     @NonNull
     private final PromptVersionActionType actionType;
-
     /**
      * UUID
      */
     private final UUID uuid;
+    /**
+     * 변수
+     */
+    private List<InputVariable> inputVariables;
 
     /**
      * 필수 필드만으로 생성하는 팩토리 메서드

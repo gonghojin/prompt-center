@@ -1,12 +1,13 @@
 package com.gongdel.promptserver.adapter.in.rest.response;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gongdel.promptserver.domain.model.User;
 import com.gongdel.promptserver.domain.model.UserRole;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * UserResponse DTO 클래스에 대한 단위 테스트
@@ -22,12 +23,12 @@ class UserResponseTest {
         String name = "테스트 사용자";
 
         User user = User.builder()
-                .id(id)
-                .email(email)
-                .name(name)
-                .password("password1234") // DTO에는 포함되지 않음
-                .role(UserRole.ROLE_USER) // DTO에는 포함되지 않음
-                .build();
+            .id(id)
+            .email(email)
+            .name(name)
+            .password("password1234") // DTO에는 포함되지 않음
+            .role(UserRole.ROLE_USER) // DTO에는 포함되지 않음
+            .build();
 
         // when
         UserResponse userResponse = UserResponse.from(user);
@@ -49,10 +50,10 @@ class UserResponseTest {
 
         // when
         UserResponse userResponse = UserResponse.builder()
-                .id(id)
-                .email(email)
-                .name(name)
-                .build();
+            .id(id)
+            .email(email)
+            .name(name)
+            .build();
 
         // then
         assertThat(userResponse).isNotNull();
