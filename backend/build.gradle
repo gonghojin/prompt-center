@@ -74,6 +74,12 @@ dependencies {
 
     // Hibernate Types for JSON mapping
     implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
+
+    // QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 }
 
 tasks.named('test') {
@@ -173,4 +179,20 @@ tasks.register('jacocoDetailedReport') {
             println "JaCoCo 리포트가 생성되지 않았습니다. 먼저 테스트를 실행해주세요."
         }
     }
+}
+
+// QueryDSL 설정
+def querydslDir = "$buildDir/generated/querydsl"
+
+
+sourceSets {
+    main {
+        java {
+            srcDirs += querydslDir
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
 }

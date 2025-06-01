@@ -3,7 +3,6 @@ package com.gongdel.promptserver.adapter.in.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gongdel.promptserver.adapter.in.rest.request.CreateCategoryRequest;
 import com.gongdel.promptserver.adapter.in.rest.request.UpdateCategoryRequest;
-import com.gongdel.promptserver.adapter.in.rest.response.CategoryResponse;
 import com.gongdel.promptserver.application.exception.CategoryDuplicateNameException;
 import com.gongdel.promptserver.application.exception.CategoryNotFoundException;
 import com.gongdel.promptserver.application.port.in.CategoryCommandUseCase;
@@ -18,9 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CategoryCommandController.class)
 class CategoryCommandControllerTest {

@@ -2,7 +2,8 @@ package com.gongdel.promptserver.adapter.in.rest;
 
 import com.gongdel.promptserver.adapter.in.rest.request.CreatePromptRequest;
 import com.gongdel.promptserver.adapter.in.rest.request.InputVariableDto;
-import com.gongdel.promptserver.adapter.in.rest.response.PromptResponse;
+import com.gongdel.promptserver.adapter.in.rest.response.CreatePromptResponse;
+import com.gongdel.promptserver.application.dto.RegisterPromptResponse;
 import com.gongdel.promptserver.application.port.in.PromptCommandUseCase;
 import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
 import com.gongdel.promptserver.domain.model.*;
@@ -19,13 +20,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.Assert;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.gongdel.promptserver.application.constant.DevelopmentConstants.*;
+import com.gongdel.promptserver.application.exception.ApplicationErrorCode;
+import com.gongdel.promptserver.application.exception.ApplicationException;
+import com.gongdel.promptserver.domain.exception.PromptValidationException;
 
 /**
  * 프롬프트 생성 등 명령성 작업을 처리하는 REST 컨트롤러입니다.
@@ -37,7 +42,7 @@ import static com.gongdel.promptserver.application.constant.DevelopmentConstants
 @RequiredArgsConstructor
 public class PromptCommandController {
 
-    private final PromptCommandUseCase registerPromptUseCase;
+    private final PromptCommandUseCase promptCommandUseCase;
 
     /**
      * 새로운 프롬프트를 생성합니다.
@@ -47,16 +52,35 @@ public class PromptCommandController {
      */
     @Operation(summary = "프롬프트 생성", description = "새로운 프롬프트를 생성합니다.")
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "프롬프트 생성 성공"),
-        @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            @ApiResponse(responseCode = "201", description = "프롬프트 생성 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청")
     })
     @PostMapping
-    public ResponseEntity<PromptResponse> createPrompt(@Valid @RequestBody CreatePromptRequest request) {
+    public ResponseEntity<CreatePromptResponse> createPrompt(@Valid @RequestBody final CreatePromptRequest request) {
         log.info("Creating new prompt with title: [{}]", request.getTitle());
-        RegisterPromptCommand command = buildRegisterPromptCommand(request);
-        PromptTemplate promptTemplate = registerPromptUseCase.registerPrompt(command);
-        log.info("Successfully created prompt with ID: [{}]", promptTemplate.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(PromptResponse.from(promptTemplate));
+        validateCreatePromptRequest(request);
+
+        final RegisterPromptCommand command = buildRegisterPromptCommand(request);
+        final RegisterPromptResponse response = promptCommandUseCase.registerPrompt(command);
+        log.info("Prompt created. ID: [{}]", response.getUuid());
+        return ResponseEntity.status(HttpStatus.CREATED).body(CreatePromptResponse.from(response));
+    }
+
+    /**
+     * 프롬프트 생성 요청의 필수 필드를 검증합니다.
+     *
+     * @param request 프롬프트 생성 요청 정보
+     */
+    private void validateCreatePromptRequest(final CreatePromptRequest request) {
+        try {
+            Assert.hasText(request.getTitle(), "Prompt title must not be empty");
+            Assert.hasText(request.getContent(), "Prompt content must not be empty");
+            Assert.hasText(request.getDescription(), "Prompt description must not be empty");
+            Assert.notNull(request.getCategoryId(), "CategoryId must not be null");
+            // 기타 필수 필드 검증 필요시 추가
+        } catch (IllegalArgumentException e) {
+            throw new PromptValidationException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -66,11 +90,11 @@ public class PromptCommandController {
      */
     private User createTemporaryUser() {
         return User.builder()
-            .id(UUID.fromString(TEMP_USER_UUID))
-            .name(TEMP_USER_NAME)
-            .email(TEMP_USER_EMAIL)
-            .role(UserRole.ROLE_USER)
-            .build();
+                .id(UUID.fromString(TEMP_USER_UUID))
+                .name(TEMP_USER_NAME)
+                .email(TEMP_USER_EMAIL)
+                .role(UserRole.ROLE_USER)
+                .build();
     }
 
     /**
@@ -79,28 +103,38 @@ public class PromptCommandController {
      * @param request 프롬프트 생성 요청 정보
      * @return 프롬프트 등록 커맨드 객체
      */
-    private RegisterPromptCommand buildRegisterPromptCommand(CreatePromptRequest request) {
-        User author = (request.getCreatedBy() != null)
-            ? toDomainUser(request.getCreatedBy())
-            : createTemporaryUser();
-        List<InputVariable> inputVariables = request
-            .getInputVariables() != null
-            ? request.getInputVariables().stream()
-            .map(InputVariableDto::toDomain)
-            .toList()
-            : List.of();
+    private RegisterPromptCommand buildRegisterPromptCommand(final CreatePromptRequest request) {
+        final User author = (request.getCreatedBy() != null)
+                ? toDomainUser(request.getCreatedBy())
+                : createTemporaryUser();
+        final List<InputVariable> inputVariables = mapInputVariables(request.getInputVariables());
 
         return RegisterPromptCommand.builder()
-            .title(request.getTitle())
-            .description(request.getDescription())
-            .content(request.getContent())
-            .createdBy(author)
-            .tags(request.getTags())
-            .inputVariables(inputVariables)
-            .categoryId(request.getCategoryId())
-            .visibility(parseVisibility(request.getVisibility(), author))
-            .status(parseStatus(request.getStatus()))
-            .build();
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .content(request.getContent())
+                .createdBy(author)
+                .tags(request.getTags())
+                .inputVariables(inputVariables)
+                .categoryId(request.getCategoryId())
+                .visibility(parseVisibility(request.getVisibility(), author))
+                .status(parseStatus(request.getStatus()))
+                .build();
+    }
+
+    /**
+     * 입력 변수 DTO 리스트를 도메인 객체 리스트로 변환합니다.
+     *
+     * @param inputVariableDtos 입력 변수 DTO 리스트
+     * @return 도메인 InputVariable 리스트
+     */
+    private List<InputVariable> mapInputVariables(final List<InputVariableDto> inputVariableDtos) {
+        if (inputVariableDtos == null || inputVariableDtos.isEmpty()) {
+            return List.of();
+        }
+        return inputVariableDtos.stream()
+                .map(InputVariableDto::toDomain)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     /**
@@ -109,13 +143,14 @@ public class PromptCommandController {
      * @param userDto 사용자 DTO
      * @return 도메인 User 객체
      */
-    private User toDomainUser(CreatePromptRequest.UserDto userDto) {
+    private User toDomainUser(final CreatePromptRequest.UserDto userDto) {
+        Assert.notNull(userDto, "UserDto must not be null");
         return User.builder()
-            .id(userDto.getId() != null ? userDto.getId() : UUID.randomUUID())
-            .email(userDto.getEmail())
-            .name(userDto.getName())
-            .role(UserRole.ROLE_USER)
-            .build();
+                .id(userDto.getId() != null ? userDto.getId() : UUID.randomUUID())
+                .email(userDto.getEmail())
+                .name(userDto.getName())
+                .role(UserRole.ROLE_USER)
+                .build();
     }
 
     /**
@@ -125,17 +160,15 @@ public class PromptCommandController {
      * @param author     작성자
      * @return Visibility 열거형
      */
-    private Visibility parseVisibility(String visibility, User author) {
+    private Visibility parseVisibility(final String visibility, final User author) {
         if (visibility != null && !visibility.isBlank()) {
             try {
                 return Visibility.valueOf(visibility.toUpperCase());
-            } catch (Exception ignored) {
-                // 무시하고 기본값 처리
+            } catch (Exception e) {
+                log.warn("Invalid visibility value: {}. Defaulting to PRIVATE or TEAM.", visibility);
             }
         }
-        if (author.getTeam() != null)
-            return Visibility.TEAM;
-        return Visibility.PRIVATE;
+        return (author.getTeam() != null) ? Visibility.TEAM : Visibility.PRIVATE;
     }
 
     /**
@@ -144,29 +177,14 @@ public class PromptCommandController {
      * @param status 상태 문자열
      * @return PromptStatus 열거형
      */
-    private PromptStatus parseStatus(String status) {
+    private PromptStatus parseStatus(final String status) {
         if (status != null && !status.isBlank()) {
             try {
                 return PromptStatus.valueOf(status.toUpperCase());
-            } catch (Exception ignored) {
-                // 무시하고 기본값 처리
+            } catch (Exception e) {
+                log.warn("Invalid status value: {}. Defaulting to DRAFT.", status);
             }
         }
         return PromptStatus.DRAFT;
-    }
-
-    /**
-     * 태그 ID 집합을 태그 문자열 집합으로 변환합니다.
-     *
-     * @param tagIds 태그 ID 집합
-     * @return 태그 문자열 집합
-     */
-    private Set<String> convertTagIdsToTags(Set<UUID> tagIds) {
-        if (tagIds == null || tagIds.isEmpty()) {
-            return Collections.emptySet();
-        }
-        return tagIds.stream()
-            .map(UUID::toString)
-            .collect(java.util.stream.Collectors.toSet());
     }
 }

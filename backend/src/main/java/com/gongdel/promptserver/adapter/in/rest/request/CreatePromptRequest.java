@@ -1,6 +1,7 @@
 package com.gongdel.promptserver.adapter.in.rest.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -56,10 +57,10 @@ public class CreatePromptRequest {
      */
     private List<InputVariableDto> inputVariables;
 
-
     /**
      * 카테고리 ID
      */
+    @NotNull(message = "CategoryId is required")
     private Long categoryId;
 
     /**
@@ -67,6 +68,7 @@ public class CreatePromptRequest {
      * 예시: "PUBLIC", "PRIVATE", "TEAM"
      * 실제 enum: com.gongdel.promptserver.domain.model.Visibility
      */
+    @NotBlank(message = "Visibility is required")
     private String visibility;
 
     /**
@@ -74,6 +76,7 @@ public class CreatePromptRequest {
      * 예시: "ARCHIVED", "DRAFT"
      * 실제 enum: com.gongdel.promptserver.domain.model.PromptStatus
      */
+    @NotBlank(message = "Status is required")
     private String status;
 
     /**

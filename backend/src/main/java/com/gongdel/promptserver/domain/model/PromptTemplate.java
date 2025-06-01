@@ -1,6 +1,5 @@
 package com.gongdel.promptserver.domain.model;
 
-import com.gongdel.promptserver.adapter.in.rest.request.CreatePromptRequest.CreatePromptRequestBuilder;
 import com.gongdel.promptserver.domain.exception.PromptValidationException;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
@@ -8,7 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * 프롬프트 템플릿을 나타내는 도메인 모델 클래스입니다. 모델 문서에 정의된 엔티티 구조에 맞춰 구현되었으며, 프롬프트 템플릿의 생성, 수정,
@@ -37,13 +37,6 @@ public class PromptTemplate extends BaseTimeEntity {
     private PromptStatus status;
     private String description;
 
-    // 관계 도메인 객체 필드 추가
-    private User createdBy;
-    private Category category;
-    private List<Tag> tags;
-    private PromptVersion version;
-    private PromptStats stats;
-
     @Builder
     public PromptTemplate(
             Long id,
@@ -55,11 +48,6 @@ public class PromptTemplate extends BaseTimeEntity {
             Visibility visibility,
             PromptStatus status,
             String description,
-            User createdBy,
-            Category category,
-            List<Tag> tags,
-            PromptVersion version,
-            PromptStats stats,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
         super(createdAt, updatedAt);
@@ -79,13 +67,6 @@ public class PromptTemplate extends BaseTimeEntity {
         this.visibility = initializeVisibility(visibility);
         this.status = initializeStatus(status);
         this.description = description;
-
-        // 관계 도메인 객체 초기화
-        this.createdBy = createdBy;
-        this.category = category;
-        this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
-        this.version = version;
-        this.stats = stats != null ? stats : new PromptStats();
 
         log.debug("Created prompt template: id={}, title={}, createdById={}, hasVersion={}",
                 this.id, this.title, this.createdById, this.currentVersionId != null);
@@ -273,4 +254,86 @@ public class PromptTemplate extends BaseTimeEntity {
         log.debug("Updated status: promptId={}, status={}", id, status);
     }
 
+    /**
+     * 도메인 유효성 검증
+     */
+    public void validate() {
+        if (StringUtils.isBlank(title))
+            throw new PromptValidationException("제목은 비어있을 수 없습니다");
+        if (createdById == null)
+            throw new PromptValidationException("생성자 ID는 필수입니다");
+        if (description != null && description.length() > 1000)
+            throw new PromptValidationException("설명은 1000자를 초과할 수 없습니다");
+    }
+
+    /**
+     * 최초 등록(생성)용 프롬프트 템플릿 생성 팩토리 메서드입니다.
+     * currentVersionId는 null로 고정됩니다.
+     *
+     * @param title       제목
+     * @param description 설명
+     * @param createdById 생성자 ID
+     * @param visibility  가시성
+     * @param categoryId  카테고리 ID
+     * @param status      상태
+     * @return 최초 등록용 프롬프트 템플릿
+     */
+    public static PromptTemplate newTemplateForInitialRegistration(
+            String title,
+            String description,
+            Long createdById,
+            Visibility visibility,
+            Long categoryId,
+            PromptStatus status) {
+
+        return new PromptTemplate(
+                null, // id
+                null, // uuid
+                title,
+                null, // currentVersionId (최초 등록이므로 null)
+                categoryId,
+                createdById,
+                visibility,
+                status,
+                description,
+                null, // createdAt
+                null // updatedAt
+        );
+    }
+
+    /**
+     * 일반 생성/조회용 프롬프트 템플릿 생성 팩토리 메서드입니다.
+     *
+     * @param id               PK
+     * @param uuid             UUID
+     * @param title            제목
+     * @param currentVersionId 현재 버전 ID
+     * @param categoryId       카테고리 ID
+     * @param createdById      생성자 ID
+     * @param visibility       가시성
+     * @param status           상태
+     * @param description      설명
+     * @param createdAt        생성일
+     * @param updatedAt        수정일
+     * @return 프롬프트 템플릿
+     */
+    public static PromptTemplate of(
+            Long id,
+            UUID uuid,
+            String title,
+            Long currentVersionId,
+            Long categoryId,
+            Long createdById,
+            Visibility visibility,
+            PromptStatus status,
+            String description,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt) {
+        if (currentVersionId == null) {
+            throw new PromptValidationException("일반 생성/조회 시 currentVersionId는 null이 아니어야 합니다.");
+        }
+        return new PromptTemplate(
+                id, uuid, title, currentVersionId, categoryId, createdById, visibility, status, description, createdAt,
+                updatedAt);
+    }
 }

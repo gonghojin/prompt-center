@@ -42,4 +42,19 @@ public enum PromptStatus {
     public String toString() {
         return displayName;
     }
+
+    /**
+     * 문자열을 PromptStatus로 안전하게 변환합니다. 잘못된 값이면 기본값을 반환합니다.
+     *
+     * @param value        파싱할 문자열
+     * @param defaultValue 기본값
+     * @return 파싱된 PromptStatus 또는 기본값
+     */
+    public static PromptStatus fromString(String value, PromptStatus defaultValue) {
+        try {
+            return PromptStatus.valueOf(value);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return defaultValue;
+        }
+    }
 }

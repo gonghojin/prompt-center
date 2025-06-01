@@ -1,12 +1,14 @@
 package com.gongdel.promptserver.adapter.in.rest;
 
-import com.gongdel.promptserver.adapter.in.rest.response.PromptResponse;
+import com.gongdel.promptserver.adapter.in.rest.response.PromptDetailResponse;
+import com.gongdel.promptserver.adapter.in.rest.response.PromptListResponse;
+import com.gongdel.promptserver.adapter.in.rest.response.PageResponse;
 import com.gongdel.promptserver.application.port.in.CategoryQueryUseCase;
 import com.gongdel.promptserver.application.port.in.PromptsQueryUseCase;
-import com.gongdel.promptserver.domain.model.Category;
+import com.gongdel.promptserver.domain.model.PromptSearchCondition;
+import com.gongdel.promptserver.domain.model.PromptSearchResult;
+import com.gongdel.promptserver.domain.model.PromptSortType;
 import com.gongdel.promptserver.domain.model.PromptStatus;
-import com.gongdel.promptserver.domain.model.PromptTemplate;
-import com.gongdel.promptserver.domain.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,12 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * 프롬프트 조회 관련 REST API를 제공하는 컨트롤러입니다.
@@ -34,167 +34,75 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PromptQueryController {
 
-    private final PromptsQueryUseCase getPromptsUseCase;
-    private final CategoryQueryUseCase categoryQueryUseCase;
+        private final PromptsQueryUseCase getPromptsUseCase;
 
-    /**
-     * ID로 프롬프트를 조회합니다.
-     *
-     * @param id 프롬프트 ID
-     * @return 프롬프트 정보 또는 404 응답
-     */
-    @Operation(summary = "프롬프트 단건 조회", description = "ID로 프롬프트를 조회합니다.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "프롬프트 조회 성공"),
-        @ApiResponse(responseCode = "404", description = "프롬프트 없음")
-    })
-    @GetMapping("/{id}")
-    public ResponseEntity<PromptResponse> getPrompt(
-        @Parameter(description = "프롬프트 ID", example = "1") @PathVariable UUID id) {
-        log.info("Retrieving prompt with id: {}", id);
-        Optional<PromptTemplate> prompt = getPromptsUseCase.loadPromptByUuid(id);
-        return prompt
-            .map(p -> ResponseEntity.ok(PromptResponse.from(p)))
-            .orElse(ResponseEntity.notFound().build());
-    }
+        /**
+         * ID로 프롬프트를 조회합니다.
+         *
+         * @param id 프롬프트 ID
+         * @return 프롬프트 정보 또는 404 응답
+         */
+        @GetMapping("/{id}")
+        @Operation(summary = "프롬프트 상세 조회", description = "UUID로 프롬프트 상세 정보를 조회합니다.")
+        public ResponseEntity<PromptDetailResponse> getPrompt(
+                        @Parameter(description = "프롬프트 ID", example = "1") @PathVariable UUID id) {
+                Assert.notNull(id, "프롬프트 ID는 null일 수 없습니다.");
+                log.info("Retrieving prompt with id: {}", id);
 
-    /**
-     * 모든 프롬프트 목록을 페이지네이션하여 조회합니다.
-     *
-     * @param pageable 페이지네이션 정보
-     * @return 프롬프트 목록 페이지
-     */
-    @Operation(summary = "프롬프트 전체 목록 조회", description = "모든 프롬프트 목록을 페이지네이션하여 조회합니다.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "프롬프트 목록 조회 성공")
-    })
-    @GetMapping
-    public ResponseEntity<List<PromptResponse>> getAllPrompts(Pageable pageable) {
-        log.info("Retrieving all prompts (paged)");
-        Page<PromptTemplate> promptsPage = getPromptsUseCase.findAllPrompts(pageable);
-        List<PromptResponse> response = promptsPage.getContent().stream()
-            .map(PromptResponse::from)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * 공개된 프롬프트 목록을 페이지네이션하여 조회합니다.
-     *
-     * @param pageable 페이지네이션 정보
-     * @return 공개 프롬프트 목록 페이지
-     */
-    @Operation(summary = "공개 프롬프트 목록 조회", description = "공개된 프롬프트 목록을 페이지네이션하여 조회합니다.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "공개 프롬프트 목록 조회 성공")
-    })
-    @GetMapping("/public")
-    public ResponseEntity<List<PromptResponse>> getPublicPrompts(Pageable pageable) {
-        log.info("Retrieving public prompts (paged)");
-        Page<PromptTemplate> promptsPage = getPromptsUseCase
-            .findPromptsByVisibilityAndStatus(
-                com.gongdel.promptserver.domain.model.Visibility.PUBLIC,
-                PromptStatus.PUBLISHED,
-                pageable);
-        List<PromptResponse> response = promptsPage.getContent().stream()
-            .map(PromptResponse::from)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * 특정 작성자의 프롬프트 목록을 페이지네이션하여 조회합니다.
-     *
-     * @param authorId 작성자 ID
-     * @param pageable 페이지네이션 정보
-     * @return 작성자의 프롬프트 목록 페이지
-     */
-    @Operation(summary = "작성자별 프롬프트 목록 조회", description = "특정 작성자의 프롬프트 목록을 페이지네이션하여 조회합니다.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "작성자별 프롬프트 목록 조회 성공")
-    })
-    @GetMapping("/author/{authorId}")
-    public ResponseEntity<List<PromptResponse>> getPromptsByAuthor(
-        @Parameter(description = "작성자 ID", example = "1") @PathVariable UUID authorId,
-        Pageable pageable) {
-        log.info("Retrieving prompts by author: {} (paged)", authorId);
-        User user = User.builder().id(authorId).build();
-        Page<PromptTemplate> promptsPage = getPromptsUseCase
-            .findPromptsByCreatedByAndStatus(
-                user,
-                PromptStatus.PUBLISHED,
-                pageable);
-        List<PromptResponse> response = promptsPage.getContent().stream()
-            .map(PromptResponse::from)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * 키워드로 프롬프트를 검색합니다.
-     *
-     * @param keyword  검색 키워드
-     * @param pageable 페이지네이션 정보
-     * @param status   프롬프트 상태 (기본값: PUBLISHED)
-     * @return 검색 결과 프롬프트 목록
-     */
-    @Operation(summary = "프롬프트 키워드 검색", description = "키워드로 프롬프트를 검색합니다.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "프롬프트 검색 성공")
-    })
-    @GetMapping("/search")
-    public ResponseEntity<List<PromptResponse>> searchPrompts(
-        @Parameter(description = "검색 키워드", example = "AI") @RequestParam String keyword,
-        Pageable pageable,
-        @RequestParam(name = "status", required = false, defaultValue = "PUBLISHED") String status) {
-        log.info("Searching prompts with keyword: {}", keyword);
-        PromptStatus promptStatus = PromptStatus
-            .valueOf(status);
-        Page<PromptTemplate> promptsPage = getPromptsUseCase
-            .searchPromptsByKeyword(keyword, promptStatus, pageable);
-        List<PromptResponse> response = promptsPage.getContent().stream()
-            .map(PromptResponse::from)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * 카테고리별 프롬프트 목록을 페이지네이션하여 조회합니다.
-     *
-     * @param categoryId 카테고리 ID
-     * @param pageable   페이지네이션 정보
-     * @param status     프롬프트 상태 (기본값: PUBLISHED)
-     * @return 카테고리별 프롬프트 목록 페이지
-     */
-    @Operation(summary = "카테고리별 프롬프트 목록 조회", description = "특정 카테고리의 프롬프트 목록을 페이지네이션하여 조회합니다.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "카테고리별 프롬프트 목록 조회 성공"),
-        @ApiResponse(responseCode = "404", description = "카테고리 없음")
-    })
-    @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<PromptResponse>> getPromptsByCategory(
-        @Parameter(description = "카테고리 ID", example = "1") @PathVariable Long categoryId,
-        Pageable pageable,
-        @RequestParam(name = "status", required = false, defaultValue = "PUBLISHED") String status) {
-        log.info("Retrieving prompts by category: {} (paged)", categoryId);
-        Optional<Category> categoryOpt = categoryQueryUseCase.getCategoryById(categoryId);
-        if (categoryOpt.isEmpty()) {
-            log.warn("Category not found with id: {}", categoryId);
-            return ResponseEntity.notFound().build();
+                return getPromptsUseCase.loadPromptDetailByUuid(id)
+                                .map(detail -> ResponseEntity.ok(PromptDetailResponse.from(detail)))
+                                .orElseGet(() -> {
+                                        log.warn("Prompt not found with id: {}", id);
+                                        return ResponseEntity.notFound().build();
+                                });
         }
-        Category category = categoryOpt.get();
-        PromptStatus promptStatus;
-        try {
-            promptStatus = PromptStatus.valueOf(status);
-        } catch (IllegalArgumentException e) {
-            log.warn("Invalid prompt status: {}. Defaulting to PUBLISHED", status);
-            promptStatus = PromptStatus.PUBLISHED;
+
+        /**
+         * 복합 검색 조건(제목, 설명, 태그, 카테고리, 정렬 등)으로 프롬프트를 조회합니다.
+         *
+         * @param title       프롬프트 제목(옵션)
+         * @param description 설명(옵션)
+         * @param tag         태그(옵션)
+         * @param categoryId  카테고리 ID(옵션)
+         * @param status      프롬프트 상태(옵션, 기본값: PUBLISHED)
+         * @param sortType    정렬 기준(옵션, 기본값: LATEST_MODIFIED)
+         * @param pageable    페이징 정보
+         * @return 프롬프트 검색 결과 페이지 (공통 페이징 포맷)
+         */
+        @Operation(summary = "프롬프트 복합 검색", description = "제목, 설명, 태그, 카테고리, 정렬 등 다양한 조건으로 프롬프트를 페이징 조회합니다.")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "프롬프트 검색 성공"),
+                        @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+                        @ApiResponse(responseCode = "500", description = "서버 오류")
+        })
+        @GetMapping("/advanced-search")
+        public ResponseEntity<PageResponse<PromptListResponse>> searchPromptsAdvanced(
+                        @Parameter(description = "프롬프트 제목", example = "AI 추천") @RequestParam(required = false) String title,
+                        @Parameter(description = "프롬프트 설명", example = "이미지 생성") @RequestParam(required = false) String description,
+                        @Parameter(description = "태그", example = "stable-diffusion") @RequestParam(required = false) String tag,
+                        @Parameter(description = "카테고리 ID", example = "1") @RequestParam(required = false) Long categoryId,
+                        @Parameter(description = "프롬프트 상태", example = "PUBLISHED", required = false) @RequestParam(required = false, defaultValue = "PUBLISHED") String status,
+                        @Parameter(description = "정렬 기준 (LATEST_MODIFIED: 최근 수정순, TITLE: 프롬프트 이름순)", example = "LATEST_MODIFIED", required = false) @RequestParam(required = false, defaultValue = "LATEST_MODIFIED") PromptSortType sortType,
+                        Pageable pageable) {
+                Assert.notNull(pageable, "Pageable 정보는 null일 수 없습니다.");
+
+                PromptStatus promptStatus = PromptStatus.fromString(status, PromptStatus.PUBLISHED);
+
+                log.info("Advanced search: title={}, description={}, tag={}, categoryId={}, status={}, sortType={}",
+                                title, description, tag, categoryId, promptStatus, sortType);
+
+                PromptSearchCondition condition = PromptSearchCondition.builder()
+                                .title(title)
+                                .description(description)
+                                .tag(tag)
+                                .categoryId(categoryId)
+                                .status(promptStatus)
+                                .sortType(sortType)
+                                .pageable(pageable)
+                                .build();
+                Page<PromptSearchResult> resultPage = getPromptsUseCase.searchPrompts(condition);
+
+                Page<PromptListResponse> mappedPage = resultPage.map(PromptListResponse::from);
+                return ResponseEntity.ok(PageResponse.from(mappedPage));
         }
-        Page<PromptTemplate> promptsPage = getPromptsUseCase
-            .findPromptsByCategoryAndStatus(category, promptStatus, pageable);
-        List<PromptResponse> response = promptsPage.getContent().stream()
-            .map(PromptResponse::from)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
 }

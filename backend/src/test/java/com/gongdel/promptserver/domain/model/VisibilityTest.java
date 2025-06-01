@@ -61,8 +61,8 @@ class VisibilityTest {
         Visibility[] visibilities = Visibility.values();
 
         // then
-        assertThat(visibilities).hasSize(2);
-        assertThat(visibilities).contains(Visibility.PUBLIC, Visibility.PRIVATE);
+        assertThat(visibilities).hasSize(3);
+        assertThat(visibilities).contains(Visibility.PUBLIC, Visibility.PRIVATE, Visibility.TEAM);
     }
 
     @Test

@@ -7,6 +7,7 @@ import com.gongdel.promptserver.application.port.in.query.FindPromptVersionsUseC
 import com.gongdel.promptserver.application.port.in.query.GetPromptVersionUseCase;
 import com.gongdel.promptserver.application.port.out.query.FindPromptVersionsPort;
 import com.gongdel.promptserver.application.port.out.query.LoadPromptVersionPort;
+import com.gongdel.promptserver.domain.exception.PromptVersionDomainException;
 import com.gongdel.promptserver.domain.model.PromptVersion;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,12 +45,12 @@ public class PromptVersionQueryService implements FindPromptVersionsUseCase, Get
             List<PromptVersion> result = findPromptVersionsPort.findPromptVersionsByPromptTemplateId(promptTemplateId);
             log.info("Prompt versions found: templateId={}, count={}", promptTemplateId, result.size());
             return result;
-        } catch (com.gongdel.promptserver.domain.exception.PromptVersionDomainException e) {
+        } catch (PromptVersionDomainException e) {
             // 도메인 예외를 애플리케이션 예외로 변환
             throw PromptVersionExceptionConverter.convertToApplicationException(e, promptTemplateId);
         } catch (Exception e) {
             log.error("Unexpected error while querying prompt versions by template ID: {}", promptTemplateId, e);
-            throw new com.gongdel.promptserver.application.exception.PromptVersionOperationFailedException(
+            throw new PromptVersionOperationFailedException(
                 "프롬프트 버전 목록 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
     }
@@ -74,15 +75,15 @@ public class PromptVersionQueryService implements FindPromptVersionsUseCase, Get
                 })
                 .orElseThrow(() -> {
                     log.warn("Prompt version not found: uuid={}", uuid);
-                    return new com.gongdel.promptserver.application.exception.PromptVersionNotFoundException(uuid);
+                    return new PromptVersionNotFoundException(uuid);
                 });
-        } catch (com.gongdel.promptserver.domain.exception.PromptVersionDomainException e) {
+        } catch (PromptVersionDomainException e) {
             // 도메인 예외를 애플리케이션 예외로 변환
             throw PromptVersionExceptionConverter
                 .convertToApplicationException(e, uuid);
         } catch (Exception e) {
             log.error("Unexpected error while querying prompt version by UUID: {}", uuid, e);
-            throw new com.gongdel.promptserver.application.exception.PromptVersionOperationFailedException(
+            throw new PromptVersionOperationFailedException(
                 "프롬프트 버전 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
     }

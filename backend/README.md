@@ -62,13 +62,31 @@
 
 | 구분         | HTTP Method | 엔드포인트                                      | 설명                                 | 주요 응답 코드 | 예외/특이사항                |
 |--------------|-------------|------------------------------------------------|--------------------------------------|---------------|------------------------------|
-| 프롬프트 생성 | POST        | `/api/v1/prompts`                              | 새로운 프롬프트 생성                 | 201, 400      |                              |
-| 단건 조회     | GET         | `/api/v1/prompts/{uuid}`                       | UUID로 프롬프트 조회                 | 200, 404      | 미존재 시 404(NOT FOUND)      |
-| 목록 조회     | GET         | `/api/v1/prompts`                              | 전체 프롬프트 목록(페이지네이션)     | 200           |                              |
-| 작성자/상태별| GET         | `/api/v1/prompts?createdBy&status`             | 작성자/상태별 프롬프트 목록 조회     | 200           |                              |
-| 가시성/상태별| GET         | `/api/v1/prompts?visibility&status`            | 가시성/상태별 프롬프트 목록 조회     | 200           |                              |
-| 카테고리/상태| GET         | `/api/v1/prompts?categoryId&status`            | 카테고리/상태별 프롬프트 목록 조회   | 200           |                              |
-| 키워드 검색  | GET         | `/api/v1/prompts/search?keyword&status`        | 키워드/상태별 프롬프트 검색         | 200           |                              |
+| 프롬프트 생성 | POST        | `/api/v1/prompts`                              | 새로운 프롬프트 생성                 | 201, 400      | 필수 필드 누락 시 400(BAD REQUEST) |
+| 단건 조회     | GET         | `/api/v1/prompts/{id}`                         | UUID로 프롬프트 상세 정보 조회       | 200, 404      | 미존재 시 404(NOT FOUND)      |
+| 복합 검색     | GET         | `/api/v1/prompts/advanced-search`              | 다양한 조건으로 프롬프트 검색        | 200, 400, 500 | 페이징 처리 포함              |
+
+### 프롬프트 생성 요청 필드
+- `title`: 프롬프트 제목 (필수)
+- `content`: 프롬프트 내용 (필수)
+- `description`: 프롬프트 설명 (필수)
+- `categoryId`: 카테고리 ID (필수)
+- `inputVariables`: 입력 변수 목록
+- `tags`: 태그 목록
+- `visibility`: 가시성 설정
+- `status`: 프롬프트 상태
+- `createdBy`: 작성자 정보
+
+### 복합 검색 파라미터
+- `title`: 프롬프트 제목 (선택)
+- `description`: 프롬프트 설명 (선택)
+- `tag`: 태그 (선택)
+- `categoryId`: 카테고리 ID (선택)
+- `status`: 프롬프트 상태 (기본값: PUBLISHED)
+- `sortType`: 정렬 기준 (기본값: LATEST_MODIFIED)
+  - LATEST_MODIFIED: 최근 수정순
+  - TITLE: 프롬프트 이름순
+- 페이징 파라미터 (Pageable)
 
 - 모든 API는 표준화된 예외 처리 및 로깅 전략을 따릅니다.
 - 상세 요청/응답 구조는 Swagger 문서 또는 코드 참고.

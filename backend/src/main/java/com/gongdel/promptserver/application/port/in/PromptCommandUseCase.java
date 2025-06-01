@@ -1,7 +1,7 @@
 package com.gongdel.promptserver.application.port.in;
 
 import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
-import com.gongdel.promptserver.domain.model.PromptTemplate;
+import com.gongdel.promptserver.application.dto.RegisterPromptResponse;
 
 /**
  * 프롬프트 템플릿 등록을 위한 유스케이스 인터페이스입니다.
@@ -14,7 +14,7 @@ public interface PromptCommandUseCase {
      * 새로운 프롬프트 템플릿을 등록합니다.
      *
      * @param command 프롬프트 등록에 필요한 정보를 담은 커맨드 객체
-     * @return 등록된 프롬프트 템플릿
+     * @return 등록된 프롬프트 정보 응답 DTO
      */
-    PromptTemplate registerPrompt(RegisterPromptCommand command);
+    RegisterPromptResponse registerPrompt(RegisterPromptCommand command);
 }
