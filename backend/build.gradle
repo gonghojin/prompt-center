@@ -89,7 +89,7 @@ tasks.named('test') {
 
 tasks.withType(JavaCompile) {
     options.compilerArgs += [
-        '-Amapstruct.defaultComponentModel=spring'
+            '-Amapstruct.defaultComponentModel=spring'
     ]
 }
 
@@ -131,8 +131,8 @@ jacocoTestCoverageVerification {
                 minimum = 0.0
             }
             excludes = [
-                'com.gongdel.promptserver.PromptServerApplication',
-                'com.gongdel.promptserver.config.*'
+                    'com.gongdel.promptserver.PromptServerApplication',
+                    'com.gongdel.promptserver.config.*'
             ]
         }
     }
@@ -169,7 +169,7 @@ tasks.register('jacocoDetailedReport') {
                         def complexityCoverage = match[4].replaceAll(/<.*?>/, "").trim()
 
                         println "| %-40s | %-10s | %-10s | %-10s |".format(
-                            packageOrClass, linesCoverage, branchCoverage, complexityCoverage)
+                                packageOrClass, linesCoverage, branchCoverage, complexityCoverage)
                     }
                 }
             }

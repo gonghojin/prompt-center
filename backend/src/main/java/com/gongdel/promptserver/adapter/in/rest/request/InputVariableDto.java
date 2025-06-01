@@ -15,23 +15,23 @@ public class InputVariableDto {
     private boolean required;
     private String defaultValue;
 
-    public InputVariable toDomain() {
-        return InputVariable.builder()
-                .name(this.name)
-                .type(this.type)
-                .description(this.description)
-                .required(this.required)
-                .defaultValue(this.defaultValue)
-                .build();
-    }
-
     public static InputVariableDto fromDomain(InputVariable domain) {
         return InputVariableDto.builder()
-                .name(domain.getName())
-                .type(domain.getType())
-                .description(domain.getDescription())
-                .required(domain.isRequired())
-                .defaultValue(domain.getDefaultValue())
-                .build();
+            .name(domain.getName())
+            .type(domain.getType())
+            .description(domain.getDescription())
+            .required(domain.isRequired())
+            .defaultValue(domain.getDefaultValue())
+            .build();
+    }
+
+    public InputVariable toDomain() {
+        return InputVariable.builder()
+            .name(this.name)
+            .type(this.type)
+            .description(this.description)
+            .required(this.required)
+            .defaultValue(this.defaultValue)
+            .build();
     }
 }

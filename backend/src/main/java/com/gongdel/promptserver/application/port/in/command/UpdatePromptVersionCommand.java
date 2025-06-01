@@ -51,11 +51,6 @@ public class UpdatePromptVersionCommand {
     @NotNull
     private final Long createdById;
     /**
-     * 프롬프트 변수 정의(JSON 스키마, 선택)
-     */
-    private List<InputVariable> inputVariables;
-
-    /**
      * 프롬프트 버전 작업 유형 (필수)
      */
     @NotNull
@@ -65,6 +60,10 @@ public class UpdatePromptVersionCommand {
      */
     @NotNull
     private final UUID uuid;
+    /**
+     * 프롬프트 변수 정의(JSON 스키마, 선택)
+     */
+    private List<InputVariable> inputVariables;
 
     /**
      * 필수 필드만으로 업데이트 커맨드 생성

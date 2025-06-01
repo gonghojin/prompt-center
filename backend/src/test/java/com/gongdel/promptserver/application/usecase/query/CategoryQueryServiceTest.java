@@ -42,14 +42,14 @@ class CategoryQueryServiceTest {
             // given
             Long categoryId = 1L;
             Category category = new Category(
-                    categoryId,
-                    "test",
-                    "테스트 카테고리",
-                    "테스트 설명",
-                    null,
-                    false,
-                    null,
-                    null);
+                categoryId,
+                "test",
+                "테스트 카테고리",
+                "테스트 설명",
+                null,
+                false,
+                null,
+                null);
 
             given(loadCategoryPort.loadCategoryById(categoryId)).willReturn(Optional.of(category));
 
@@ -84,14 +84,14 @@ class CategoryQueryServiceTest {
             // given
             String categoryName = "test-category";
             Category category = new Category(
-                    1L,
-                    categoryName,
-                    "테스트 카테고리",
-                    "테스트 설명",
-                    null,
-                    false,
-                    null,
-                    null);
+                1L,
+                categoryName,
+                "테스트 카테고리",
+                "테스트 설명",
+                null,
+                false,
+                null,
+                null);
 
             given(loadCategoryPort.loadCategoryByName(categoryName)).willReturn(Optional.of(category));
 
@@ -114,8 +114,8 @@ class CategoryQueryServiceTest {
         void getAllCategories() {
             // given
             List<Category> categories = Arrays.asList(
-                    new Category(1L, "cat1", "카테고리1", "설명1", null, false, null, null),
-                    new Category(2L, "cat2", "카테고리2", "설명2", null, false, null, null));
+                new Category(1L, "cat1", "카테고리1", "설명1", null, false, null, null),
+                new Category(2L, "cat2", "카테고리2", "설명2", null, false, null, null));
 
             given(findCategoriesPort.findAllCategories()).willReturn(categories);
 
@@ -134,8 +134,8 @@ class CategoryQueryServiceTest {
         void getCategoriesBySystemFlag() {
             // given
             List<Category> systemCategories = Arrays.asList(
-                    new Category(1L, "sys1", "시스템1", "설명1", null, true, null, null),
-                    new Category(2L, "sys2", "시스템2", "설명2", null, true, null, null));
+                new Category(1L, "sys1", "시스템1", "설명1", null, true, null, null),
+                new Category(2L, "sys2", "시스템2", "설명2", null, true, null, null));
 
             given(findCategoriesPort.findCategoriesByIsSystem(true)).willReturn(systemCategories);
 
@@ -154,8 +154,8 @@ class CategoryQueryServiceTest {
         void getRootCategories() {
             // given
             List<Category> rootCategories = Arrays.asList(
-                    new Category(1L, "root1", "루트1", "설명1", null, false, null, null),
-                    new Category(2L, "root2", "루트2", "설명2", null, false, null, null));
+                new Category(1L, "root1", "루트1", "설명1", null, false, null, null),
+                new Category(2L, "root2", "루트2", "설명2", null, false, null, null));
 
             given(findCategoriesPort.findRootCategories()).willReturn(rootCategories);
 
@@ -177,8 +177,8 @@ class CategoryQueryServiceTest {
             Category parent = new Category(parentId, "parent", "상위", "상위 설명", null, false, null, null);
 
             List<Category> subCategories = Arrays.asList(
-                    new Category(2L, "sub1", "하위1", "설명1", parent, false, null, null),
-                    new Category(3L, "sub2", "하위2", "설명2", parent, false, null, null));
+                new Category(2L, "sub1", "하위1", "설명1", parent, false, null, null),
+                new Category(3L, "sub2", "하위2", "설명2", parent, false, null, null));
 
             given(loadCategoryPort.loadCategoryById(parentId)).willReturn(Optional.of(mock(Category.class)));
             given(findCategoriesPort.findCategoriesByParentId(parentId)).willReturn(subCategories);

@@ -6,6 +6,7 @@ import com.gongdel.promptserver.adapter.in.rest.response.CreatePromptResponse;
 import com.gongdel.promptserver.application.dto.RegisterPromptResponse;
 import com.gongdel.promptserver.application.port.in.PromptCommandUseCase;
 import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
+import com.gongdel.promptserver.domain.exception.PromptValidationException;
 import com.gongdel.promptserver.domain.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,21 +17,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.util.Assert;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.gongdel.promptserver.application.constant.DevelopmentConstants.*;
-import com.gongdel.promptserver.application.exception.ApplicationErrorCode;
-import com.gongdel.promptserver.application.exception.ApplicationException;
-import com.gongdel.promptserver.domain.exception.PromptValidationException;
 
 /**
  * 프롬프트 생성 등 명령성 작업을 처리하는 REST 컨트롤러입니다.
@@ -52,8 +49,8 @@ public class PromptCommandController {
      */
     @Operation(summary = "프롬프트 생성", description = "새로운 프롬프트를 생성합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "프롬프트 생성 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+        @ApiResponse(responseCode = "201", description = "프롬프트 생성 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청")
     })
     @PostMapping
     public ResponseEntity<CreatePromptResponse> createPrompt(@Valid @RequestBody final CreatePromptRequest request) {
@@ -90,11 +87,11 @@ public class PromptCommandController {
      */
     private User createTemporaryUser() {
         return User.builder()
-                .id(UUID.fromString(TEMP_USER_UUID))
-                .name(TEMP_USER_NAME)
-                .email(TEMP_USER_EMAIL)
-                .role(UserRole.ROLE_USER)
-                .build();
+            .id(UUID.fromString(TEMP_USER_UUID))
+            .name(TEMP_USER_NAME)
+            .email(TEMP_USER_EMAIL)
+            .role(UserRole.ROLE_USER)
+            .build();
     }
 
     /**
@@ -105,21 +102,21 @@ public class PromptCommandController {
      */
     private RegisterPromptCommand buildRegisterPromptCommand(final CreatePromptRequest request) {
         final User author = (request.getCreatedBy() != null)
-                ? toDomainUser(request.getCreatedBy())
-                : createTemporaryUser();
+            ? toDomainUser(request.getCreatedBy())
+            : createTemporaryUser();
         final List<InputVariable> inputVariables = mapInputVariables(request.getInputVariables());
 
         return RegisterPromptCommand.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .content(request.getContent())
-                .createdBy(author)
-                .tags(request.getTags())
-                .inputVariables(inputVariables)
-                .categoryId(request.getCategoryId())
-                .visibility(parseVisibility(request.getVisibility(), author))
-                .status(parseStatus(request.getStatus()))
-                .build();
+            .title(request.getTitle())
+            .description(request.getDescription())
+            .content(request.getContent())
+            .createdBy(author)
+            .tags(request.getTags())
+            .inputVariables(inputVariables)
+            .categoryId(request.getCategoryId())
+            .visibility(parseVisibility(request.getVisibility(), author))
+            .status(parseStatus(request.getStatus()))
+            .build();
     }
 
     /**
@@ -133,8 +130,8 @@ public class PromptCommandController {
             return List.of();
         }
         return inputVariableDtos.stream()
-                .map(InputVariableDto::toDomain)
-                .collect(Collectors.toUnmodifiableList());
+            .map(InputVariableDto::toDomain)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     /**
@@ -146,11 +143,11 @@ public class PromptCommandController {
     private User toDomainUser(final CreatePromptRequest.UserDto userDto) {
         Assert.notNull(userDto, "UserDto must not be null");
         return User.builder()
-                .id(userDto.getId() != null ? userDto.getId() : UUID.randomUUID())
-                .email(userDto.getEmail())
-                .name(userDto.getName())
-                .role(UserRole.ROLE_USER)
-                .build();
+            .id(userDto.getId() != null ? userDto.getId() : UUID.randomUUID())
+            .email(userDto.getEmail())
+            .name(userDto.getName())
+            .role(UserRole.ROLE_USER)
+            .build();
     }
 
     /**

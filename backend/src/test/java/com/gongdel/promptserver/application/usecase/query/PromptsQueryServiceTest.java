@@ -48,28 +48,28 @@ class PromptsQueryServiceTest {
     void setUp() {
         promptId = UUID.randomUUID();
         promptDetail = PromptDetail.builder()
-                .id(promptId)
-                .title("테스트 프롬프트")
-                .build();
+            .id(promptId)
+            .title("테스트 프롬프트")
+            .build();
         searchCondition = PromptSearchCondition.builder()
-                .title("테스트")
-                .build();
+            .title("테스트")
+            .build();
         searchResult = PromptSearchResult.builder()
-                .id(1L)
-                .uuid(UUID.randomUUID())
-                .title("테스트 프롬프트")
-                .description("설명")
-                .currentVersionId(1L)
-                .categoryId(1L)
-                .categoryName("카테고리")
-                .createdById(1L)
-                .createdByName("홍길동")
-                .tags(Collections.singletonList("태그"))
-                .visibility(Visibility.PUBLIC)
-                .status(PromptStatus.PUBLISHED)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+            .id(1L)
+            .uuid(UUID.randomUUID())
+            .title("테스트 프롬프트")
+            .description("설명")
+            .currentVersionId(1L)
+            .categoryId(1L)
+            .categoryName("카테고리")
+            .createdById(1L)
+            .createdByName("홍길동")
+            .tags(Collections.singletonList("태그"))
+            .visibility(Visibility.PUBLIC)
+            .status(PromptStatus.PUBLISHED)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
         pageable = PageRequest.of(0, 20);
     }
 
@@ -124,8 +124,8 @@ class PromptsQueryServiceTest {
             given(searchPromptsPort.searchPrompts(any())).willThrow(new RuntimeException("DB error"));
             // when & then
             assertThatThrownBy(() -> promptsQueryService.searchPrompts(searchCondition))
-                    .isInstanceOf(PromptVersionOperationFailedException.class)
-                    .hasMessageContaining("Error occurred during prompt search operation");
+                .isInstanceOf(PromptVersionOperationFailedException.class)
+                .hasMessageContaining("Error occurred during prompt search operation");
         }
     }
 }

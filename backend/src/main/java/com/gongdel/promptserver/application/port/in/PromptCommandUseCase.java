@@ -1,7 +1,7 @@
 package com.gongdel.promptserver.application.port.in;
 
-import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
 import com.gongdel.promptserver.application.dto.RegisterPromptResponse;
+import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
 
 /**
  * 프롬프트 템플릿 등록을 위한 유스케이스 인터페이스입니다.

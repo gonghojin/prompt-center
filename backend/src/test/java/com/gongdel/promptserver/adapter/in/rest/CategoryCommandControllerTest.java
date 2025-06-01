@@ -42,9 +42,9 @@ class CategoryCommandControllerTest {
         mockMvc.perform(post("/api/v1/categories")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("test"));
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.name").value("test"));
     }
 
     @Test
@@ -56,7 +56,7 @@ class CategoryCommandControllerTest {
         mockMvc.perform(post("/api/v1/categories")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict());
+            .andExpect(status().isConflict());
     }
 
     @Test
@@ -69,9 +69,9 @@ class CategoryCommandControllerTest {
         mockMvc.perform(put("/api/v1/categories/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.displayName").value("수정"));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.displayName").value("수정"));
     }
 
     @Test
@@ -83,7 +83,7 @@ class CategoryCommandControllerTest {
         mockMvc.perform(put("/api/v1/categories/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -92,7 +92,7 @@ class CategoryCommandControllerTest {
         Mockito.doNothing().when(categoryCommandUseCase).deleteCategory(1L);
 
         mockMvc.perform(delete("/api/v1/categories/1"))
-                .andExpect(status().isNoContent());
+            .andExpect(status().isNoContent());
     }
 
     @Test
@@ -101,6 +101,6 @@ class CategoryCommandControllerTest {
         Mockito.doThrow(new CategoryNotFoundException(1L)).when(categoryCommandUseCase).deleteCategory(1L);
 
         mockMvc.perform(delete("/api/v1/categories/1"))
-                .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound());
     }
 }

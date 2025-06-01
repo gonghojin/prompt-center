@@ -1,9 +1,9 @@
 package com.gongdel.promptserver.application.port.in.command;
 
+import com.gongdel.promptserver.domain.model.InputVariable;
 import com.gongdel.promptserver.domain.model.PromptStatus;
 import com.gongdel.promptserver.domain.model.User;
 import com.gongdel.promptserver.domain.model.Visibility;
-import com.gongdel.promptserver.domain.model.InputVariable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -66,15 +66,15 @@ public class RegisterPromptCommand {
 
     @Builder
     public RegisterPromptCommand(
-            @NonNull String title,
-            String description,
-            @NonNull String content,
-            @NonNull User createdBy,
-            Set<String> tags,
-            Visibility visibility,
-            Long categoryId,
-            List<InputVariable> inputVariables,
-            PromptStatus status) {
+        @NonNull String title,
+        String description,
+        @NonNull String content,
+        @NonNull User createdBy,
+        Set<String> tags,
+        Visibility visibility,
+        Long categoryId,
+        List<InputVariable> inputVariables,
+        PromptStatus status) {
         this.title = title;
         this.description = description;
         this.content = content;
@@ -88,7 +88,7 @@ public class RegisterPromptCommand {
         this.categoryId = categoryId;
 
         this.inputVariables = inputVariables != null ? Collections.unmodifiableList(new ArrayList<>(inputVariables))
-                : Collections.emptyList();
+            : Collections.emptyList();
         this.status = status;
     }
 
@@ -101,15 +101,15 @@ public class RegisterPromptCommand {
      * @return 생성된 커맨드 객체
      */
     public static RegisterPromptCommand createBasic(
-            @NonNull String title,
-            @NonNull String content,
-            @NonNull User createdBy) {
+        @NonNull String title,
+        @NonNull String content,
+        @NonNull User createdBy) {
         return RegisterPromptCommand.builder()
-                .title(title)
-                .content(content)
-                .createdBy(createdBy)
-                .status(PromptStatus.DRAFT)
-                .build();
+            .title(title)
+            .content(content)
+            .createdBy(createdBy)
+            .status(PromptStatus.DRAFT)
+            .build();
     }
 
     /**
@@ -121,16 +121,16 @@ public class RegisterPromptCommand {
      * @return 생성된 커맨드 객체
      */
     public static RegisterPromptCommand createForTeam(
-            @NonNull String title,
-            @NonNull String content,
-            @NonNull User createdBy) {
+        @NonNull String title,
+        @NonNull String content,
+        @NonNull User createdBy) {
         return RegisterPromptCommand.builder()
-                .title(title)
-                .content(content)
-                .createdBy(createdBy)
-                .visibility(Visibility.TEAM)
-                .status(PromptStatus.DRAFT)
-                .build();
+            .title(title)
+            .content(content)
+            .createdBy(createdBy)
+            .visibility(Visibility.TEAM)
+            .status(PromptStatus.DRAFT)
+            .build();
     }
 
     /**
@@ -143,17 +143,17 @@ public class RegisterPromptCommand {
      * @return 생성된 커맨드 객체
      */
     public static RegisterPromptCommand createWithCategory(
-            @NonNull String title,
-            @NonNull String content,
-            @NonNull User createdBy,
-            Long categoryId) {
+        @NonNull String title,
+        @NonNull String content,
+        @NonNull User createdBy,
+        Long categoryId) {
         return RegisterPromptCommand.builder()
-                .title(title)
-                .content(content)
-                .createdBy(createdBy)
-                .categoryId(categoryId)
-                .status(PromptStatus.DRAFT)
-                .build();
+            .title(title)
+            .content(content)
+            .createdBy(createdBy)
+            .categoryId(categoryId)
+            .status(PromptStatus.DRAFT)
+            .build();
     }
 
     /**

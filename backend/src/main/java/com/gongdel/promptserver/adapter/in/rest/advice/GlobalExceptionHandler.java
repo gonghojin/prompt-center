@@ -9,9 +9,9 @@ import com.gongdel.promptserver.domain.exception.PromptErrorType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -39,10 +39,10 @@ public class GlobalExceptionHandler {
 
         ErrorCode errorCode = ex.getErrorCode();
         Map<String, Object> errorResponse = createErrorResponse(
-                errorCode.getClass().getSimpleName(),
-                ex.getMessage(),
-                errorCode.name(),
-                errorCode.getMessage());
+            errorCode.getClass().getSimpleName(),
+            ex.getMessage(),
+            errorCode.name(),
+            errorCode.getMessage());
 
         return new ResponseEntity<>(errorResponse, determineHttpStatus(ex));
     }
@@ -59,10 +59,10 @@ public class GlobalExceptionHandler {
         logException("Application exception occurred", ex);
 
         Map<String, Object> errorResponse = createErrorResponse(
-                ex.getErrorCode().getClass().getSimpleName(),
-                ex.getMessage(),
-                ex.getErrorCodeName(),
-                ex.getErrorCodeMessage());
+            ex.getErrorCode().getClass().getSimpleName(),
+            ex.getMessage(),
+            ex.getErrorCodeName(),
+            ex.getErrorCodeMessage());
 
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
     }
@@ -79,32 +79,31 @@ public class GlobalExceptionHandler {
         logException("Unexpected exception occurred", ex);
 
         Map<String, Object> errorResponse = createErrorResponse(
-                "INTERNAL_SERVER_ERROR",
-                "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
-                "SYSTEM_ERROR",
-                "서버 내부 오류");
+            "INTERNAL_SERVER_ERROR",
+            "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+            "SYSTEM_ERROR",
+            "서버 내부 오류");
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
-     * @Valid 유효성 검증 실패 예외를 처리하는 핸들러
-     *
      * @param ex 발생한 예외
      * @return 에러 응답
+     * @Valid 유효성 검증 실패 예외를 처리하는 핸들러
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException ex) {
         logException("Validation failed", ex);
         String message = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getDefaultMessage())
-                .findFirst()
-                .orElse("Validation failed");
+            .map(error -> error.getDefaultMessage())
+            .findFirst()
+            .orElse("Validation failed");
         Map<String, Object> errorResponse = createErrorResponse(
-                "VALIDATION_ERROR",
-                message,
-                "VALIDATION_ERROR",
-                "입력값 검증 오류");
+            "VALIDATION_ERROR",
+            message,
+            "VALIDATION_ERROR",
+            "입력값 검증 오류");
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -136,7 +135,7 @@ public class GlobalExceptionHandler {
      * @return 오류 응답 맵
      */
     private Map<String, Object> createErrorResponse(String code, String message, String errorType,
-            String errorTypeDescription) {
+                                                    String errorTypeDescription) {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("timestamp", LocalDateTime.now().toString());
         errorResponse.put("code", code);

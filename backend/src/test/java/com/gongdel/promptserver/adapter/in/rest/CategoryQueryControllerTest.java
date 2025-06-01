@@ -37,9 +37,9 @@ class CategoryQueryControllerTest {
         Mockito.when(categoryQueryUseCase.getCategoryById(1L)).thenReturn(Optional.of(category));
 
         mockMvc.perform(get("/api/v1/categories/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("test"));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.name").value("test"));
     }
 
     @Test
@@ -48,7 +48,7 @@ class CategoryQueryControllerTest {
         Mockito.when(categoryQueryUseCase.getCategoryById(1L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/v1/categories/1"))
-                .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -59,9 +59,9 @@ class CategoryQueryControllerTest {
         Mockito.when(categoryQueryUseCase.getAllCategories()).thenReturn(List.of(c1, c2));
 
         mockMvc.perform(get("/api/v1/categories"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[1].id").value(2L));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].id").value(1L))
+            .andExpect(jsonPath("$[1].id").value(2L));
     }
 
     @Test
@@ -71,8 +71,8 @@ class CategoryQueryControllerTest {
         Mockito.when(categoryQueryUseCase.getCategoryByName("test")).thenReturn(Optional.of(category));
 
         mockMvc.perform(get("/api/v1/categories?name=test"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].id").value(1L));
     }
 
     @Test
@@ -81,9 +81,9 @@ class CategoryQueryControllerTest {
         Mockito.when(categoryQueryUseCase.getCategoryByName("notfound")).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/v1/categories?name=notfound"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(0));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test
@@ -93,8 +93,8 @@ class CategoryQueryControllerTest {
         Mockito.when(categoryQueryUseCase.getCategoriesBySystemFlag(true)).thenReturn(List.of(c1));
 
         mockMvc.perform(get("/api/v1/categories?isSystem=true"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].isSystem").value(true));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].isSystem").value(true));
     }
 
     @Test
@@ -104,8 +104,8 @@ class CategoryQueryControllerTest {
         Mockito.when(categoryQueryUseCase.getRootCategories()).thenReturn(List.of(c1));
 
         mockMvc.perform(get("/api/v1/categories/roots"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].id").value(1L));
     }
 
     @Test
@@ -115,8 +115,8 @@ class CategoryQueryControllerTest {
         Mockito.when(categoryQueryUseCase.getSubCategories(1L)).thenReturn(List.of(c1));
 
         mockMvc.perform(get("/api/v1/categories/1/subcategories"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(2L));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].id").value(2L));
     }
 
     @Test
@@ -125,6 +125,6 @@ class CategoryQueryControllerTest {
         Mockito.when(categoryQueryUseCase.getSubCategories(1L)).thenThrow(new CategoryNotFoundException(1L));
 
         mockMvc.perform(get("/api/v1/categories/1/subcategories"))
-                .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound());
     }
 }
