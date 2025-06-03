@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PromptCommandController.class)
-class PromptCommandControllerTest {
+class PromptCommandControllerTest extends BaseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

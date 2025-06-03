@@ -6,7 +6,6 @@ import com.gongdel.promptserver.domain.user.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,8 +33,8 @@ class UserTest {
             .build();
 
         // then
-        assertThat(user.getId()).isEqualTo(id);
-        assertThat(user.getEmail()).isEqualTo(email);
+        assertThat(user.getUuid().getValue()).isEqualTo(id);
+        assertThat(user.getEmail().getValue()).isEqualTo(email);
         assertThat(user.getName()).isEqualTo(name);
         assertThat(user.getCreatedAt()).isNotNull();
         assertThat(user.getUpdatedAt()).isNotNull();

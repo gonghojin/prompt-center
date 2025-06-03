@@ -2,12 +2,10 @@ package com.gongdel.promptserver.domain.user;
 
 import com.gongdel.promptserver.domain.model.BaseTimeEntity;
 import com.gongdel.promptserver.domain.team.Team;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 

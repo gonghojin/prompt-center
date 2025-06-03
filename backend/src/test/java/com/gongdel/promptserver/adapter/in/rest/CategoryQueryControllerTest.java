@@ -20,7 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CategoryQueryController.class)
-class CategoryQueryControllerTest {
+class CategoryQueryControllerTest extends BaseControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
 

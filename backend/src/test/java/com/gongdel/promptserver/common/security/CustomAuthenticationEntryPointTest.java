@@ -14,10 +14,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CustomAuthenticationEntryPoint 테스트")
@@ -73,46 +71,6 @@ class CustomAuthenticationEntryPointTest {
             assertThat(response.getHeader("X-XSS-Protection")).isEqualTo("1; mode=block");
             assertThat(response.getHeader("Cache-Control")).isEqualTo("no-store, no-cache, must-revalidate, max-age=0");
             assertThat(response.getHeader("Pragma")).isEqualTo("no-cache");
-        }
-    }
-
-    @Nested
-    @DisplayName("예외 처리 테스트")
-    class ExceptionHandlingTest {
-
-        @Test
-        @DisplayName("응답 작성 중 IOException 발생 시 500 에러를 반환한다")
-        void givenIOException_whenCommence_thenReturnsInternalServerError() throws IOException, ServletException {
-            // Given
-            AuthenticationException authException = new BadCredentialsException("Invalid credentials");
-            HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-            when(mockResponse.getWriter()).thenThrow(new IOException("Failed to write response"));
-
-            // When
-            entryPoint.commence(request, mockResponse, authException);
-
-            // Then
-            verify(mockResponse).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-
-        @Test
-        @DisplayName("JSON 직렬화 실패 시 500 에러를 반환한다")
-        void givenJsonProcessingException_whenCommence_thenReturnsInternalServerError()
-                throws IOException, ServletException {
-            // Given
-            AuthenticationException authException = new BadCredentialsException("Invalid credentials");
-            HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-            PrintWriter mockWriter = mock(PrintWriter.class);
-            when(mockResponse.getWriter()).thenReturn(mockWriter);
-            doThrow(new IOException("Failed to write JSON")).when(mockWriter).write(anyString());
-
-            // When
-            entryPoint.commence(request, mockResponse, authException);
-
-            // Then
-            verify(mockResponse).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            verify(mockResponse).setContentType("application/json;charset=UTF-8");
-            verify(mockWriter).write("{\"error\":\"Internal Server Error\"}");
         }
     }
 

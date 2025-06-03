@@ -2,7 +2,10 @@ package com.gongdel.promptserver.adapter.in.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gongdel.promptserver.application.port.in.PromptsQueryUseCase;
-import com.gongdel.promptserver.domain.model.*;
+import com.gongdel.promptserver.domain.model.PromptDetail;
+import com.gongdel.promptserver.domain.model.PromptSearchResult;
+import com.gongdel.promptserver.domain.model.PromptStatus;
+import com.gongdel.promptserver.domain.model.Visibility;
 import com.gongdel.promptserver.domain.user.Email;
 import com.gongdel.promptserver.domain.user.User;
 import com.gongdel.promptserver.domain.user.UserId;
@@ -30,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PromptQueryController.class)
-class PromptQueryControllerTest {
+class PromptQueryControllerTest extends BaseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -54,7 +57,7 @@ class PromptQueryControllerTest {
                 .author(User.builder()
                     .uuid(new UserId(UUID.randomUUID()))
                     .name("홍길동")
-                    .email(new Email("test"))
+                    .email(new Email("test@naver.com"))
                     .build())
                 .title("테스트 프롬프트")
                 .build();
