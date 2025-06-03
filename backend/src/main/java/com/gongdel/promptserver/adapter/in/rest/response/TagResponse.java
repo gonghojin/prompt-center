@@ -23,8 +23,8 @@ public class TagResponse {
      */
     public static TagResponse from(Tag tag) {
         return TagResponse.builder()
-            .id(tag.getId())
-            .name(tag.getName())
-            .build();
+                .id(tag.getId())
+                .name(tag.getName())
+                .build();
     }
 }

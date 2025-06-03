@@ -3,6 +3,9 @@ package com.gongdel.promptserver.adapter.in.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gongdel.promptserver.application.port.in.PromptsQueryUseCase;
 import com.gongdel.promptserver.domain.model.*;
+import com.gongdel.promptserver.domain.user.Email;
+import com.gongdel.promptserver.domain.user.User;
+import com.gongdel.promptserver.domain.user.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,9 +52,9 @@ class PromptQueryControllerTest {
             PromptDetail detail = PromptDetail.builder()
                 .id(promptId)
                 .author(User.builder()
-                    .id(UUID.randomUUID())
+                    .uuid(new UserId(UUID.randomUUID()))
                     .name("홍길동")
-                    .email("test")
+                    .email(new Email("test"))
                     .build())
                 .title("테스트 프롬프트")
                 .build();
