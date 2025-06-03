@@ -1,23 +1,24 @@
-package com.gongdel.promptserver.domain.model;
+package com.gongdel.promptserver.domain.team;
 
-import lombok.*;
+import com.gongdel.promptserver.domain.user.User;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * 팀 정보를 나타내는 도메인 모델 클래스입니다. 사용자 그룹을 관리합니다.
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "id")
-@ToString(of = {"id", "name", "status"})
 public class Team {
 
-    private UUID id;
+    private Long id;
+    private TeamId uuid;
     private String name;
     private String description;
     private Set<User> members = new HashSet<>();
@@ -29,20 +30,17 @@ public class Team {
      * 팀을 생성합니다.
      *
      * @param id          팀 ID
+     * @param uuid        팀 UUID
      * @param name        팀 이름
      * @param description 팀 설명
      * @param status      팀 상태
      */
-    @Builder
-    public Team(
-        UUID id,
-        String name,
-        String description,
-        TeamStatus status) {
-        this.id = Objects.requireNonNullElseGet(id, UUID::randomUUID);
+    public Team(Long id, TeamId uuid, String name, String description, TeamStatus status) {
+        this.id = id;
+        this.uuid = uuid != null ? uuid : TeamId.randomId();
         this.name = Objects.requireNonNull(name, "Team name cannot be null");
         this.description = description;
-        this.status = Objects.requireNonNullElse(status, TeamStatus.ACTIVE);
+        this.status = status != null ? status : TeamStatus.ACTIVE;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -80,7 +78,7 @@ public class Team {
     public void update(String name, String description, TeamStatus status) {
         this.name = Objects.requireNonNull(name, "Team name cannot be null");
         this.description = description;
-        this.status = Objects.requireNonNullElse(status, this.status);
+        this.status = status != null ? status : this.status;
         this.updatedAt = LocalDateTime.now();
     }
 

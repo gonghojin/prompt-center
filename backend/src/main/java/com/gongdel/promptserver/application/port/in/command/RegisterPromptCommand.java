@@ -2,8 +2,8 @@ package com.gongdel.promptserver.application.port.in.command;
 
 import com.gongdel.promptserver.domain.model.InputVariable;
 import com.gongdel.promptserver.domain.model.PromptStatus;
-import com.gongdel.promptserver.domain.model.User;
 import com.gongdel.promptserver.domain.model.Visibility;
+import com.gongdel.promptserver.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;

@@ -11,6 +11,9 @@ import com.gongdel.promptserver.application.port.out.command.SavePromptVersionPo
 import com.gongdel.promptserver.application.port.out.query.LoadPromptPort;
 import com.gongdel.promptserver.application.port.out.query.LoadTagPort;
 import com.gongdel.promptserver.domain.model.*;
+import com.gongdel.promptserver.domain.user.Email;
+import com.gongdel.promptserver.domain.user.User;
+import com.gongdel.promptserver.domain.user.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,7 +58,7 @@ class PromptCommandServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder().id(UUID.randomUUID()).name("TestUser").email("test@test.com").build();
+        testUser = User.builder().uuid(new UserId(UUID.randomUUID())).name("TestUser").email(new Email("test@test.com")).build();
         inputVariables = List.of(
             InputVariable.builder().name("var1").type("String").description("desc1").required(true)
                 .defaultValue("").build(),

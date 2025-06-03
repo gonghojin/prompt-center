@@ -7,7 +7,12 @@ import com.gongdel.promptserver.application.dto.RegisterPromptResponse;
 import com.gongdel.promptserver.application.port.in.PromptCommandUseCase;
 import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
 import com.gongdel.promptserver.domain.exception.PromptValidationException;
-import com.gongdel.promptserver.domain.model.*;
+import com.gongdel.promptserver.domain.model.InputVariable;
+import com.gongdel.promptserver.domain.model.PromptStatus;
+import com.gongdel.promptserver.domain.model.Visibility;
+import com.gongdel.promptserver.domain.user.Email;
+import com.gongdel.promptserver.domain.user.User;
+import com.gongdel.promptserver.domain.user.UserId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -87,10 +92,9 @@ public class PromptCommandController {
      */
     private User createTemporaryUser() {
         return User.builder()
-            .id(UUID.fromString(TEMP_USER_UUID))
+            .uuid(new UserId(UUID.fromString(TEMP_USER_UUID)))
             .name(TEMP_USER_NAME)
-            .email(TEMP_USER_EMAIL)
-            .role(UserRole.ROLE_USER)
+            .email(new Email(TEMP_USER_EMAIL))
             .build();
     }
 
@@ -143,10 +147,9 @@ public class PromptCommandController {
     private User toDomainUser(final CreatePromptRequest.UserDto userDto) {
         Assert.notNull(userDto, "UserDto must not be null");
         return User.builder()
-            .id(userDto.getId() != null ? userDto.getId() : UUID.randomUUID())
-            .email(userDto.getEmail())
+            .uuid(new UserId(userDto.getId()))
+            .email(new Email(userDto.getEmail()))
             .name(userDto.getName())
-            .role(UserRole.ROLE_USER)
             .build();
     }
 

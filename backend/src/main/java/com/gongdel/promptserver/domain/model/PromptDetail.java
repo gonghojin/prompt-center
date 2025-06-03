@@ -1,5 +1,6 @@
 package com.gongdel.promptserver.domain.model;
 
+import com.gongdel.promptserver.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 
