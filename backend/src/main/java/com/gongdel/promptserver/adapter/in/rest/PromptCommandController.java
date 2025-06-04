@@ -6,7 +6,7 @@ import com.gongdel.promptserver.adapter.in.rest.response.CreatePromptResponse;
 import com.gongdel.promptserver.application.dto.RegisterPromptResponse;
 import com.gongdel.promptserver.application.port.in.PromptCommandUseCase;
 import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
-import com.gongdel.promptserver.common.security.SecurityUtils;
+import com.gongdel.promptserver.common.security.CurrentUserProvider;
 import com.gongdel.promptserver.domain.exception.PromptValidationException;
 import com.gongdel.promptserver.domain.model.InputVariable;
 import com.gongdel.promptserver.domain.model.PromptStatus;
@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 public class PromptCommandController {
 
     private final PromptCommandUseCase promptCommandUseCase;
+    private final CurrentUserProvider currentUserProvider;
 
     /**
      * 새로운 프롬프트를 생성합니다.
@@ -89,7 +90,7 @@ public class PromptCommandController {
      * @return 프롬프트 등록 커맨드 객체
      */
     private RegisterPromptCommand buildRegisterPromptCommand(final CreatePromptRequest request) {
-        final User author = SecurityUtils.getCurrentUser();
+        final User author = currentUserProvider.getCurrentUser();
         final List<InputVariable> inputVariables = mapInputVariables(request.getInputVariables());
 
         return RegisterPromptCommand.builder()
