@@ -106,7 +106,7 @@ public class AuthCommandService implements AuthCommandUseCase {
             user = userDetails.getUser();
 
             String accessToken = generateAccessToken(user);
-            String refreshToken = generateAndSaveRefreshToken(user.getUuid());
+            String refreshToken = generateAndSaveRefreshToken(user);
 
             log.info("User logged in successfully: userId={}", user.getUuid());
             return new LoginResponse(accessToken, refreshToken, "Bearer");
@@ -186,57 +186,55 @@ public class AuthCommandService implements AuthCommandUseCase {
 
     private User createAndSaveUser(SignUpCommand command) {
         User user = User.register(
-                command.getEmail(),
-                command.getName(),
-                null,
-                UserStatus.ACTIVE,
-                LocalDateTime.now(),
-                LocalDateTime.now());
+            command.getEmail(),
+            command.getName(),
+            null,
+            UserStatus.ACTIVE,
+            LocalDateTime.now(),
+            LocalDateTime.now());
         return saveUserPort.saveUser(user);
     }
 
     private void createAndSaveUserAuthentication(Long userId, Password password) {
         String encodedPassword = passwordEncoder.encode(password.toRaw());
         UserAuthentication userAuth = UserAuthentication.register(
-                userId,
-                encodedPassword,
-                LocalDateTime.now());
+            userId,
+            encodedPassword,
+            LocalDateTime.now());
         saveUserAuthPort.saveUserAuthentication(userAuth);
 
     }
 
     private void assignDefaultRole(Long userId) {
         Role role = loadRolePort.loadRoleByName("ROLE_USER")
-                .orElseThrow(() -> new IllegalStateException("기본 권한(ROLE_USER)이 존재하지 않습니다. 데이터베이스를 확인하세요."));
+            .orElseThrow(() -> new IllegalStateException("기본 권한(ROLE_USER)이 존재하지 않습니다. 데이터베이스를 확인하세요."));
         UserRole userRole = UserRole.register(userId, role.getId());
         saveUserRolePort.saveUserRole(userRole);
     }
 
     private Authentication authenticateUser(LoginCommand command) {
         return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        command.getEmail(),
-                        command.getPassword().toRaw()));
+            new UsernamePasswordAuthenticationToken(
+                command.getEmail(),
+                command.getPassword().toRaw()));
     }
 
     private String generateAccessToken(User user) {
-        return jwtTokenProvider.generateAccessToken(
-                user.getUuid(),
-                user.getEmail().getValue());
+        return jwtTokenProvider.generateAccessToken(user);
     }
 
-    private String generateAndSaveRefreshToken(UserId userId) {
+    private String generateAndSaveRefreshToken(User user) {
         try {
-            String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
+            String refreshToken = jwtTokenProvider.generateRefreshToken(user);
             Date refreshTokenExpiry = jwtTokenProvider.getExpiration(refreshToken);
             RefreshToken refreshTokenDomain = RefreshToken.create(
-                    userId,
-                    refreshToken,
-                    refreshTokenExpiry.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+                user.getUuid(),
+                refreshToken,
+                refreshTokenExpiry.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
             saveRefreshTokenPort.saveRefreshToken(refreshTokenDomain);
             return refreshToken;
         } catch (Exception e) {
-            throw TokenException.saveFailed(userId.toString(), e);
+            throw TokenException.saveFailed(user.getUuid().toString(), e);
         }
     }
 
@@ -250,10 +248,10 @@ public class AuthCommandService implements AuthCommandUseCase {
     private User getUserFromRefreshToken(String refreshToken) {
         UserId userId = jwtTokenProvider.getUserId(refreshToken);
         return loadUserPort.loadUserByUserId(userId)
-                .orElseThrow(() -> {
-                    log.warn("User not found for refresh token");
-                    return AuthException.userNotFound(userId.toString());
-                });
+            .orElseThrow(() -> {
+                log.warn("User not found for refresh token");
+                return AuthException.userNotFound(userId.toString());
+            });
     }
 
     private void validateAccessToken(String accessToken) {

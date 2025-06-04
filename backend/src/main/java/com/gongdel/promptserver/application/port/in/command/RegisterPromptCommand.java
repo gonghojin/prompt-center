@@ -7,6 +7,7 @@ import com.gongdel.promptserver.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import org.springframework.util.Assert;
 
 import java.util.*;
 
@@ -90,6 +91,8 @@ public class RegisterPromptCommand {
         this.inputVariables = inputVariables != null ? Collections.unmodifiableList(new ArrayList<>(inputVariables))
             : Collections.emptyList();
         this.status = status;
+
+        validateUserFields(createdBy);
     }
 
     /**
@@ -167,5 +170,12 @@ public class RegisterPromptCommand {
         if (categoryId != null && categoryId <= 0) {
             throw new IllegalArgumentException("카테고리 ID는 양수여야 합니다: " + categoryId);
         }
+    }
+
+    private void validateUserFields(User user) {
+        Assert.notNull(user.getId(), "User id must not be empty");
+        Assert.notNull(user.getUuid(), "User uuid must not be empty");
+        Assert.notNull(user.getEmail(), "User email must not be empty");
+        Assert.hasText(user.getName(), "User name must not be empty");
     }
 }

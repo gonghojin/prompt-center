@@ -2,19 +2,20 @@ package com.gongdel.promptserver.application.usecase.command;
 
 import com.gongdel.promptserver.adapter.in.rest.response.LoginResponse;
 import com.gongdel.promptserver.adapter.in.rest.response.TokenRefreshResponse;
-import com.gongdel.promptserver.application.port.in.command.*;
+import com.gongdel.promptserver.application.port.in.command.LoginCommand;
+import com.gongdel.promptserver.application.port.in.command.LogoutCommand;
+import com.gongdel.promptserver.application.port.in.command.SignUpCommand;
+import com.gongdel.promptserver.application.port.in.command.TokenRefreshCommand;
 import com.gongdel.promptserver.application.port.out.command.*;
 import com.gongdel.promptserver.application.port.out.query.LoadRefreshTokenPort;
 import com.gongdel.promptserver.application.port.out.query.LoadRolePort;
 import com.gongdel.promptserver.application.port.out.query.LoadUserPort;
 import com.gongdel.promptserver.common.security.JwtTokenProvider;
 import com.gongdel.promptserver.common.security.SecurityUserDetails;
-import com.gongdel.promptserver.domain.exception.AuthErrorType;
 import com.gongdel.promptserver.domain.exception.AuthException;
 import com.gongdel.promptserver.domain.exception.TokenException;
 import com.gongdel.promptserver.domain.exception.TokenValidationException;
 import com.gongdel.promptserver.domain.logout.LogoutToken;
-import com.gongdel.promptserver.domain.refreshtoken.RefreshToken;
 import com.gongdel.promptserver.domain.role.Role;
 import com.gongdel.promptserver.domain.user.*;
 import com.gongdel.promptserver.domain.userauth.UserAuthentication;
@@ -33,7 +34,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -178,9 +178,9 @@ class AuthCommandServiceTest {
             when(userDetails.getUser()).thenReturn(mockUser);
             when(mockUser.getUuid()).thenReturn(new UserId(UUID.randomUUID()));
             when(mockUser.getEmail()).thenReturn(new Email("test@example.com"));
-            when(jwtTokenProvider.generateAccessToken(any(), anyString())).thenReturn("accessToken");
-            when(jwtTokenProvider.generateRefreshToken(any(UserId.class))).thenReturn("refreshToken");
-            when(jwtTokenProvider.getExpiration(anyString())).thenReturn(new Date());
+            when(mockUser.getName()).thenReturn("테스트유저");
+            when(jwtTokenProvider.generateAccessToken(any(User.class))).thenReturn("accessToken");
+            when(jwtTokenProvider.generateRefreshToken(any(User.class))).thenReturn("refreshToken");
 
             // When
             LoginResponse response = authCommandService.login(loginCommand);
@@ -232,7 +232,8 @@ class AuthCommandServiceTest {
             when(loadUserPort.loadUserByUserId(userId)).thenReturn(Optional.of(mockUser));
             when(mockUser.getEmail()).thenReturn(email);
             when(mockUser.getUuid()).thenReturn(userId);
-            when(jwtTokenProvider.generateAccessToken(userId, email.getValue())).thenReturn("newAccessToken");
+            when(mockUser.getName()).thenReturn("테스트유저");
+            when(jwtTokenProvider.generateAccessToken(any(User.class))).thenReturn("newAccessToken");
 
             // When
             TokenRefreshResponse response = authCommandService.refresh(refreshCommand);
@@ -244,7 +245,7 @@ class AuthCommandServiceTest {
             verify(loadRefreshTokenPort).isRefreshTokenValid(refreshCommand.getRefreshToken());
             verify(jwtTokenProvider).getUserId(refreshCommand.getRefreshToken());
             verify(loadUserPort).loadUserByUserId(userId);
-            verify(jwtTokenProvider).generateAccessToken(userId, email.getValue());
+            verify(jwtTokenProvider).generateAccessToken(any(User.class));
         }
 
         @Test

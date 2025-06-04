@@ -6,13 +6,12 @@ import com.gongdel.promptserver.adapter.in.rest.response.CreatePromptResponse;
 import com.gongdel.promptserver.application.dto.RegisterPromptResponse;
 import com.gongdel.promptserver.application.port.in.PromptCommandUseCase;
 import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
+import com.gongdel.promptserver.common.security.SecurityUtils;
 import com.gongdel.promptserver.domain.exception.PromptValidationException;
 import com.gongdel.promptserver.domain.model.InputVariable;
 import com.gongdel.promptserver.domain.model.PromptStatus;
 import com.gongdel.promptserver.domain.model.Visibility;
-import com.gongdel.promptserver.domain.user.Email;
 import com.gongdel.promptserver.domain.user.User;
-import com.gongdel.promptserver.domain.user.UserId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -29,10 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static com.gongdel.promptserver.application.constant.DevelopmentConstants.*;
 
 /**
  * 프롬프트 생성 등 명령성 작업을 처리하는 REST 컨트롤러입니다.
@@ -55,7 +51,8 @@ public class PromptCommandController {
     @Operation(summary = "프롬프트 생성", description = "새로운 프롬프트를 생성합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "프롬프트 생성 성공"),
-        @ApiResponse(responseCode = "400", description = "잘못된 요청")
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "401", description = "인증되지 않은 요청")
     })
     @PostMapping
     public ResponseEntity<CreatePromptResponse> createPrompt(@Valid @RequestBody final CreatePromptRequest request) {
@@ -86,28 +83,13 @@ public class PromptCommandController {
     }
 
     /**
-     * 임시 사용자를 생성합니다. 실제 애플리케이션에서는 인증된 사용자 정보를 사용해야 합니다.
-     *
-     * @return 생성된 임시 사용자
-     */
-    private User createTemporaryUser() {
-        return User.builder()
-            .uuid(new UserId(UUID.fromString(TEMP_USER_UUID)))
-            .name(TEMP_USER_NAME)
-            .email(new Email(TEMP_USER_EMAIL))
-            .build();
-    }
-
-    /**
      * 프롬프트 등록 요청으로부터 커맨드 객체를 생성합니다.
      *
      * @param request 프롬프트 생성 요청 정보
      * @return 프롬프트 등록 커맨드 객체
      */
     private RegisterPromptCommand buildRegisterPromptCommand(final CreatePromptRequest request) {
-        final User author = (request.getCreatedBy() != null)
-            ? toDomainUser(request.getCreatedBy())
-            : createTemporaryUser();
+        final User author = SecurityUtils.getCurrentUser();
         final List<InputVariable> inputVariables = mapInputVariables(request.getInputVariables());
 
         return RegisterPromptCommand.builder()
@@ -136,21 +118,6 @@ public class PromptCommandController {
         return inputVariableDtos.stream()
             .map(InputVariableDto::toDomain)
             .collect(Collectors.toUnmodifiableList());
-    }
-
-    /**
-     * CreatePromptRequest.UserDto를 도메인 User로 변환합니다.
-     *
-     * @param userDto 사용자 DTO
-     * @return 도메인 User 객체
-     */
-    private User toDomainUser(final CreatePromptRequest.UserDto userDto) {
-        Assert.notNull(userDto, "UserDto must not be null");
-        return User.builder()
-            .uuid(new UserId(userDto.getId()))
-            .email(new Email(userDto.getEmail()))
-            .name(userDto.getName())
-            .build();
     }
 
     /**
