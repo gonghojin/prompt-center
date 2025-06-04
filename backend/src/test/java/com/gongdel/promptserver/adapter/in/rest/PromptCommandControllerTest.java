@@ -2,7 +2,6 @@ package com.gongdel.promptserver.adapter.in.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gongdel.promptserver.adapter.in.rest.request.CreatePromptRequest;
-import com.gongdel.promptserver.adapter.in.rest.request.CreatePromptRequest.UserDto;
 import com.gongdel.promptserver.adapter.in.rest.request.InputVariableDto;
 import com.gongdel.promptserver.application.dto.RegisterPromptResponse;
 import com.gongdel.promptserver.application.port.in.PromptCommandUseCase;
@@ -11,9 +10,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -26,7 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PromptCommandController.class)
-class PromptCommandControllerTest {
+@AutoConfigureMockMvc(addFilters = false)
+class PromptCommandControllerTest extends BaseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,13 +47,9 @@ class PromptCommandControllerTest {
             .title("테스트 프롬프트")
             .description("설명")
             .content("내용")
-            .createdBy(UserDto.builder()
-                .id(UUID.randomUUID())
-                .name("홍길동")
-                .email("hong@test.com")
-                .build())
             .tags(Set.of("tag1", "tag2"))
-            .inputVariables(List.of(InputVariableDto.builder().name("var1").description("desc").build()))
+            .inputVariables(List.of(
+                InputVariableDto.builder().name("var1").description("desc").build()))
             .categoryId(1L)
             .visibility("PRIVATE")
             .status("DRAFT")
@@ -80,6 +78,7 @@ class PromptCommandControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "testuser", roles = "USER")
     @DisplayName("프롬프트 생성 실패 - title 누락")
     void create_prompt_fail_missing_title() throws Exception {
         // given: title이 누락된 요청
@@ -96,6 +95,7 @@ class PromptCommandControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "testuser", roles = "USER")
     @DisplayName("프롬프트 생성 성공 - 입력 변수와 태그가 null")
     void create_prompt_success_with_null_input_variables_and_tags() throws Exception {
         // given
@@ -103,11 +103,6 @@ class PromptCommandControllerTest {
             .title("테스트 프롬프트")
             .description("설명")
             .content("내용")
-            .createdBy(UserDto.builder()
-                .id(UUID.randomUUID())
-                .name("홍길동")
-                .email("hong@test.com")
-                .build())
             .inputVariables(null)
             .tags(null)
             .categoryId(1L)
@@ -138,6 +133,7 @@ class PromptCommandControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "testuser", roles = "USER")
     @DisplayName("프롬프트 생성 성공 - 입력 변수와 태그가 빈 컬렉션")
     void create_prompt_success_with_empty_input_variables_and_tags() throws Exception {
         // given
@@ -145,11 +141,6 @@ class PromptCommandControllerTest {
             .title("테스트 프롬프트")
             .description("설명")
             .content("내용")
-            .createdBy(UserDto.builder()
-                .id(UUID.randomUUID())
-                .name("홍길동")
-                .email("hong@test.com")
-                .build())
             .inputVariables(List.of())
             .tags(Set.of())
             .categoryId(1L)

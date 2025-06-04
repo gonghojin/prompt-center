@@ -43,7 +43,7 @@ logging:
   level:
     root: INFO
     com.promptcenter: DEBUG
-    org.springframework.security: INFO
+    org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
 
 management:
@@ -56,3 +56,8 @@ management:
   endpoint:
     health:
       show-details: never
+
+jwt:
+  secret: ${JWT_SECRET:c2VjcmV0LWtleS1tdXN0LWJlLWF0LWxlYXN0LTI1Ni1iaXRzLWxvbmctZm9yLWp3dC1zaWduaW5n}
+  access-token-validity-in-ms: 3600000  # 1시간
+  refresh-token-validity-in-ms: 604800000  # 7일

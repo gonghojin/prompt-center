@@ -21,6 +21,11 @@ erDiagram
     Team ||--o{ User : contains
     Category ||--o{ PromptTemplate : categorizes
     Favorite ||--o{ FavoriteNote : has
+    User ||--o{ OAuthConnection : has
+    User ||--o{ TokenBlacklist : has
+    User ||--o{ RefreshToken : has
+    User ||--o{ UserRole : has
+    UserRole }o--|| Role : references
 ```
 
 ## 📊 엔티티 상세
@@ -34,11 +39,30 @@ erDiagram
 | uuid | UUID | 외부 노출용 고유 식별자 | Unique, Not Null |
 | email | String | 사용자 이메일 | Unique, Not Null |
 | name | String | 사용자 이름 | Not Null |
-| role | Enum | 사용자 역할 | ADMIN, DEVELOPER, DATA_SCIENTIST, DESIGNER |
 | teamId | BigInt | 소속 팀 ID | Foreign Key, Nullable |
 | createdAt | DateTime | 생성 일시 | Not Null |
 | updatedAt | DateTime | 수정 일시 | Not Null |
 | status | Enum | 계정 상태 | ACTIVE, INACTIVE, DELETED |
+
+### 🛡️ Role (역할)
+사용자 역할 정보를 관리하는 엔티티입니다.
+
+| 필드 | 타입 | 설명 | 제약조건 |
+|------|------|------|----------|
+| id | BigInt | 역할 고유 식별자 | Primary Key, Auto Increment |
+| uuid | UUID | 외부 노출용 고유 식별자 | Unique, Not Null |
+| name | String | 역할 이름 | Unique, Not Null |
+| description | Text | 역할 설명 | Nullable |
+
+### 🔗 UserRole (사용자-역할 매핑)
+사용자와 역할 간의 다대다 관계를 관리하는 엔티티입니다.
+
+| 필드 | 타입 | 설명 | 제약조건 |
+|------|------|------|----------|
+| id | BigInt | 매핑 고유 식별자 | Primary Key, Auto Increment |
+| uuid | UUID | 매핑 고유 식별자(글로벌 유일) | Unique, Not Null |
+| userId | BigInt | 사용자 ID | Foreign Key, Not Null |
+| roleId | BigInt | 역할 ID | Foreign Key, Not Null |
 
 ### 🔐 UserAuthentication (사용자 인증)
 사용자 인증 정보를 별도로 관리하는 엔티티입니다.
@@ -47,8 +71,47 @@ erDiagram
 |------|------|------|----------|
 | id | BigInt | 인증 정보 고유 식별자 | Primary Key, Auto Increment |
 | userId | BigInt | 사용자 ID | Foreign Key, Not Null |
-| passwordHash | String | 암호화된 비밀번호 | Not Null |
-| lastPasswordChangeAt | DateTime | 마지막 비밀번호 변경 일시 | Not Null |
+| passwordHash | String | 암호화된 비밀번호 | Nullable |
+| lastPasswordChangeAt | DateTime | 마지막 비밀번호 변경 일시 | Nullable |
+| createdAt | DateTime | 생성 일시 | Not Null |
+| updatedAt | DateTime | 수정 일시 | Not Null |
+
+### 🔑 OAuthConnection (OAuth 연동)
+OAuth 제공자와의 연동 정보를 관리하는 엔티티입니다.
+
+| 필드 | 타입 | 설명 | 제약조건 |
+|------|------|------|----------|
+| id | BigInt | 연동 정보 고유 식별자 | Primary Key, Auto Increment |
+| userId | BigInt | 사용자 ID | Foreign Key, Not Null |
+| provider | Enum | OAuth 제공자 | GOOGLE, GITHUB |
+| providerUserId | String | OAuth 제공자의 사용자 ID | Not Null |
+| accessToken | String | OAuth 액세스 토큰 | Not Null |
+| refreshToken | String | OAuth 리프레시 토큰 | Nullable |
+| tokenExpiresAt | DateTime | 토큰 만료 일시 | Not Null |
+| scope | String | OAuth 권한 범위 | Nullable |
+| createdAt | DateTime | 생성 일시 | Not Null |
+| updatedAt | DateTime | 수정 일시 | Not Null |
+
+### 🔄 TokenBlacklist (토큰 블랙리스트)
+로그아웃된 JWT 토큰을 관리하는 엔티티입니다.
+
+| 필드 | 타입 | 설명 | 제약조건 |
+|------|------|------|----------|
+| id | BigInt | 블랙리스트 고유 식별자 | Primary Key, Auto Increment |
+| tokenId | String | JWT 토큰 ID (jti) | Not Null |
+| userId | BigInt | 사용자 ID | Foreign Key, Not Null |
+| expiresAt | DateTime | 토큰 만료 일시 | Not Null |
+| createdAt | DateTime | 생성 일시 | Not Null |
+
+### 🔄 RefreshToken (리프레시 토큰)
+JWT 리프레시 토큰을 관리하는 엔티티입니다.
+
+| 필드 | 타입 | 설명 | 제약조건 |
+|------|------|------|----------|
+| id | BigInt | 토큰 고유 식별자 | Primary Key, Auto Increment |
+| userId | BigInt | 사용자 ID | Foreign Key, Not Null |
+| token | String | 리프레시 토큰 | Not Null |
+| expiresAt | DateTime | 토큰 만료 일시 | Not Null |
 | createdAt | DateTime | 생성 일시 | Not Null |
 | updatedAt | DateTime | 수정 일시 | Not Null |
 
@@ -260,9 +323,10 @@ PromptTemplate의 visibility(공개 범위)와 PromptVersion의 actionType(작�
 2. 대량의 로그 데이터나 분산 처리가 필요한 엔티티는 UUID를 기본 키로 사용합니다.
 3. 외래 키는 참조 무결성을 보장합니다.
 4. 필수 필드는 Not Null 제약조건을 가집니다.
-5. 이메일과 태그 이름은 유니크 제약조건을 가집니다.
+5. 이메일, 태그 이름, 역할 이름은 유니크 제약조건을 가집니다.
 6. PromptTemplateTag는 promptTemplateId와 tagId의 조합이 유니크해야 합니다.
 7. Favorite은 userId와 promptTemplateId의 조합이 유니크해야 합니다.
+8. UserRole은 userId와 roleId의 조합이 유니크해야 합니다.
 
 ## 📈 인덱스 전략
 1. User: email, teamId, uuid
@@ -278,6 +342,8 @@ PromptTemplate의 visibility(공개 범위)와 PromptVersion의 actionType(작�
 11. Category: parentCategoryId, name
 12. PromptExample: promptTemplateId, createdById
 13. Team: uuid
+14. Role: uuid, name
+15. UserRole: uuid, userId, roleId
 
 ## 🔄 데이터 마이그레이션
 1. 버전 관리가 필요한 엔티티는 createdAt, updatedAt 필드를 포함합니다.
@@ -288,3 +354,4 @@ PromptTemplate의 visibility(공개 범위)와 PromptVersion의 actionType(작�
 6. 기존 PromptCategory 열거형의 값들은 Category 테이블의 시스템 카테고리로 마이그레이션됩니다(isSystem=true).
 7. Favorite의 note 필드는 별도의 FavoriteNote 테이블로 분리됩니다.
 8. 기존 UUID 기반 데이터는 BigInt ID로 마이그레이션하되, 외부 노출용 중, 보안이 필요한 필드는 UUID 필드를 추가로 유지합니다.
+9. 기존 User의 role(enum) 필드는 제거하고, UserRole/Role 테이블로 마이그레이션합니다.
