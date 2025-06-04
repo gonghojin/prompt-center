@@ -58,7 +58,7 @@ class PromptCommandServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder().uuid(new UserId(UUID.randomUUID())).name("TestUser").email(new Email("test@test.com")).build();
+        testUser = User.builder().id(1l).uuid(new UserId(UUID.randomUUID())).name("TestUser").email(new Email("test@test.com")).build();
         inputVariables = List.of(
             InputVariable.builder().name("var1").type("String").description("desc1").required(true)
                 .defaultValue("").build(),

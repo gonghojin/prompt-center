@@ -43,7 +43,7 @@ logging:
   level:
     root: INFO
     com.promptcenter: DEBUG
-    org.springframework.security: INFO
+    org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
 
 management:

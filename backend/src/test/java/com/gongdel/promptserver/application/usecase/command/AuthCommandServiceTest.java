@@ -34,6 +34,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -120,7 +121,7 @@ class AuthCommandServiceTest {
             // When & Then
             assertThatThrownBy(() -> authCommandService.signUp(signUpCommand))
                     .isInstanceOf(AuthException.class)
-                    .hasMessage("이미 사용 중인 이메일입니다: " + signUpCommand.getEmail());
+                .hasMessageContaining("이미 사용 중인 이메일");
 
             verify(loadUserPort).loadUserByEmail(any(Email.class));
             verify(saveUserPort, never()).saveUser(any(User.class));
@@ -177,10 +178,9 @@ class AuthCommandServiceTest {
             when(authentication.getPrincipal()).thenReturn(userDetails);
             when(userDetails.getUser()).thenReturn(mockUser);
             when(mockUser.getUuid()).thenReturn(new UserId(UUID.randomUUID()));
-            when(mockUser.getEmail()).thenReturn(new Email("test@example.com"));
-            when(mockUser.getName()).thenReturn("테스트유저");
             when(jwtTokenProvider.generateAccessToken(any(User.class))).thenReturn("accessToken");
             when(jwtTokenProvider.generateRefreshToken(any(User.class))).thenReturn("refreshToken");
+            when(jwtTokenProvider.getExpiration(eq("refreshToken"))).thenReturn(new Date());
 
             // When
             LoginResponse response = authCommandService.login(loginCommand);
@@ -201,7 +201,8 @@ class AuthCommandServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> authCommandService.login(loginCommand))
-                    .isInstanceOf(AuthException.class);
+                .isInstanceOf(AuthException.class)
+                .hasMessageContaining(AuthException.invalidCredentials().getMessage());
         }
     }
 
@@ -230,11 +231,8 @@ class AuthCommandServiceTest {
             when(loadRefreshTokenPort.isRefreshTokenValid(anyString())).thenReturn(true);
             when(jwtTokenProvider.getUserId(anyString())).thenReturn(userId);
             when(loadUserPort.loadUserByUserId(userId)).thenReturn(Optional.of(mockUser));
-            when(mockUser.getEmail()).thenReturn(email);
-            when(mockUser.getUuid()).thenReturn(userId);
-            when(mockUser.getName()).thenReturn("테스트유저");
             when(jwtTokenProvider.generateAccessToken(any(User.class))).thenReturn("newAccessToken");
-
+            // when(jwtTokenProvider.getExpiration(anyString())).thenReturn(mock(Date.class));
             // When
             TokenRefreshResponse response = authCommandService.refresh(refreshCommand);
 
@@ -256,7 +254,8 @@ class AuthCommandServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> authCommandService.refresh(refreshCommand))
-                    .isInstanceOf(TokenException.class);
+                .isInstanceOf(TokenException.class)
+                .hasMessageContaining("토큰 저장에 실패했습니다:");
             verify(loadRefreshTokenPort).isRefreshTokenValid(refreshCommand.getRefreshToken());
             verify(jwtTokenProvider, never()).getUserId(anyString());
             verify(loadUserPort, never()).loadUserByUserId(any(UserId.class));
@@ -299,7 +298,8 @@ class AuthCommandServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> authCommandService.logout(logoutCommand))
-                    .isInstanceOf(TokenValidationException.class);
+                .isInstanceOf(TokenValidationException.class)
+                .hasMessageContaining("토큰 형식이 올바르지 않습니다");
         }
     }
 }
