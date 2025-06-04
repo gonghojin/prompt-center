@@ -1,40 +1,40 @@
 version: '3.8'
 
 services:
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/prompt_center
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - SPRING_REDIS_HOST=redis
-      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
-    depends_on:
-      - db
-      - redis
-      - elasticsearch
-    volumes:
-      - ./backend:/app
-    networks:
-      - prompt-network
+#  backend:
+#    build:
+#      context: ./backend
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/prompt_center
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=postgres
+#      - SPRING_REDIS_HOST=redis
+#      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
+#    depends_on:
+#      - db
+#      - redis
+#      - elasticsearch
+#    volumes:
+#      - ./backend:/app
+#    networks:
+#      - prompt-network
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    depends_on:
-      - backend
-    networks:
-      - prompt-network
+#  frontend:
+#    build:
+#      context: ./frontend
+#      dockerfile: Dockerfile
+#    ports:
+#      - "3000:3000"
+#    volumes:
+#      - ./frontend:/app
+#      - /app/node_modules
+#    depends_on:
+#      - backend
+#    networks:
+#      - prompt-network
 
   db:
     image: postgres:15
@@ -77,4 +77,4 @@ volumes:
 
 networks:
   prompt-network:
-    driver: bridge 
+    driver: bridge

@@ -1,7 +1,8 @@
 package com.gongdel.promptserver.adapter.in.rest.response;
 
-import com.gongdel.promptserver.domain.model.User;
-import com.gongdel.promptserver.domain.model.UserRole;
+import com.gongdel.promptserver.domain.user.Email;
+import com.gongdel.promptserver.domain.user.User;
+import com.gongdel.promptserver.domain.user.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,11 +24,9 @@ class UserResponseTest {
         String name = "테스트 사용자";
 
         User user = User.builder()
-            .id(id)
-            .email(email)
+            .uuid(new UserId(id))
+            .email(new Email(email))
             .name(name)
-            .password("password1234") // DTO에는 포함되지 않음
-            .role(UserRole.ROLE_USER) // DTO에는 포함되지 않음
             .build();
 
         // when

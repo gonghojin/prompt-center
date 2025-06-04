@@ -42,54 +42,6 @@
 
 - 개발 환경: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 - 운영/스테이징 환경: (배포 후 실제 URL 기입)
-
-## 카테고리 API 지원 기능
-
-| 구분      | HTTP Method | 엔드포인트                                         | 설명                  | 주요 응답 코드      | 예외/특이사항                 |
-|---------|-------------|-----------------------------------------------|---------------------|---------------|-------------------------|
-| 카테고리 생성 | POST        | `/api/v1/categories`                          | 새로운 카테고리 생성         | 201, 409, 400 | 이름 중복 시 409(CONFLICT)   |
-| 카테고리 수정 | PUT         | `/api/v1/categories/{id}`                     | 기존 카테고리 정보 수정       | 200, 404, 400 | 미존재 시 404(NOT FOUND)    |
-| 카테고리 삭제 | DELETE      | `/api/v1/categories/{id}`                     | 카테고리 삭제             | 204, 404      | 미존재 시 404(NOT FOUND)    |
-| 단건 조회   | GET         | `/api/v1/categories/{id}`                     | ID로 카테고리 조회         | 200, 404      | 미존재 시 404(NOT FOUND)    |
-| 목록 조회   | GET         | `/api/v1/categories?name&isSystem`            | 조건(이름/시스템여부)별 목록 조회 | 200           | 결과 없으면 빈 배열 반환          |
-| 루트 목록   | GET         | `/api/v1/categories/roots`                    | 최상위(루트) 카테고리 목록 조회  | 200           |                         |
-| 하위 목록   | GET         | `/api/v1/categories/{parentId}/subcategories` | 특정 카테고리의 하위 목록 조회   | 200, 404      | 상위 미존재 시 404(NOT FOUND) |
-
-- 모든 API는 표준화된 예외 처리 및 로깅 전략을 따릅니다.
-- 상세 요청/응답 구조는 Swagger 문서 또는 코드 참고.
-
-## 프롬프트 API 지원 기능
-
-| 구분      | HTTP Method | 엔드포인트                             | 설명                  | 주요 응답 코드      | 예외/특이사항                     |
-|---------|-------------|-----------------------------------|---------------------|---------------|-----------------------------|
-| 프롬프트 생성 | POST        | `/api/v1/prompts`                 | 새로운 프롬프트 생성         | 201, 400      | 필수 필드 누락 시 400(BAD REQUEST) |
-| 단건 조회   | GET         | `/api/v1/prompts/{id}`            | UUID로 프롬프트 상세 정보 조회 | 200, 404      | 미존재 시 404(NOT FOUND)        |
-| 복합 검색   | GET         | `/api/v1/prompts/advanced-search` | 다양한 조건으로 프롬프트 검색    | 200, 400, 500 | 페이징 처리 포함                   |
-
-### 프롬프트 생성 요청 필드
-
-- `title`: 프롬프트 제목 (필수)
-- `content`: 프롬프트 내용 (필수)
-- `description`: 프롬프트 설명 (필수)
-- `categoryId`: 카테고리 ID (필수)
-- `inputVariables`: 입력 변수 목록
-- `tags`: 태그 목록
-- `visibility`: 가시성 설정
-- `status`: 프롬프트 상태
-- `createdBy`: 작성자 정보
-
-### 복합 검색 파라미터
-
-- `title`: 프롬프트 제목 (선택)
-- `description`: 프롬프트 설명 (선택)
-- `tag`: 태그 (선택)
-- `categoryId`: 카테고리 ID (선택)
-- `status`: 프롬프트 상태 (기본값: PUBLISHED)
-- `sortType`: 정렬 기준 (기본값: LATEST_MODIFIED)
-    - LATEST_MODIFIED: 최근 수정순
-    - TITLE: 프롬프트 이름순
-- 페이징 파라미터 (Pageable)
-
 - 모든 API는 표준화된 예외 처리 및 로깅 전략을 따릅니다.
 - 상세 요청/응답 구조는 Swagger 문서 또는 코드 참고.
 
@@ -249,19 +201,6 @@ jacocoTestCoverageVerification {
 ## Backend Server
 
 ### 개발 환경 설정
-
-#### 임시 사용자 설정
-
-현재 사용자 관리 시스템이 개발 중이므로, 개발 환경에서는 임시 시스템 사용자를 사용합니다:
-
-- ID: 1
-- UUID: 00000000-0000-0000-0000-000000000000
-- Email: temp@system.local
-- Name: System User
-
-이 임시 사용자는 자동으로 데이터베이스에 생성되며, 프롬프트 템플릿 생성 시 기본 사용자로 사용됩니다.
-
-> **주의**: 이 임시 사용자는 개발 환경에서만 사용되어야 합니다. 운영 환경 배포 전에 반드시 실제 사용자 관리 시스템으로 교체해야 합니다.
 
 ### 실행 방법
 
