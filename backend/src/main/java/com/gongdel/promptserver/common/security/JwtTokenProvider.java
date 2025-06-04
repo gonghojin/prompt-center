@@ -1,19 +1,18 @@
 package com.gongdel.promptserver.common.security;
 
+import com.gongdel.promptserver.domain.exception.InvalidJwtException;
+import com.gongdel.promptserver.domain.exception.JwtErrorType;
 import com.gongdel.promptserver.domain.user.UserId;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import com.gongdel.promptserver.domain.exception.InvalidJwtException;
-import com.gongdel.promptserver.domain.exception.JwtErrorType;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -55,53 +54,57 @@ public class JwtTokenProvider {
     /**
      * 사용자 정보를 기반으로 액세스 토큰을 생성합니다.
      *
-     * @param userId 사용자 ID
-     * @param email  사용자 이메일
+     * @param user 사용자 객체
      * @return JWT 액세스 토큰
-     * @throws IllegalArgumentException userId가 null이거나, email이 비어있는 경우
+     * @throws IllegalArgumentException user가 null이거나, email/name이 비어있는 경우
      */
-    public String generateAccessToken(UserId userId, String email) {
-        Assert.notNull(userId, "UserId must not be null");
-        Assert.hasText(email, "Email must not be empty");
+    public String generateAccessToken(com.gongdel.promptserver.domain.user.User user) {
+        Assert.notNull(user, "User must not be null");
+        Assert.notNull(user.getUuid(), "UserId must not be null");
+        Assert.hasText(user.getEmail().getValue(), "Email must not be empty");
+        Assert.hasText(user.getName(), "Name must not be empty");
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenValidityInMs);
 
         String token = Jwts.builder()
-                .setSubject(userId.getValue().toString())
-                .claim("email", email)
+            .setSubject(user.getUuid().getValue().toString())
+            .claim("email", user.getEmail().getValue())
+            .claim("name", user.getName())
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        log.debug("Generated access token for userId={}, email={}", userId, email);
+        log.debug("Generated access token for userId={}, email={}, name={}", user.getUuid(), user.getEmail().getValue(),
+            user.getName());
         return token;
     }
 
     /**
      * 사용자 정보를 기반으로 리프레시 토큰을 생성합니다.
      *
-     * @param userId 사용자 ID
+     * @param user 사용자 객체
      * @return JWT 리프레시 토큰
-     * @throws IllegalArgumentException userId가 null인 경우
+     * @throws IllegalArgumentException user가 null인 경우
      */
-    public String generateRefreshToken(UserId userId) {
-        Assert.notNull(userId, "UserId must not be null");
+    public String generateRefreshToken(com.gongdel.promptserver.domain.user.User user) {
+        Assert.notNull(user, "User must not be null");
+        Assert.notNull(user.getUuid(), "UserId must not be null");
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + refreshTokenValidityInMs);
 
         String token = Jwts.builder()
-                .setSubject(userId.getValue().toString())
+            .setSubject(user.getUuid().getValue().toString())
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        log.debug("Generated refresh token for userId={}", userId);
+        log.debug("Generated refresh token for userId={}", user.getUuid());
         return token;
     }
 

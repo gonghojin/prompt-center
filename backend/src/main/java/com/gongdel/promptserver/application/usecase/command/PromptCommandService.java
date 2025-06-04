@@ -1,6 +1,5 @@
 package com.gongdel.promptserver.application.usecase.command;
 
-import com.gongdel.promptserver.application.constant.DevelopmentConstants;
 import com.gongdel.promptserver.application.dto.RegisterPromptResponse;
 import com.gongdel.promptserver.application.exception.PromptErrorType;
 import com.gongdel.promptserver.application.exception.PromptRegistrationException;
@@ -121,7 +120,7 @@ public class PromptCommandService implements PromptCommandUseCase {
      * @throws PromptValidationException 프롬프트 템플릿 유효성 검증에 실패한 경우
      */
     private PromptTemplate buildPromptTemplate(RegisterPromptCommand command) throws PromptValidationException {
-        Long createdById = DevelopmentConstants.TEMP_USER_ID;
+        Long createdById = command.getCreatedBy().getId();
         Visibility visibility;
         if (command.getVisibility() != null) {
             visibility = command.getVisibility();
