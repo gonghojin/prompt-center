@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -28,7 +29,7 @@ public class PromptListResponse {
     @Schema(description = "작성자명", example = "홍길동")
     private final String createdByName;
     @Schema(description = "태그 목록", example = "[\"stable-diffusion\", \"ai\"]")
-    private final java.util.List<String> tags;
+    private final List<String> tags;
 
     @Schema(description = "공개 여부", example = "true")
     private final boolean isPublic;
