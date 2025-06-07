@@ -795,20 +795,15 @@
       ]
     },
     {
-      "name": "Prompt Statistics API",
+      "name": "PromptDashboard API",
       "item": [
         {
-          "name": "프롬프트 통계 조회",
+          "name": "최근 프롬프트 목록 조회",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/dashboard/prompt-statistics?startDate=2024-06-01T00:00:00&endDate=2024-06-02T00:00:00",
+              "raw": "{{baseUrl}}/api/v1/dashboard/prompts/recent?pageSize=4",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -816,37 +811,91 @@
                 "api",
                 "v1",
                 "dashboard",
-                "prompt-statistics"
+                "prompts",
+                "recent"
               ],
               "query": [
                 {
-                  "key": "startDate",
-                  "value": "2024-06-01T00:00:00",
-                  "description": "시작일(필수, ISO-8601)"
-                },
-                {
-                  "key": "endDate",
-                  "value": "2024-06-02T00:00:00",
-                  "description": "종료일(필수, ISO-8601)"
+                  "key": "pageSize",
+                  "value": "4",
+                  "description": "조회할 프롬프트 개수(기본값: 4, 0 이하 입력 시 4로 대체)"
                 }
               ]
             },
-            "description": "대시보드용 프롬프트 통계 정보 조회 (endDate < startDate 또는 파라미터 누락 시 400)"
+            "description": "대시보드에서 최근 N개의 프롬프트를 최신순으로 조회"
           },
           "response": [
             {
               "name": "200 OK",
-              "originalRequest": {},
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"totalCount\": 1500,\n  \"currentCount\": 100,\n  \"previousCount\": 80,\n  \"percentageChange\": 25.0\n}"
+              "body": "[PromptListResponse, ...]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CategoryStatistics API",
+      "item": [
+        {
+          "name": "루트 카테고리별 프롬프트 통계",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dashboard/categories/root/statistics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "categories",
+                "root",
+                "statistics"
+              ]
             },
+            "description": "루트 카테고리별 프롬프트 통계 조회"
+          },
+          "response": [
             {
-              "name": "400 Bad Request",
-              "originalRequest": {},
-              "status": "Bad Request",
-              "code": 400,
-              "body": "파라미터 누락 또는 endDate < startDate 시"
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"categories\": [\n    {\n      \"categoryId\": 1,\n      \"categoryName\": \"AI\",\n      \"promptCount\": 10\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "하위 카테고리별 프롬프트 통계",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dashboard/categories/1/children/statistics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "categories",
+                "1",
+                "children",
+                "statistics"
+              ]
+            },
+            "description": "특정 루트의 하위 카테고리별 프롬프트 통계 조회 (rootId 필수)"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"categories\": [\n    {\n      \"categoryId\": 2,\n      \"categoryName\": \"AI-Sub\",\n      \"promptCount\": 5\n    }\n  ]\n}"
             }
           ]
         }
