@@ -31,7 +31,10 @@ public enum ApplicationErrorCode implements ErrorCode {
     // 통계 관련 오류 (3000-3999)
     STATISTICS_VALIDATION_ERROR(3000, "통계 데이터 유효성 검증 실패"),
     STATISTICS_OPERATION_FAILED(3001, "통계 작업 수행 실패"),
-    STATISTICS_UNKNOWN_ERROR(3999, "알 수 없는 통계 관련 오류");
+    STATISTICS_UNKNOWN_ERROR(3999, "알 수 없는 통계 관련 오류"),
+
+    // 대시보드 관련 오류 (4000-4999)
+    DASHBOARD_OPERATION_FAILED(4001, "대시보드 작업 수행 실패");
 
     private final int code;
     private final String message;
