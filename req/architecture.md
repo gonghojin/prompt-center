@@ -376,3 +376,17 @@ classDiagram
 - Git Flow
 - 시맨틱 버저닝
 - 변경 이력 관리
+
+## 📚 실무적 QueryDSL 통계/집계 쿼리 설계 정책
+
+### 통계/집계 쿼리의 Repository 위치 정책
+
+- 카테고리별 프롬프트 개수 등 **통계/집계 쿼리(QueryDSL 기반)**는 도메인 레포지토리(JpaCategoryRepository, PromptTemplateJpaRepository 등)와 분리하여,
+- `adapter/out/persistence/repository/CategoryStatisticsQueryRepository.java` 등 **별도의 QueryRepository**로 관리하는 것이 실무적 표준이다.
+- **이유**:
+    - 통계/집계 쿼리는 여러 도메인(카테고리, 프롬프트 등)에 걸친 복합 집계가 많으므로, 도메인 레포지토리와 분리하면 관심사 분리와 유지보수성이 높아진다.
+    - 향후 사용자별, 팀별, 기간별 등 다양한 통계성 쿼리도 이곳에 추가할 수 있어 확장성이 뛰어나다.
+    - CQRS, 헥사고날/클린 아키텍처 원칙(포트-어댑터, 읽기/쓰기 분리)에도 부합한다.
+- **실무 권장 구조**:
+    - `adapter/out/persistence/repository/CategoryStatisticsQueryRepository.java` (QueryDSL 기반, 통계/집계 전용)
+    - 도메인별 JpaRepository와 별도 관리

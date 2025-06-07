@@ -1,7 +1,7 @@
 package com.gongdel.promptserver.application.usecase.command;
 
-import com.gongdel.promptserver.adapter.in.rest.response.LoginResponse;
 import com.gongdel.promptserver.adapter.in.rest.response.TokenRefreshResponse;
+import com.gongdel.promptserver.adapter.in.rest.response.auth.LoginResponse;
 import com.gongdel.promptserver.application.port.in.AuthCommandUseCase;
 import com.gongdel.promptserver.application.port.in.command.LoginCommand;
 import com.gongdel.promptserver.application.port.in.command.LogoutCommand;

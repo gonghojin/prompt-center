@@ -9,10 +9,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Map;
 
@@ -160,6 +162,27 @@ class GlobalExceptionHandlerTest {
             assertThat(response.getBody()).containsEntry("code", "MISSING_PARAMETER");
             assertThat(response.getBody()).containsEntry("message",
                 String.format("필수 파라미터 '%s'가 누락되었습니다.", parameterName));
+        }
+    }
+
+    @Nested
+    @DisplayName("handleNoResourceFoundException(NoResourceFoundException) 메서드는")
+    class HandleNoResourceFoundExceptionTest {
+        @Test
+        @DisplayName("존재하지 않는 리소스 요청 시 404 상태와 표준 메시지로 반환한다")
+        void givenNoResourceFoundException_whenHandle_thenReturnsNotFound() {
+            // Given
+            String path = "/api/v1/dashboard/categories/children/statistics";
+            NoResourceFoundException ex = new NoResourceFoundException(HttpMethod.GET, path);
+
+            // When
+            ResponseEntity<Map<String, Object>> response = handler.handleNoResourceFoundException(ex);
+
+            // Then
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+            assertThat(response.getBody()).containsEntry("code", "NOT_FOUND");
+            assertThat(response.getBody()).containsEntry("message", "요청하신 리소스를 찾을 수 없습니다.");
+            assertThat(response.getBody()).containsKey("error");
         }
     }
 }
