@@ -5,8 +5,12 @@ import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Set;
+
 /**
  * 프롬프트 검색 조건을 담는 불변 객체입니다.
+ * <p>
+ * - 고도화 검색 및 내 프롬프트 조회를 위한 다양한 필터와 검색어, 사용자 ID, 전용 플래그를 포함합니다.
  */
 @Getter
 @Builder
@@ -40,4 +44,25 @@ public class PromptSearchCondition {
      * 페이징 정보
      */
     private final Pageable pageable;
+
+    /**
+     * 상태 필터 (다중 선택)
+     */
+    private final Set<PromptStatus> statusFilters;
+    /**
+     * 공개 범위 필터 (다중 선택)
+     */
+    private final Set<Visibility> visibilityFilters;
+    /**
+     * 통합 검색어 (제목, 설명, 태그 등)
+     */
+    private final String searchKeyword;
+    /**
+     * 사용자 ID (내 프롬프트 조회 시 사용)
+     */
+    private final Long userId;
+    /**
+     * 내 프롬프트 조회 여부
+     */
+    private final boolean isMyPrompts;
 }

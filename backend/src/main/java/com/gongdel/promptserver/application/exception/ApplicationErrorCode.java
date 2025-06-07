@@ -26,7 +26,12 @@ public enum ApplicationErrorCode implements ErrorCode {
     CATEGORY_UNKNOWN_ERROR(2999, "카테고리 관련 알 수 없는 오류가 발생했습니다"),
 
     // 일반 오류 (9000-9999)
-    UNKNOWN_ERROR(9999, "알 수 없는 오류");
+    UNKNOWN_ERROR(9999, "알 수 없는 오류"),
+
+    // 통계 관련 오류 (3000-3999)
+    STATISTICS_VALIDATION_ERROR(3000, "통계 데이터 유효성 검증 실패"),
+    STATISTICS_OPERATION_FAILED(3001, "통계 작업 수행 실패"),
+    STATISTICS_UNKNOWN_ERROR(3999, "알 수 없는 통계 관련 오류");
 
     private final int code;
     private final String message;
