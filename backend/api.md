@@ -238,6 +238,79 @@ GET /api/v1/dashboard/prompt-statistics?startDate=2024-06-01T00:00:00&endDate=20
 
 ---
 
+## 대시보드(Dashboard) API
+
+| 기능                  | HTTP Method | 엔드포인트                                                       | 설명                         | 주요 파라미터/Body          | 응답 코드 | 예외/특이사항              |
+|---------------------|-------------|-------------------------------------------------------------|----------------------------|-----------------------|-------|----------------------|
+| 최근 프롬프트 조회          | GET         | `/api/v1/dashboard/prompts/recent`                          | 대시보드에서 최근 N개의 프롬프트 조회      | query: pageSize(기본 4) | 200   | pageSize ≤ 0 시 4로 대체 |
+| 루트 카테고리별 프롬프트 통계 조회 | GET         | `/api/v1/dashboard/categories/root/statistics`              | 루트 카테고리별 프롬프트 개수 조회        | 없음                    | 200   |                      |
+| 하위 카테고리별 프롬프트 통계 조회 | GET         | `/api/v1/dashboard/categories/{rootId}/children/statistics` | 특정 루트의 하위 카테고리별 프롬프트 개수 조회 | path: rootId          | 200   |                      |
+
+### 루트 카테고리별 프롬프트 통계 조회
+
+#### 요청 예시
+
+```
+GET /api/v1/dashboard/categories/root/statistics
+```
+
+#### 응답 예시
+
+```json
+{
+  "categories": [
+    {
+      "categoryId": 1,
+      "categoryName": "AI",
+      "promptCount": 10
+    },
+    {
+      "categoryId": 2,
+      "categoryName": "마케팅",
+      "promptCount": 5
+    }
+  ]
+}
+```
+
+---
+
+### 하위 카테고리별 프롬프트 통계 조회
+
+#### 요청 예시
+
+```
+GET /api/v1/dashboard/categories/1/children/statistics
+```
+
+#### path 파라미터
+
+| 파라미터명  | 타입   | 필수 | 설명         |
+|--------|------|----|------------|
+| rootId | Long | Y  | 루트 카테고리 ID |
+
+#### 응답 예시
+
+```json
+{
+  "categories": [
+    {
+      "categoryId": 10,
+      "categoryName": "챗봇",
+      "promptCount": 3
+    },
+    {
+      "categoryId": 11,
+      "categoryName": "이미지 생성",
+      "promptCount": 7
+    }
+  ]
+}
+```
+
+- 응답은 `CategoryStatisticsResponse` 객체입니다.
+- 각 카테고리별로 `categoryId`, `categoryName`, `promptCount` 필드를 포함합니다.
+
 ## 공통 안내
 
 - 모든 API는 표준화된 예외 처리 및 로깅 전략을 따릅니다.

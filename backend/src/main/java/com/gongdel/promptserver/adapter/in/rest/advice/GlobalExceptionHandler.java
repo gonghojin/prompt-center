@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -139,6 +140,23 @@ public class GlobalExceptionHandler {
             SYSTEM_ERROR,
             "서버 내부 오류");
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * 존재하지 않는 정적/동적 리소스 요청 시 404 반환
+     *
+     * @param ex NoResourceFoundException
+     * @return 404 NOT_FOUND 응답
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNoResourceFoundException(NoResourceFoundException ex) {
+        logException("No resource found", ex);
+        Map<String, Object> errorResponse = createErrorResponse(
+            "NOT_FOUND",
+            "요청하신 리소스를 찾을 수 없습니다.",
+            "NOT_FOUND",
+            "리소스 없음");
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     /**

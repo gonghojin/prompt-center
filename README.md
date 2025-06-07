@@ -101,9 +101,6 @@ prompt-center/
 cd backend
 ./gradlew test
 
-# 프론트엔드 테스트
-cd frontend
-npm test
 ```
 
 ## 🧩 API 통합 테스트 자동화

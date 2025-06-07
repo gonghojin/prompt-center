@@ -1,5 +1,6 @@
 package com.gongdel.promptserver.adapter.in.rest.response;
 
+import com.gongdel.promptserver.adapter.in.rest.response.auth.UserResponse;
 import com.gongdel.promptserver.domain.user.Email;
 import com.gongdel.promptserver.domain.user.User;
 import com.gongdel.promptserver.domain.user.UserId;

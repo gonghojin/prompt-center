@@ -1,11 +1,11 @@
 package com.gongdel.promptserver.application.port.in;
 
-import com.gongdel.promptserver.adapter.in.rest.response.LoginResponse;
 import com.gongdel.promptserver.adapter.in.rest.response.TokenRefreshResponse;
-import com.gongdel.promptserver.application.port.in.command.SignUpCommand;
+import com.gongdel.promptserver.adapter.in.rest.response.auth.LoginResponse;
 import com.gongdel.promptserver.application.port.in.command.LoginCommand;
-import com.gongdel.promptserver.application.port.in.command.TokenRefreshCommand;
 import com.gongdel.promptserver.application.port.in.command.LogoutCommand;
+import com.gongdel.promptserver.application.port.in.command.SignUpCommand;
+import com.gongdel.promptserver.application.port.in.command.TokenRefreshCommand;
 
 /**
  * 인증 관련 유스케이스 인터페이스
