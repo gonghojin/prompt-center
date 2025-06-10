@@ -1,0 +1,70 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Java Code Improvement Guidelines
+
+## Code Structure and Readability
+- Decompose complex logic into smaller methods to follow the Single Responsibility Principle.
+- Avoid unnecessary nested conditions and prefer early return patterns.
+- Use descriptive and consistent naming for variables and methods.
+
+## Commenting Guidelines
+- All public API methods must include JavaDoc in **Korean** (for your team's convention).
+- Focus comments on **"why"** something is done, rather than just **"what"** is being done.
+
+```java
+/**
+ * Creates a new user account.
+ *
+ * @param userDto DTO containing user information
+ * @return Created user information
+ * @throws DuplicateEmailException Thrown if the email already exists
+ */
+public UserResponse createUser(UserDto userDto) {
+    // Implementation
+}
+```
+
+## Code Refactoring Example
+### Before
+```java
+public boolean processData(String input) {
+    if (input != null) {
+        if (input.length() > 0) {
+            String trimmed = input.trim();
+            if (trimmed.length() > 0) {
+                // Data processing logic
+                return true;
+            }
+        }
+    }
+    return false;
+}
+```
+
+### After
+```java
+/**
+ * Processes the input data.
+ *
+ * @param input Input string to be processed
+ * @return Whether processing was successful
+ */
+public boolean processData(String input) {
+    if (StringUtils.isBlank(input)) {
+        log.debug("Empty input data received, skipping processing");
+        return false;
+    }
+
+    // Data processing logic
+    log.debug("Processing data: {}", input);
+    return true;
+}
+```
+
+## Lombok Usage Guidelines
+- Avoid using `@Data`; instead, use more specific annotations like `@Getter`, `@Setter`, and `@ToString`.
+- Use `@Builder`, `@RequiredArgsConstructor`, etc., to reduce boilerplate code where appropriate.
+- Prefer explicit type declarations over `val` or `var` for better readability and clarity.

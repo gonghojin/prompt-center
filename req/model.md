@@ -8,6 +8,8 @@
 erDiagram
     User ||--o{ PromptTemplate : creates
     User ||--o{ Favorite : has
+    User ||--o{ PromptLike : likes
+    User ||--o{ PromptViewLog : views
     User }o--|| Team : belongs_to
     User ||--o{ UserAuthentication : has
     User ||--o{ LoginHistory : performs
@@ -16,6 +18,8 @@ erDiagram
     PromptTemplate ||--o{ PromptUsage : tracks
     PromptTemplate ||--o{ PromptTemplateTag : contains
     PromptTemplate ||--o{ PromptExample : has
+    PromptTemplate ||--o{ PromptLike : liked_by
+    PromptTemplate ||--o{ PromptViewCount : viewed
     PromptTemplateTag }o--|| Tag : references
     PromptTemplate }o--|| Category : belongs_to
     Team ||--o{ User : contains
@@ -318,6 +322,47 @@ PromptTemplate의 visibility(공개 범위)와 PromptVersion의 actionType(작�
 | createdAt | DateTime | 생성 일시 | Not Null |
 | updatedAt | DateTime | 수정 일시 | Not Null |
 
+### 👍 PromptLike (프롬프트 좋아요)
+
+사용자가 프롬프트에 '좋아요'를 누른 기록을 관리합니다.
+
+| 필드               | 타입       | 설명         | 제약조건                        |
+|------------------|----------|------------|-----------------------------|
+| id               | BigInt   | 좋아요 고유 식별자 | Primary Key, Auto Increment |
+| userId           | BigInt   | 사용자 ID     | Foreign Key, Not Null       |
+| promptTemplateId | BigInt   | 템플릿 ID     | Foreign Key, Not Null       |
+| createdAt        | DateTime | 좋아요 생성 일시  | Not Null                    |
+
+> **유니크 제약:** (userId, promptTemplateId)
+
+### 👁️ PromptViewCount (프롬프트 조회수 집계)
+
+프롬프트에 대한 누적 조회 수를 관리하는 집계용 테이블입니다.
+
+| 필드               | 타입       | 설명          | 제약조건                     |
+|------------------|----------|-------------|--------------------------|
+| promptTemplateId | BigInt   | 템플릿 ID      | Primary Key, Foreign Key |
+| totalViewCount   | Long     | 누적 조회수      | Default: 0               |
+| updatedAt        | DateTime | 마지막 업데이트 일시 | Nullable                 |
+
+### 🧾 PromptViewLog (프롬프트 조회 로그)
+
+중복 조회 방지 및 사용자 행동 분석을 위한 상세 조회 기록입니다.
+
+| 필드               | 타입       | 설명           | 제약조건                                |
+|------------------|----------|--------------|-------------------------------------|
+| id               | UUID     | 조회 기록 고유 식별자 | Primary Key                         |
+| promptTemplateId | BigInt   | 템플릿 ID       | Foreign Key, Not Null               |
+| userId           | BigInt   | 사용자 ID       | Foreign Key, Nullable (비로그인 사용자 대응) |
+| ipAddress        | String   | 사용자 IP 주소    | Nullable                            |
+| viewedAt         | DateTime | 조회 일시        | Not Null                            |
+
+👉 조건: 최근 1시간 내 동일 사용자/아이피가 본 경우 → 카운트 제외
+
+로그인 사용자: userId + promptTemplateId 로 체크
+
+비로그인 사용자: ipAddress + promptTemplateId 로 체크
+
 ## 🔒 데이터 무결성 규칙
 1. 핵심 엔티티는 정수형(BigInt) ID를 기본 키로 사용하고, 외부 노출이 필요한 경우 UUID 필드를 추가합니다.
 2. 대량의 로그 데이터나 분산 처리가 필요한 엔티티는 UUID를 기본 키로 사용합니다.
@@ -327,6 +372,8 @@ PromptTemplate의 visibility(공개 범위)와 PromptVersion의 actionType(작�
 6. PromptTemplateTag는 promptTemplateId와 tagId의 조합이 유니크해야 합니다.
 7. Favorite은 userId와 promptTemplateId의 조합이 유니크해야 합니다.
 8. UserRole은 userId와 roleId의 조합이 유니크해야 합니다.
+9. PromptLike는 userId와 promptTemplateId의 조합이 유니크해야 합니다.
+10. PromptViewLog는 중복방지를 위해 TTL 또는 별도 제약 조건을 둘 수 있습니다.
 
 ## 📈 인덱스 전략
 1. User: email, teamId, uuid
@@ -344,6 +391,9 @@ PromptTemplate의 visibility(공개 범위)와 PromptVersion의 actionType(작�
 13. Team: uuid
 14. Role: uuid, name
 15. UserRole: uuid, userId, roleId
+16. PromptLike: userId, promptTemplateId (unique index)
+17. PromptViewCount: promptTemplateId
+18. PromptViewLog: promptTemplateId, userId, viewedAt
 
 ## 🔄 데이터 마이그레이션
 1. 버전 관리가 필요한 엔티티는 createdAt, updatedAt 필드를 포함합니다.

@@ -1,0 +1,310 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Spring Exception Handling Guidelines
+
+## Architecture and Structure
+
+### 1. Layered Exception Design
+- All business exceptions should inherit from a common base exception class.
+```java
+@Getter
+public abstract class BaseException extends RuntimeException {
+    private final ErrorCode errorCode;
+
+    protected BaseException(ErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
+    }
+
+    protected BaseException(ErrorCode errorCode, String message, Throwable cause) {
+        super(message, cause);
+        this.errorCode = errorCode;
+    }
+}
+```
+
+### 2. Systematic Error Codes
+- Manage error codes using enums to maintain consistency and improve maintainability
+```java
+public enum ErrorCode {
+    // General errors (1000-1999)
+    INVALID_INPUT_VALUE(1000, "Invalid input value"),
+    INTERNAL_SERVER_ERROR(1001, "Internal server error"),
+
+    // User-related errors (2000-2999)
+    USER_NOT_FOUND(2000, "User not found"),
+    DUPLICATE_EMAIL(2001, "Email already in use"),
+
+    // Permission-related errors (3000-3999)
+    ACCESS_DENIED(3000, "Access denied"),
+    INSUFFICIENT_PERMISSION(3001, "Insufficient permission");
+
+    private final int code;
+    private final String message;
+
+    ErrorCode(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+}
+```
+
+### 3. Domain-Specific Exception Classes
+- Define specific exception classes for each domain or functional area
+- **Always use English for error messages** to ensure consistency and facilitate internationalization
+```java
+public class UserException extends BaseException {
+    public UserException(ErrorCode errorCode, String message) {
+        super(errorCode, message);
+    }
+
+    // Factory method pattern
+    public static UserException notFound(String userId) {
+        return new UserException(
+            ErrorCode.USER_NOT_FOUND,
+            String.format("User with ID '%s' not found", userId)
+        );
+    }
+}
+```
+
+## Exception Handling Strategies
+
+### 1. Global Exception Handling
+- Consistent exception handling using `@ControllerAdvice` and `@ExceptionHandler`
+```java
+@Slf4j
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ErrorResponse> handleBaseException(BaseException ex) {
+        log.error("BaseException occurred: {}", ex.getMessage(), ex);
+
+        ErrorResponse response = ErrorResponse.of(
+            ex.getErrorCode(),
+            ex.getMessage()
+        );
+
+        return new ResponseEntity<>(response, determineStatus(ex.getErrorCode()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        log.error("Unexpected exception occurred: {}", ex.getMessage(), ex);
+
+        ErrorResponse response = ErrorResponse.of(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            "An internal server error occurred. Please try again later."
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private HttpStatus determineStatus(ErrorCode errorCode) {
+        // Determine appropriate HTTP status code based on error code
+        // E.g., 1000-1999 for 400, 2000-2999 for 404, 3000-3999 for 403, etc.
+    }
+}
+```
+
+### 2. Exception Translation Pattern
+- Explicitly convert low-level exceptions to business exceptions
+```java
+@Service
+public class UserService {
+    public User findById(String id) {
+        try {
+            return userRepository.findById(id)
+                .orElseThrow(() -> UserException.notFound(id));
+        } catch (DataAccessException e) {
+            throw new SystemException(
+                ErrorCode.DATABASE_ERROR,
+                "Database error occurred while retrieving user",
+                e
+            );
+        }
+    }
+}
+```
+
+## Standardizing Response Formats
+
+### 1. Error Response DTO
+- Define a consistent error response format
+```java
+@Getter
+public class ErrorResponse {
+    private final LocalDateTime timestamp;
+    private final int code;
+    private final String message;
+    private final List<FieldError> fieldErrors;
+
+    private ErrorResponse(ErrorCode errorCode, String message) {
+        this.timestamp = LocalDateTime.now();
+        this.code = errorCode.getCode();
+        this.message = message;
+        this.fieldErrors = new ArrayList<>();
+    }
+
+    // Field error information for handling validation errors like MethodArgumentNotValidException
+    @Getter
+    public static class FieldError {
+        private final String field;
+        private final String value;
+        private final String reason;
+
+        // Constructor and factory methods
+    }
+
+    // Factory methods
+    public static ErrorResponse of(ErrorCode errorCode, String message) {
+        return new ErrorResponse(errorCode, message);
+    }
+
+    // Factory method for validation errors
+    public static ErrorResponse ofValidation(ErrorCode errorCode, List<FieldError> fieldErrors) {
+        ErrorResponse response = new ErrorResponse(errorCode, "Validation failed");
+        response.fieldErrors.addAll(fieldErrors);
+        return response;
+    }
+}
+```
+
+### 2. Using Spring Boot 3.x Problem Details
+- Utilize the RFC 7807 standard-based error response format
+```java
+@ExceptionHandler(BaseException.class)
+ProblemDetail handleBaseException(BaseException ex) {
+    log.error("BaseException occurred: {}", ex.getMessage(), ex);
+
+    ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+        determineStatus(ex.getErrorCode()),
+        ex.getMessage()
+    );
+
+    problem.setTitle(ex.getErrorCode().name());
+    problem.setProperty("code", ex.getErrorCode().getCode());
+    problem.setProperty("timestamp", LocalDateTime.now().toString());
+
+    return problem;
+}
+```
+
+## Validation and Documentation
+
+### 1. Integration with Bean Validation
+- Request validation using `@Valid` and Bean Validation
+- Providing consistent error responses for validation failures
+```java
+@PostMapping("/users")
+public ResponseEntity<UserDto> createUser(
+        @Valid @RequestBody CreateUserRequest request) {
+    // Only executed if validation passes
+    User user = userService.createUser(request);
+    return ResponseEntity.status(HttpStatus.CREATED)
+            .body(UserDto.from(user));
+}
+
+@ExceptionHandler(MethodArgumentNotValidException.class)
+public ResponseEntity<ErrorResponse> handleValidationException(
+        MethodArgumentNotValidException ex) {
+    log.error("Validation error: {}", ex.getMessage());
+
+    List<ErrorResponse.FieldError> fieldErrors = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(error -> new ErrorResponse.FieldError(
+                    error.getField(),
+                    error.getRejectedValue() != null ? error.getRejectedValue().toString() : "",
+                    error.getDefaultMessage()
+            ))
+            .collect(Collectors.toList());
+
+    ErrorResponse response = ErrorResponse.ofValidation(
+            ErrorCode.INVALID_INPUT_VALUE, fieldErrors);
+
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+}
+```
+
+### 2. API Documentation Integration
+- Documenting exception responses with Swagger/OpenAPI
+```java
+@Operation(
+    summary = "Create user",
+    description = "Creates a new user"
+)
+@ApiResponses({
+    @ApiResponse(
+        responseCode = "201",
+        description = "User created successfully"
+    ),
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+    ),
+    @ApiResponse(
+        responseCode = "409",
+        description = "Email already exists",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+    )
+})
+@PostMapping("/users")
+public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserRequest request) {
+    // Method implementation
+}
+```
+
+## Logging Strategy
+
+### 1. Enhanced Context Information
+- Include sufficient context information when logging exceptions
+```java
+@ExceptionHandler(BaseException.class)
+public ResponseEntity<ErrorResponse> handleBaseException(BaseException ex, HttpServletRequest request) {
+
+
+    log.error("Exception occurred: {}", ex.getMessage(), ex);
+
+    // Generate and return response
+    // ...
+
+}
+```
+
+### 2. Structured Logging
+- Use JSON format logging for log analysis
+```
+<appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+        <customFields>{"application":"my-app"}</customFields>
+    </encoder>
+</appender>
+```
+
+## Performance and Scalability Considerations
+
+### 1. Minimizing Exception Creation Cost
+- Use exceptions only for exceptional situations, not for control flow
+- Consider using Optional, Result pattern where appropriate in business logic
+
+### 2. Separating Exception Handlers by Module/Domain
+- For large applications, separate @ControllerAdvice by domain
+```java
+@Slf4j
+@ControllerAdvice(basePackages = "com.example.user")
+public class UserExceptionHandler {
+    // Handle user-related exceptions
+}
+
+@Slf4j
+@ControllerAdvice(basePackages = "com.example.order")
+public class OrderExceptionHandler {
+    // Handle order-related exceptions
+}
+```

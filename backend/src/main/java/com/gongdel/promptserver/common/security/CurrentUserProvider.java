@@ -57,4 +57,19 @@ public class CurrentUserProvider {
         }
         return (SecurityUserDetails) principal;
     }
+
+    /**
+     * 현재 인증된 사용자의 ID를 반환합니다.
+     *
+     * @return 사용자 ID
+     * @throws AuthException 인증 정보가 없거나 사용자 ID가 null인 경우
+     */
+    public Long getCurrentUserId() {
+        User user = getCurrentUser();
+        if (user == null || user.getId() == null) {
+            log.error("Current user is not authenticated or user ID is null");
+            throw new AuthException(AuthErrorType.UNAUTHORIZED, "인증된 사용자를 찾을 수 없습니다.");
+        }
+        return user.getId();
+    }
 }

@@ -165,14 +165,13 @@ Authorization: Bearer {accessToken}
       "status": "PUBLISHED",
       "visibility": "PUBLIC",
       "createdAt": "2024-06-01T12:00:00",
-      "updatedAt": "2024-06-02T12:00:00"
-      // ... 기타 필드 ...
+      "updatedAt": "2024-06-02T12:00:00",
+      "isFavorite": true
     }
   ],
   "pageable": {
     "pageNumber": 0,
     "pageSize": 20
-    // ... 기타 페이징 정보 ...
   },
   "totalElements": 100,
   "totalPages": 5,
@@ -317,3 +316,125 @@ GET /api/v1/dashboard/categories/1/children/statistics
 - 인증이 필요한 API(카테고리, 프롬프트, 통계 등)는 반드시 'Authorization: Bearer {accessToken}' 헤더를 포함해야 합니다.
 - 상세 요청/응답 구조는 Swagger 문서 또는 코드 참고.
 - 모든 카테고리 조회 API의 응답은 CategoryResponse 단일 객체 또는 배열(List) 형태입니다.
+
+---
+
+## 즐겨찾기(Favorite) API
+
+| 기능               | HTTP Method | 엔드포인트                                                  | 설명                  | 주요 파라미터/Body                                                                 | 응답 코드                        | 예외/특이사항               |
+|------------------|-------------|--------------------------------------------------------|---------------------|------------------------------------------------------------------------------|------------------------------|-----------------------|
+| 즐겨찾기 추가          | POST        | `/api/v1/prompts/{id}/favorite`                        | 프롬프트를 즐겨찾기에 추가      | path: id(UUID), header: Authorization(Bearer)                                | 201, 400, 401, 404, 409, 500 | 이미 추가 시 409(CONFLICT) |
+| 즐겨찾기 삭제          | DELETE      | `/api/v1/prompts/{id}/favorite`                        | 프롬프트 즐겨찾기 삭제        | path: id(UUID), header: Authorization(Bearer)                                | 204, 400, 401, 404, 500      | 미존재 시 404             |
+| 내 즐겨찾기 목록 조회     | GET         | `/api/v1/prompts/my/favorites`                         | 내가 즐겨찾기한 프롬프트 목록 조회 | query: page, size, sort, order, searchKeyword, header: Authorization(Bearer) | 200, 400, 401, 500           | 페이징 처리, 검색/정렬 지원      |
+| 내 즐겨찾기 개수 조회     | GET         | `/api/v1/prompts/my/favorites/count`                   | 내가 즐겨찾기한 프롬프트 개수 조회 | header: Authorization(Bearer)                                                | 200, 401, 500                |                       |
+| 프롬프트별 즐겨찾기 개수 조회 | GET         | `/api/v1/prompts/my/favorites/count?promptUuid={uuid}` | 특정 프롬프트의 즐겨찾기 개수 조회 | query: promptUuid(UUID), header: Authorization(Bearer)                       | 200, 400, 404, 500           |                       |
+
+### 즐겨찾기 추가 요청/응답 예시
+
+**요청**
+
+```
+POST /api/v1/prompts/123e4567-e89b-12d3-a456-426614174000/favorite
+Authorization: Bearer {accessToken}
+```
+
+**응답**
+
+```json
+{
+  "id": 1001,
+  "promptTemplateId": "123e4567-e89b-12d3-a456-426614174000",
+  "createdAt": "2024-03-21T10:00:00Z"
+}
+```
+
+### 즐겨찾기 삭제 요청/응답 예시
+
+**요청**
+
+```
+DELETE /api/v1/prompts/123e4567-e89b-12d3-a456-426614174000/favorite
+Authorization: Bearer {accessToken}
+```
+
+**응답**
+
+- 204 No Content
+
+### 내 즐겨찾기 목록 조회 예시
+
+**요청**
+
+```
+GET /api/v1/prompts/my/favorites?page=0&size=20&sort=createdAt&order=desc
+Authorization: Bearer {accessToken}
+```
+
+**응답**
+
+```json
+{
+  "content": [
+    {
+      "favoriteId": 1001,
+      "promptUuid": "123e4567-e89b-12d3-a456-426614174000",
+      "title": "예시 프롬프트",
+      "description": "설명",
+      "tags": ["ai", "stable-diffusion"],
+      "createdById": 1,
+      "createdByName": "홍길동",
+      "categoryId": 2,
+      "visibility": "PUBLIC",
+      "status": "PUBLISHED",
+      "promptCreatedAt": "2024-06-01T12:00:00",
+      "promptUpdatedAt": "2024-06-02T12:00:00",
+      "favoriteCreatedAt": "2024-06-03T10:00:00",
+      "viewCount": 123,
+      "favoriteCount": 10,
+      "isFavorite": true
+    }
+  ],
+  "page": 0,
+  "size": 20,
+  "totalElements": 100,
+  "totalPages": 5,
+  "hasNext": true,
+  "hasPrevious": false
+}
+```
+
+### 내 즐겨찾기 개수 조회 예시
+
+**요청**
+
+```
+GET /api/v1/prompts/my/favorites/count
+Authorization: Bearer {accessToken}
+```
+
+**응답**
+
+```json
+{
+  "count": 100
+}
+```
+
+| 필드명   | 타입   | 설명      |
+|-------|------|---------|
+| count | Long | 즐겨찾기 개수 |
+
+### 프롬프트별 즐겨찾기 개수 조회 예시
+
+**요청**
+
+```
+GET /api/v1/prompts/my/favorites/count?promptUuid=123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {accessToken}
+```
+
+**응답**
+
+```json
+5
+```
