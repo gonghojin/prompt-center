@@ -4,6 +4,8 @@ import com.gongdel.promptserver.adapter.in.rest.response.PageResponse;
 import com.gongdel.promptserver.adapter.in.rest.response.prompt.PromptDetailResponse;
 import com.gongdel.promptserver.adapter.in.rest.response.prompt.PromptListResponse;
 import com.gongdel.promptserver.application.port.in.PromptsQueryUseCase;
+import com.gongdel.promptserver.application.port.in.query.LoadPromptDetailQuery;
+import com.gongdel.promptserver.common.security.CurrentUserProvider;
 import com.gongdel.promptserver.domain.model.PromptSearchCondition;
 import com.gongdel.promptserver.domain.model.PromptSearchResult;
 import com.gongdel.promptserver.domain.model.PromptSortType;
@@ -34,6 +36,7 @@ import java.util.UUID;
 public class PromptQueryController {
 
     private final PromptsQueryUseCase getPromptsUseCase;
+    private final CurrentUserProvider currentUserProvider;
 
     /**
      * ID로 프롬프트를 조회합니다.
@@ -47,8 +50,9 @@ public class PromptQueryController {
         @Parameter(description = "프롬프트 ID", example = "1") @PathVariable UUID id) {
         Assert.notNull(id, "프롬프트 ID는 null일 수 없습니다.");
         log.info("Retrieving prompt with id: {}", id);
-
-        return getPromptsUseCase.loadPromptDetailByUuid(id)
+        return getPromptsUseCase.loadPromptDetailByUuid(LoadPromptDetailQuery.builder().promptUuid(id)
+                .userId(currentUserProvider.getCurrentUserId())
+                .build())
             .map(detail -> ResponseEntity.ok(PromptDetailResponse.from(detail)))
             .orElseGet(() -> {
                 log.warn("Prompt not found with id: {}", id);
@@ -82,6 +86,7 @@ public class PromptQueryController {
         @Parameter(description = "카테고리 ID", example = "1") @RequestParam(required = false) Long categoryId,
         @Parameter(description = "프롬프트 상태", example = "PUBLISHED", required = false) @RequestParam(required = false, defaultValue = "PUBLISHED") String status,
         @Parameter(description = "정렬 기준 (LATEST_MODIFIED: 최근 수정순, TITLE: 프롬프트 이름순)", example = "LATEST_MODIFIED", required = false) @RequestParam(required = false, defaultValue = "LATEST_MODIFIED") PromptSortType sortType,
+        @Parameter(description = "검색어", required = false) @RequestParam(required = false) String searchKeyword,
         Pageable pageable) {
         Assert.notNull(pageable, "Pageable 정보는 null일 수 없습니다.");
 
@@ -96,8 +101,10 @@ public class PromptQueryController {
             .tag(tag)
             .categoryId(categoryId)
             .status(promptStatus)
+            .searchKeyword(searchKeyword)
             .sortType(sortType)
             .pageable(pageable)
+            .userId(currentUserProvider.getCurrentUserId())
             .build();
         Page<PromptSearchResult> resultPage = getPromptsUseCase.searchPrompts(condition);
 

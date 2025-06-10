@@ -2,6 +2,7 @@ package com.gongdel.promptserver.application.usecase.query;
 
 import com.gongdel.promptserver.application.exception.PromptVersionOperationFailedException;
 import com.gongdel.promptserver.application.port.in.PromptsQueryUseCase;
+import com.gongdel.promptserver.application.port.in.query.LoadPromptDetailQuery;
 import com.gongdel.promptserver.application.port.out.query.LoadPromptPort;
 import com.gongdel.promptserver.application.port.out.query.SearchPromptsPort;
 import com.gongdel.promptserver.domain.model.PromptDetail;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * 프롬프트 목록 및 상세 조회, 검색 등 다양한 조건으로 프롬프트를 조회하는 유스케이스 서비스 구현체입니다.
@@ -30,19 +30,25 @@ public class PromptsQueryService implements PromptsQueryUseCase {
     private final SearchPromptsPort searchPromptsPort;
 
     /**
-     * {@inheritDoc}
+     * 주어진 UUID로 프롬프트 상세 정보를 조회합니다.
+     *
+     * @param query 프롬프트 상세 조회 쿼리 객체
+     * @return 프롬프트 상세 정보(Optional), 존재하지 않을 경우 Optional.empty()
+     * @throws IllegalArgumentException 쿼리 객체가 null인 경우 발생
      */
     @Override
-    public Optional<PromptDetail> loadPromptDetailByUuid(UUID uuid) {
-        Assert.notNull(uuid, "UUID must not be null");
-        log.debug("Loading prompt detail by UUID: {}", uuid);
-        Optional<PromptDetail> detail = loadPromptPort.loadPromptDetailByUuid(uuid);
+    public Optional<PromptDetail> loadPromptDetailByUuid(LoadPromptDetailQuery query) {
+        Assert.notNull(query, "LoadPromptDetailQuery must not be null");
+        log.debug("Loading prompt detail by UUID: {}", query.getPromptUuid());
+
+        Optional<PromptDetail> detail = loadPromptPort.loadPromptDetailBy(query);
         if (detail.isPresent()) {
-            log.debug("Successfully loaded prompt detail for UUID: {}", uuid);
-        } else {
-            log.debug("No prompt detail found for UUID: {}", uuid);
+            log.debug("Successfully loaded prompt detail for UUID: {}", query.getPromptUuid());
+            return detail;
         }
-        return detail;
+
+        log.info("No prompt detail found for UUID: {}", query.getPromptUuid());
+        return Optional.empty();
     }
 
     /**

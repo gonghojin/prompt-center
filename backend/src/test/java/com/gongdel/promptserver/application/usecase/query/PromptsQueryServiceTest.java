@@ -1,6 +1,7 @@
 package com.gongdel.promptserver.application.usecase.query;
 
 import com.gongdel.promptserver.application.exception.PromptVersionOperationFailedException;
+import com.gongdel.promptserver.application.port.in.query.LoadPromptDetailQuery;
 import com.gongdel.promptserver.application.port.out.query.LoadPromptPort;
 import com.gongdel.promptserver.application.port.out.query.SearchPromptsPort;
 import com.gongdel.promptserver.domain.model.*;
@@ -80,9 +81,13 @@ class PromptsQueryServiceTest {
         @DisplayName("존재하는 프롬프트 ID로 조회 시 Optional 반환")
         void loadPromptDetail_success() {
             // given
-            given(loadPromptPort.loadPromptDetailByUuid(promptId)).willReturn(Optional.of(promptDetail));
+            LoadPromptDetailQuery query = LoadPromptDetailQuery.builder()
+                .promptUuid(promptId)
+                .userId(1L)
+                .build();
+            given(loadPromptPort.loadPromptDetailBy(query)).willReturn(Optional.of(promptDetail));
             // when
-            Optional<PromptDetail> result = promptsQueryService.loadPromptDetailByUuid(promptId);
+            Optional<PromptDetail> result = promptsQueryService.loadPromptDetailByUuid(query);
             // then
             assertThat(result).isPresent();
             assertThat(result.get().getId()).isEqualTo(promptId);
@@ -92,9 +97,13 @@ class PromptsQueryServiceTest {
         @DisplayName("존재하지 않는 프롬프트 ID로 조회 시 Optional.empty 반환")
         void loadPromptDetail_notFound() {
             // given
-            given(loadPromptPort.loadPromptDetailByUuid(promptId)).willReturn(Optional.empty());
+            LoadPromptDetailQuery query = LoadPromptDetailQuery.builder()
+                .promptUuid(promptId)
+                .userId(1L)
+                .build();
+            given(loadPromptPort.loadPromptDetailBy(query)).willReturn(Optional.empty());
             // when
-            Optional<PromptDetail> result = promptsQueryService.loadPromptDetailByUuid(promptId);
+            Optional<PromptDetail> result = promptsQueryService.loadPromptDetailByUuid(query);
             // then
             assertThat(result).isEmpty();
         }

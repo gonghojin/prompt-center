@@ -1,0 +1,116 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 롬복(Lombok) 사용 가이드라인
+
+## 환경 설정
+- IntelliJ IDEA: Lombok 플러그인 설치 및 어노테이션 프로세싱 활성화
+- Cursor IDE: 설정 파일에 롬복 경로 지정 및 확장 프로그램 설치
+```json
+"java.jdt.ls.vmargs": "-javaagent:/Users/user/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar"
+```
+
+## 권장 어노테이션
+
+### 생성자 관련
+- `@NoArgsConstructor`: 매개변수 없는 기본 생성자 생성
+- `@AllArgsConstructor`: 모든 필드를 매개변수로 받는 생성자 생성
+- `@RequiredArgsConstructor`: `final` 또는 `@NonNull` 필드만 매개변수로 받는 생성자 생성
+
+### 필드 접근자 관련
+- `@Getter`, `@Setter`: 개별 필드나 클래스 수준에서 게터/세터 생성
+- `@Data` 사용을 지양하고 필요한 어노테이션만 명시적으로 사용
+
+### 보일러플레이트 축소
+- `@Builder`: 빌더 패턴 구현 (불변 객체 생성에 유용)
+- `@ToString`: `toString()` 메소드 자동 생성 (민감한 필드는 `@ToString.Exclude` 사용)
+- `@EqualsAndHashCode`: `equals()` 및 `hashCode()` 메소드 자동 생성
+
+### 로깅 지원
+- `@Slf4j`: SLF4J 로거 필드 자동 생성
+```java
+@Slf4j
+public class UserService {
+    public void createUser() {
+        log.info("Creating new user");
+        // 필드 선언 없이 바로 log 사용 가능
+    }
+}
+```
+
+## 모범 사례
+
+### Entity 클래스
+```java
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(exclude = "password")
+@EqualsAndHashCode(of = "id")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Builder
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+}
+```
+
+### DTO 클래스
+```java
+@Getter
+@ToString
+@NoArgsConstructor
+public class UserRequest {
+    @NotBlank
+    private String email;
+
+    @NotBlank
+    private String password;
+
+    @Builder
+    public UserRequest(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+}
+```
+
+### 서비스 클래스
+```java
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class UserService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public User createUser(UserRequest request) {
+        log.info("Creating new user with email: {}", request.getEmail());
+
+        // 구현 코드
+        return User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .build();
+    }
+}
+```
+
+## 주의사항
+- `@Data`는 모든 필드에 게터/세터, `equals()`, `hashCode()`, `toString()`을 생성하므로 신중하게 사용
+- `@Builder`와 `@NoArgsConstructor`를 함께 사용할 때는 별도의 생성자 정의 필요
+- JPA 엔티티에는 `@Setter` 사용을 지양하고 명시적인 메소드로 상태 변경 구현
+- 순환 참조가 있는 객체에서 `@ToString`이나 `@EqualsAndHashCode` 사용 시 무한 재귀 주의

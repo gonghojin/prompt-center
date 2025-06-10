@@ -1,0 +1,39 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+## Logging Guidelines
+- All logs for debugging purposes must be written in **English**.
+- Use @Slf4j with Logging
+- Use appropriate log levels:
+  - **ERROR**: Exceptions and critical issues
+  - **WARN**: Potential problems
+  - **INFO**: Important business events
+  - **DEBUG**: Detailed debugging information
+  - **TRACE**: Very fine-grained diagnostic information
+
+```java
+// Good logging examples
+log.info("User {} created successfully", user.getEmail());
+log.debug("Processing payment transaction: {}", transactionId);
+log.error("Failed to connect to external service", exception);
+```
+
+## Validation Guidelines
+- Use Spring's Assert utilities for parameter validation:
+  - **Assert.notNull()**: For validating non-null values
+  - **Assert.hasLength()**: For validating non-empty strings
+  - **Assert.hasText()**: For validating strings with non-whitespace content
+  - **Assert.notEmpty()**: For validating collections and arrays
+
+```java
+// Good validation examples
+Assert.notNull(category, "Category must not be null");
+Assert.hasText(name, "Name must not be empty");
+Assert.isTrue(age > 0, "Age must be positive");
+```
+
+- Always log validation failures at appropriate level (ERROR or WARN)
+- Include detailed error messages in exceptions for user feedback
+- Use domain-specific exception types with error codes for structured error handling

@@ -12,7 +12,7 @@ echo "백엔드 서비스 기동 완료!"
 # 2. 카테고리 생성 (POST)
 echo "1. 카테고리 생성"
 
-CAT_NAME="test_prompt_category19"
+CAT_NAME="test_prompt_category"
 CAT_DISPLAY="테스트 프롬프트 카테고리"
 CAT_DESC="프롬프트 테스트용 카테고리"
 CAT_SYS=false
@@ -33,9 +33,11 @@ echo "2. 프롬프트 등록 테스트"
 REQ_TITLE="테스트 프롬프트"
 REQ_DESC="테스트용 프롬프트 설명"
 REQ_CONTENT="이것은 테스트 프롬프트 내용입니다."
-REQ_VARIABLES='{"user":"홍길동","age":30}'
 REQ_TAGS='["테스트","AI"]'
-REQ_INPUT_VARIABLES='["user","age"]'
+REQ_INPUT_VARIABLES='[
+  {"name":"user","type":"String","description":"사용자명","required":true,"defaultValue":"홍길동"},
+  {"name":"age","type":"Number","description":"나이","required":false,"defaultValue":30}
+]'
 REQ_VISIBILITY="PRIVATE"
 REQ_STATUS="PUBLISHED"
 REQ_CREATED_BY='{"id":"00000000-0000-0000-0000-000000000000","email":"temp@system.local","name":"System User"}'
@@ -44,14 +46,13 @@ CREATE_RES=$(jq -n \
   --arg title "$REQ_TITLE" \
   --arg description "$REQ_DESC" \
   --arg content "$REQ_CONTENT" \
-  --argjson variablesSchema "$REQ_VARIABLES" \
   --argjson tags "$REQ_TAGS" \
   --argjson categoryId "$CAT_ID" \
   --argjson inputVariables "$REQ_INPUT_VARIABLES" \
   --arg visibility "$REQ_VISIBILITY" \
   --arg status "$REQ_STATUS" \
   --argjson createdBy "$REQ_CREATED_BY" \
-  '{title: $title, description: $description, content: $content, variablesSchema: $variablesSchema, tags: $tags, categoryId: $categoryId, inputVariables: $inputVariables, visibility: $visibility, status: $status, createdBy: $createdBy}' | \
+  '{title: $title, description: $description, content: $content, tags: $tags, categoryId: $categoryId, inputVariables: $inputVariables, visibility: $visibility, status: $status, createdBy: $createdBy}' | \
   curl -s -X POST http://localhost:8080/api/v1/prompts \
     -H "Content-Type: application/json" \
     -d @-)

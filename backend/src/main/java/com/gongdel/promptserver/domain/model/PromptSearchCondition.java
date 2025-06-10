@@ -65,4 +65,37 @@ public class PromptSearchCondition {
      * 내 프롬프트 조회 여부
      */
     private final boolean isMyPrompts;
+
+    private final boolean isFavoritePrompts;
+
+    @Builder
+    public PromptSearchCondition(
+        String title,
+        String description,
+        String tag,
+        Long categoryId,
+        PromptStatus status,
+        PromptSortType sortType,
+        Pageable pageable,
+        Set<PromptStatus> statusFilters,
+        Set<Visibility> visibilityFilters,
+        String searchKeyword,
+        Long userId,
+        boolean isMyPrompts,
+        boolean isFavoritePrompts) {
+        this.title = title;
+        this.description = description;
+        this.tag = tag;
+        this.categoryId = categoryId;
+        this.status = status;
+        this.sortType = sortType;
+        this.pageable = pageable;
+        this.statusFilters = statusFilters;
+        this.visibilityFilters = visibilityFilters;
+        this.searchKeyword = searchKeyword;
+        this.userId = userId;
+        this.isMyPrompts = isMyPrompts;
+        this.isFavoritePrompts = isFavoritePrompts;
+    }
+
 }
