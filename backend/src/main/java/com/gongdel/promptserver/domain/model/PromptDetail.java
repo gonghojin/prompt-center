@@ -28,4 +28,39 @@ public class PromptDetail {
     private final Long categoryId;
     private final String visibility;
     private final String status;
+    private final boolean isFavorite;
+
+    @Builder
+    public PromptDetail(
+        UUID id,
+        String title,
+        String description,
+        String content,
+        User author,
+        Set<String> tags,
+        boolean isPublic,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
+        int viewCount,
+        int favoriteCount,
+        Long categoryId,
+        String visibility,
+        String status,
+        boolean isFavorite) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.content = content;
+        this.author = author;
+        this.tags = tags;
+        this.isPublic = isPublic;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.viewCount = viewCount;
+        this.favoriteCount = favoriteCount;
+        this.categoryId = categoryId;
+        this.visibility = visibility;
+        this.status = status;
+        this.isFavorite = isFavorite;
+    }
 }

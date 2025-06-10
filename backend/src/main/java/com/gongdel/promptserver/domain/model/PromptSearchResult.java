@@ -6,7 +6,6 @@ import lombok.NonNull;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -88,6 +87,10 @@ public class PromptSearchResult {
      */
     @NonNull
     private final LocalDateTime updatedAt;
+    /**
+     * 내가 즐겨찾기한 프롬프트 여부
+     */
+    private final boolean isFavorite;
 
     @Builder
     public PromptSearchResult(
@@ -97,7 +100,8 @@ public class PromptSearchResult {
         Long categoryId, String categoryName,
         Long createdById, String createdByName,
         List<String> tags, Visibility visibility, PromptStatus status,
-        LocalDateTime createdAt, LocalDateTime updatedAt) {
+        LocalDateTime createdAt, LocalDateTime updatedAt,
+        boolean isFavorite) {
         this.id = java.util.Objects.requireNonNull(id, "id must not be null");
         this.uuid = java.util.Objects.requireNonNull(uuid, "uuid must not be null");
         this.title = title == null ? "" : title;
@@ -107,10 +111,11 @@ public class PromptSearchResult {
         this.categoryName = categoryName == null ? "" : categoryName;
         this.createdById = createdById == null ? 0L : createdById;
         this.createdByName = createdByName == null ? "" : createdByName;
-        this.tags = tags == null ? Collections.emptyList() : tags;
+        this.tags = tags == null ? java.util.Collections.emptyList() : tags;
         this.visibility = java.util.Objects.requireNonNull(visibility, "visibility must not be null");
         this.status = java.util.Objects.requireNonNull(status, "status must not be null");
         this.createdAt = java.util.Objects.requireNonNull(createdAt, "createdAt must not be null");
         this.updatedAt = java.util.Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+        this.isFavorite = isFavorite;
     }
 }

@@ -725,7 +725,7 @@
               "originalRequest": {},
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"title\": \"예시 프롬프트\",\n      \"description\": \"설명\",\n      \"status\": \"PUBLISHED\",\n      \"visibility\": \"PUBLIC\",\n      \"createdAt\": \"2024-06-01T12:00:00\",\n      \"updatedAt\": \"2024-06-02T12:00:00\"\n    }\n  ],\n  \"pageable\": {\n    \"pageNumber\": 0,\n    \"pageSize\": 20\n  },\n  \"totalElements\": 100,\n  \"totalPages\": 5,\n  \"size\": 20,\n  \"number\": 0\n}"
+              "body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"title\": \"예시 프롬프트\",\n      \"description\": \"설명\",\n      \"status\": \"PUBLISHED\",\n      \"visibility\": \"PUBLIC\",\n      \"createdAt\": \"2024-06-01T12:00:00\",\n      \"updatedAt\": \"2024-06-02T12:00:00\",\n      \"isFavorite\": true\n    }\n  ],\n  \"pageable\": {\n    \"pageNumber\": 0,\n    \"pageSize\": 20\n  },\n  \"totalElements\": 100,\n  \"totalPages\": 5,\n  \"size\": 20,\n  \"number\": 0\n}"
             },
             {
               "name": "400 Bad Request",
@@ -789,6 +789,219 @@
               "status": "Internal Server Error",
               "code": 500,
               "body": "서버 오류 시"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Favorite API",
+      "item": [
+        {
+          "name": "즐겨찾기 추가",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prompts/:id/favorite",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "prompts",
+                ":id",
+                "favorite"
+              ]
+            },
+            "description": "프롬프트를 즐겨찾기에 추가"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 1001,\n  \"promptTemplateId\": 42,\n  \"createdAt\": \"2024-03-21T10:00:00Z\"\n}"
+            },
+            {
+              "name": "409 Conflict",
+              "status": "Conflict",
+              "code": 409,
+              "body": "이미 즐겨찾기한 프롬프트"
+            }
+          ]
+        },
+        {
+          "name": "즐겨찾기 삭제",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prompts/:id/favorite",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "prompts",
+                ":id",
+                "favorite"
+              ]
+            },
+            "description": "프롬프트 즐겨찾기 삭제"
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "body": "즐겨찾기 미존재 시"
+            }
+          ]
+        },
+        {
+          "name": "내 즐겨찾기 목록 조회",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prompts/my/favorites?page=0&size=20&sort=createdAt&order=desc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "prompts",
+                "my",
+                "favorites"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                }
+              ]
+            },
+            "description": "내가 즐겨찾기한 프롬프트 목록 조회"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"content\": [\n    {\n      \"favoriteId\": 1001,\n      \"promptUuid\": \"123e4567-e89b-12d3-a456-426614174000\",\n      \"title\": \"예시 프롬프트\",\n      \"description\": \"설명\",\n      \"tags\": [\"ai\", \"stable-diffusion\"],\n      \"createdById\": 1,\n      \"createdByName\": \"홍길동\",\n      \"categoryId\": 2,\n      \"visibility\": \"PUBLIC\",\n      \"status\": \"PUBLISHED\",\n      \"promptCreatedAt\": \"2024-06-01T12:00:00\",\n      \"promptUpdatedAt\": \"2024-06-02T12:00:00\",\n      \"favoriteCreatedAt\": \"2024-06-03T10:00:00\",\n      \"viewCount\": 123,\n      \"favoriteCount\": 10,\n      \"isFavorite\": true\n    }\n  ],\n  \"page\": 0,\n  \"size\": 20,\n  \"totalElements\": 100,\n  \"totalPages\": 5,\n  \"hasNext\": true,\n  \"hasPrevious\": false\n}"
+            }
+          ]
+        },
+        {
+          "name": "내 즐겨찾기 개수 조회",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prompts/my/favorites/count",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "prompts",
+                "my",
+                "favorites",
+                "count"
+              ]
+            },
+            "description": "내가 즐겨찾기한 프롬프트 개수 조회"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "100"
+            }
+          ]
+        },
+        {
+          "name": "프롬프트별 즐겨찾기 개수 조회",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prompts/my/favorites/count?promptUuid=123e4567-e89b-12d3-a456-426614174000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "prompts",
+                "my",
+                "favorites",
+                "count"
+              ],
+              "query": [
+                {
+                  "key": "promptUuid",
+                  "value": "123e4567-e89b-12d3-a456-426614174000"
+                }
+              ]
+            },
+            "description": "특정 프롬프트의 즐겨찾기 개수 조회"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "5"
             }
           ]
         }

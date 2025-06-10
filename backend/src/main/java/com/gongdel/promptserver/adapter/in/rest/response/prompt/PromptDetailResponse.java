@@ -38,6 +38,7 @@ public class PromptDetailResponse {
     @Schema(description = "공개 여부", example = "true")
     private final boolean isPublic;
 
+
     @Schema(description = "생성일시", example = "2024-05-01T12:34:56")
     private final LocalDateTime createdAt;
 
@@ -58,6 +59,9 @@ public class PromptDetailResponse {
 
     @Schema(description = "프롬프트 상태", example = "ACTIVE")
     private final String status;
+
+    @Schema(description = "내가 즐겨찾기한 프롬프트 여부", example = "true")
+    private final boolean isFavorite;
 
     /**
      * <b>여러 도메인 객체로부터 상세 조회 응답 DTO를 생성합니다.</b><br>
@@ -93,7 +97,9 @@ public class PromptDetailResponse {
         int favoriteCount,
         Long categoryId,
         String visibility,
-        String status) {
+        String status,
+        boolean isFavorite
+    ) {
         return PromptDetailResponse.builder()
             .id(id)
             .title(title)
@@ -109,6 +115,7 @@ public class PromptDetailResponse {
             .categoryId(categoryId)
             .visibility(visibility)
             .status(status)
+            .isFavorite(isFavorite)
             .build();
     }
 
@@ -135,6 +142,8 @@ public class PromptDetailResponse {
             detail.getFavoriteCount(),
             detail.getCategoryId(),
             detail.getVisibility(),
-            detail.getStatus());
+            detail.getStatus(),
+            detail.isFavorite()
+        );
     }
 }

@@ -1,0 +1,20 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+Your task is to improve the code's readability, efficiency, and maintainability without changing its functionality. Follow these steps:
+Analyze the following selected code:
+Identify areas for improvement, such as:
+Simplifying complex logic
+Removing redundant code
+Improving naming conventions
+Enhancing code structure
+Write JavaDoc in Korean for public API methods, following good documentation guidelines.
+Add appropriate logs in English for debugging purposes.
+Refactor the code, keeping these guidelines in mind:
+Maintain the original functionality
+Follow best practices for the programming language used
+Prioritize readability and maintainability
+Be concise in your explanation, focusing on the most important improvements made.
+Here's the code to refactor:
