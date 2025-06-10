@@ -64,7 +64,7 @@ class PromptQueryControllerTest extends BaseControllerTest {
                     .build())
                 .title("테스트 프롬프트")
                 .build();
-            when(promptsQueryUseCase.loadPromptDetailByUuid(promptId))
+            when(promptsQueryUseCase.loadPromptDetailByUuid(any()))
                 .thenReturn(Optional.of(detail));
 
             mockMvc.perform(get("/api/v1/prompts/{id}", promptId))
@@ -77,7 +77,7 @@ class PromptQueryControllerTest extends BaseControllerTest {
         @DisplayName("존재하지 않는 프롬프트 ID로 조회 시 404 Not Found 반환")
         void getPrompt_notFound() throws Exception {
             UUID promptId = UUID.randomUUID();
-            when(promptsQueryUseCase.loadPromptDetailByUuid(promptId))
+            when(promptsQueryUseCase.loadPromptDetailByUuid(any()))
                 .thenReturn(Optional.empty());
 
             mockMvc.perform(get("/api/v1/prompts/{id}", promptId))

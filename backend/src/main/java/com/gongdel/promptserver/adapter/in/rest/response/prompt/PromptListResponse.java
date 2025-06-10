@@ -41,6 +41,8 @@ public class PromptListResponse {
     private final int favoriteCount;
     @Schema(description = "조회수", example = "123")
     private final int viewCount;
+    @Schema(description = "내가 즐겨찾기한 프롬프트 여부", example = "true")
+    private final boolean isFavorite;
 
     /**
      * PromptSearchResult 객체로부터 응답 DTO를 생성합니다.
@@ -64,6 +66,7 @@ public class PromptListResponse {
             .updatedAt(result.getUpdatedAt())
             .favoriteCount(0) // TODO: 실제 값으로 교체 필요
             .viewCount(0) // TODO: 실제 값으로 교체 필요
+            .isFavorite(result.isFavorite())
             .build();
     }
 }

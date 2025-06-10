@@ -28,5 +28,6 @@ public class BaseControllerTest {
             .email(new Email("test@example.com"))
             .build();
         when(currentUserProvider.getCurrentUser()).thenReturn(testUser);
+        when(currentUserProvider.getCurrentUserId()).thenReturn(testUser.getId());
     }
 }

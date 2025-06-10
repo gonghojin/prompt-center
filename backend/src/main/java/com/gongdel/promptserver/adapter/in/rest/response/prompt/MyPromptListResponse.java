@@ -37,6 +37,8 @@ public class MyPromptListResponse {
     private final Visibility visibility;
     @Schema(description = "공개 여부", example = "true")
     private final boolean isPublic;
+    @Schema(description = "내가 즐겨찾기한 프롬프트 여부", example = "true")
+    private final boolean isFavorite;
     @Schema(description = "태그 목록", example = "[\"stable-diffusion\", \"ai\"]")
     private final List<String> tags;
 
@@ -58,6 +60,7 @@ public class MyPromptListResponse {
             .status(result.getStatus())
             .visibility(result.getVisibility())
             .isPublic(result.getVisibility() != null && result.getVisibility() == Visibility.PUBLIC)
+            .isFavorite(result.isFavorite())
             .tags(result.getTags())
             .build();
     }

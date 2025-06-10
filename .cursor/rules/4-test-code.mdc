@@ -1,0 +1,118 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+Your task is to create concise, effective tests for the given code.
+Generate unit tests for the provided code. Focus on:
+
+Testing main functionalities
+
+Edge cases
+
+Input validation
+
+Do not test private methods — they must be covered by public methods
+
+Do not test Unnecessary stubbings detected.
+
+Apply GWT annotation by Given, When, Then
+
+Use @Nested test classes to group related test cases by role or method name
+
+Organize test structure clearly:
+
+Group tests for each public method into a separate @Nested class
+
+Use higher-level @Nested classes if needed, e.g., for grouping by domain logic (e.g., “Prompt 검색 관련”, “예외 처리 관련”)
+
+```java
+@DisplayName("UserQueryAdapter 테스트")
+class UserQueryAdapterTest {
+
+    @Mock
+    private UserJpaRepository userJpaRepository;
+
+    @Mock
+    private UserMapper userMapper;
+
+    @InjectMocks
+    private UserQueryAdapter userQueryAdapter;
+
+    @Nested
+    @DisplayName("loadUserById(UserId) 메서드는")
+    class LoadUserByUuidTest {
+
+        private UserId userId;
+        private User mockUser;
+        private UserEntity mockEntity;
+
+        @BeforeEach
+        void setUp() {
+            userId = new UserId(UUID.randomUUID());
+            mockUser = mock(User.class);
+            mockEntity = mock(UserEntity.class);
+        }
+
+        @Test
+        @DisplayName("사용자를 성공적으로 조회한다")
+        void givenValidUserId_whenLoadUserByUuid_thenReturnsUser() {
+            // Given
+            when(userJpaRepository.findByUuid(userId.getValue()))
+                .thenReturn(Optional.of(mockEntity));
+            when(userMapper.toDomain(any(UserEntity.class))).thenReturn(mockUser);
+
+            // When
+            Optional<User> result = userQueryAdapter.loadUserByUserId(userId);
+
+            // Then
+            assertThat(result).isPresent();
+            assertThat(result.get()).isEqualTo(mockUser);
+            verify(userJpaRepository).findByUuid(userId.getValue());
+            verify(userMapper).toDomain(any(UserEntity.class));
+        }
+
+        @Test
+        @DisplayName("사용자가 존재하지 않으면 빈 Optional을 반환한다")
+        void givenNonExistentUserId_whenLoadUserByUuid_thenReturnsEmpty() {
+            // Given
+            when(userJpaRepository.findByUuid(userId.getValue()))
+                .thenReturn(Optional.empty());
+
+            // When
+            Optional<User> result = userQueryAdapter.loadUserByUserId(userId);
+
+            // Then
+            assertThat(result).isEmpty();
+            verify(userJpaRepository).findByUuid(userId.getValue());
+            verify(userMapper, never()).toDomain(any(UserEntity.class));
+        }
+
+        @Test
+        @DisplayName("데이터베이스 오류 발생 시 UserOperationException을 던진다")
+        void givenDatabaseError_whenLoadUserByUuid_thenThrowsUserOperationException() {
+            // Given
+            when(userJpaRepository.findByUuid(userId.getValue()))
+                .thenThrow(new DataAccessException("Database error") {
+                });
+
+            // When & Then
+            assertThatThrownBy(() -> userQueryAdapter.loadUserByUserId(userId))
+                .isInstanceOf(UserOperationException.class)
+                .hasMessageContaining("Failed to load user by uuid");
+        }
+
+        @Test
+        @DisplayName("null UserId가 전달되면 IllegalArgumentException을 던진다")
+        void givenNullUserId_whenLoadUserByUuid_thenThrowsIllegalArgumentException() {
+            // When & Then
+            assertThatThrownBy(() -> userQueryAdapter.loadUserByUserId(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("userId must not be null");
+        }
+    }
+}
+```
+Provide your test code in the same language as the original code
+
+Use common testing frameworks and assertion libraries appropriate for the language (e.g., JUnit 5 + AssertJ for Java)
