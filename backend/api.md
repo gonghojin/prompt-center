@@ -96,11 +96,13 @@
 
 ## 프롬프트(Prompt) API
 
-| 기능      | HTTP Method | 엔드포인트                             | 설명                  | 주요 파라미터/Body                                                                                     | 응답 코드         | 예외/특이사항                        |
-|---------|-------------|-----------------------------------|---------------------|--------------------------------------------------------------------------------------------------|---------------|--------------------------------|
-| 프롬프트 생성 | POST        | `/api/v1/prompts`                 | 새로운 프롬프트 생성         | body: title, content, ... , header: Authorization(Bearer)                                        | 201, 400      | 필수 필드 누락 시 400                 |
-| 단건 조회   | GET         | `/api/v1/prompts/{id}`            | UUID로 프롬프트 상세 정보 조회 | path: id, header: Authorization(Bearer)                                                          | 200, 404      | 미존재 시 404                      |
-| 복합 검색   | GET         | `/api/v1/prompts/advanced-search` | 다양한 조건으로 프롬프트 검색    | query: title, description, tag, categoryId, status, sortType, 페이징, header: Authorization(Bearer) | 200, 400, 500 | 페이징 처리 포함, 기본 status=PUBLISHED |
+| 기능      | HTTP Method | 엔드포인트                             | 설명                      | 주요 파라미터/Body                                                                                                                           | 응답 코드                   | 예외/특이사항                        |
+|---------|-------------|-----------------------------------|-------------------------|----------------------------------------------------------------------------------------------------------------------------------------|-------------------------|--------------------------------|
+| 프롬프트 생성 | POST        | `/api/v1/prompts`                 | 새로운 프롬프트 생성             | body: title, content, ... , header: Authorization(Bearer)                                                                              | 201, 400                | 필수 필드 누락 시 400                 |
+| 단건 조회   | GET         | `/api/v1/prompts/{id}`            | UUID로 프롬프트 상세 정보 조회     | path: id, header: Authorization(Bearer)                                                                                                | 200, 404                | 미존재 시 404                      |
+| 복합 검색   | GET         | `/api/v1/prompts/advanced-search` | 다양한 조건으로 프롬프트 검색        | query: title, description, tag, categoryId, status, sortType, 페이징, header: Authorization(Bearer)                                       | 200, 400, 500           | 페이징 처리 포함, 기본 status=PUBLISHED |
+| 프롬프트 삭제 | DELETE      | `/api/v1/prompts/{id}`            | 프롬프트를 논리적으로 삭제          | path: uuid(UUID), header: Authorization(Bearer)                                                                                        | 200, 400, 401, 403, 404 | 삭제 권한 없음, 미존재 시 404            |
+| 프롬프트 수정 | PUT         | `/api/v1/prompts/{id}`            | 기존 프롬프트 정보 수정(소프트 업데이트) | path: id(UUID), body: title, content, description, categoryId, inputVariables, tags, visibility, status, header: Authorization(Bearer) | 200, 400, 401, 403, 404 | 권한 없음 403, 미존재 404, 유효성 오류 400 |
 
 ### 프롬프트 생성 요청 필드
 
@@ -123,6 +125,95 @@
 - `status` (선택, 기본값: PUBLISHED): 프롬프트 상태
 - `sortType` (선택, 기본값: LATEST_MODIFIED): 정렬 기준 (LATEST_MODIFIED, TITLE)
 - 페이징 파라미터 (Pageable): page, size 등
+
+### 프롬프트 삭제 요청 예시
+
+```
+DELETE /api/v1/prompts/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {accessToken}
+```
+
+#### 응답 예시
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "deleted": true
+}
+```
+
+| 응답 필드명  | 타입   | 설명            |
+|---------|------|---------------|
+| id      | UUID | 삭제된 프롬프트 UUID |
+| deleted | Bool | 논리 삭제 성공 여부   |
+
+### 프롬프트 수정 요청 필드
+
+- `title` (필수): 프롬프트 제목
+- `content` (필수): 프롬프트 내용
+- `description` (필수): 프롬프트 설명
+- `categoryId` (필수): 카테고리 ID
+- `inputVariables`: 입력 변수 목록
+- `tags`: 태그 목록
+- `visibility`: 가시성 설정
+- `status`: 프롬프트 상태
+
+#### 요청 예시
+
+```json
+{
+  "title": "수정된 프롬프트 제목",
+  "content": "수정된 프롬프트 내용",
+  "description": "수정된 설명",
+  "categoryId": 2,
+  "inputVariables": [
+    {
+      "name": "userName",
+      "type": "string",
+      "description": "사용자 이름"
+    }
+  ],
+  "tags": [
+    "ai",
+    "gpt"
+  ],
+  "visibility": "PUBLIC",
+  "status": "DRAFT"
+}
+```
+
+#### 응답 예시
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "수정된 프롬프트 제목",
+  "content": "수정된 프롬프트 내용",
+  "description": "수정된 설명",
+  "categoryId": 2,
+  "inputVariables": [
+    {
+      "name": "userName",
+      "type": "string",
+      "description": "사용자 이름"
+    }
+  ],
+  "tags": [
+    "ai",
+    "gpt"
+  ],
+  "visibility": "PUBLIC",
+  "status": "DRAFT",
+  "updatedAt": "2024-06-10T12:00:00"
+}
+```
+
+#### 예외 및 오류 코드
+
+- 400: 필수값 누락, 유효성 오류
+- 401: 인증 실패
+- 403: 수정 권한 없음(작성자/권한자만 가능)
+- 404: 프롬프트 미존재
 
 ---
 

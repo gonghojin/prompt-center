@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -37,6 +39,9 @@ public class PromptTemplate extends BaseTimeEntity {
     private PromptStatus status;
     private String description;
 
+    // 태그 연관관계 (불변성 보장 위해 Set 사용)
+    private Set<Tag> tags = new HashSet<>();
+
     @Builder
     public PromptTemplate(
         Long id,
@@ -49,15 +54,12 @@ public class PromptTemplate extends BaseTimeEntity {
         PromptStatus status,
         String description,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt) {
+        LocalDateTime updatedAt,
+        Set<Tag> tags) {
         super(createdAt, updatedAt);
-
-        // 각 필드에 대한 유효성 검증 수행
         validateTitle(title);
         validateCreatedById(createdById);
         validateDescription(description);
-        // currentVersionId와 categoryId는 생성 시 null 허용
-
         this.id = id;
         this.uuid = initializeUuid(uuid);
         this.title = title;
@@ -67,7 +69,9 @@ public class PromptTemplate extends BaseTimeEntity {
         this.visibility = initializeVisibility(visibility);
         this.status = initializeStatus(status);
         this.description = description;
-
+        if (tags != null) {
+            this.tags = new HashSet<>(tags);
+        }
         log.debug("Created prompt template: id={}, title={}, createdById={}, hasVersion={}",
             this.id, this.title, this.createdById, this.currentVersionId != null);
     }
@@ -82,6 +86,7 @@ public class PromptTemplate extends BaseTimeEntity {
      * @param visibility  가시성
      * @param categoryId  카테고리 ID
      * @param status      상태
+     * @param tags        태그 목록
      * @return 최초 등록용 프롬프트 템플릿
      */
     public static PromptTemplate newTemplateForInitialRegistration(
@@ -90,8 +95,8 @@ public class PromptTemplate extends BaseTimeEntity {
         Long createdById,
         Visibility visibility,
         Long categoryId,
-        PromptStatus status) {
-
+        PromptStatus status,
+        Set<Tag> tags) {
         return new PromptTemplate(
             null, // id
             null, // uuid
@@ -103,8 +108,8 @@ public class PromptTemplate extends BaseTimeEntity {
             status,
             description,
             null, // createdAt
-            null // updatedAt
-        );
+            null, // updatedAt
+            tags);
     }
 
     /**
@@ -121,6 +126,7 @@ public class PromptTemplate extends BaseTimeEntity {
      * @param description      설명
      * @param createdAt        생성일
      * @param updatedAt        수정일
+     * @param tags             태그 목록
      * @return 프롬프트 템플릿
      */
     public static PromptTemplate of(
@@ -134,13 +140,14 @@ public class PromptTemplate extends BaseTimeEntity {
         PromptStatus status,
         String description,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt) {
+        LocalDateTime updatedAt,
+        Set<Tag> tags) {
         if (currentVersionId == null) {
             throw new PromptValidationException("일반 생성/조회 시 currentVersionId는 null이 아니어야 합니다.");
         }
         return new PromptTemplate(
             id, uuid, title, currentVersionId, categoryId, createdById, visibility, status, description, createdAt,
-            updatedAt);
+            updatedAt, tags);
     }
 
     /**
@@ -152,6 +159,7 @@ public class PromptTemplate extends BaseTimeEntity {
      * @param visibility       업데이트할 가시성
      * @param status           업데이트할 상태
      * @param description      업데이트할 설명
+     * @param tags             업데이트할 태그 목록
      * @throws PromptValidationException 유효성 검증에 실패한 경우
      */
     public void update(
@@ -160,7 +168,8 @@ public class PromptTemplate extends BaseTimeEntity {
         Long categoryId,
         Visibility visibility,
         PromptStatus status,
-        String description) throws PromptValidationException {
+        String description,
+        Set<Tag> tags) throws PromptValidationException {
 
         // 유효성 검증은 각 필드별로 개별적으로 수행
         validateTitle(title);
@@ -173,6 +182,10 @@ public class PromptTemplate extends BaseTimeEntity {
         this.visibility = initializeVisibility(visibility);
         this.status = initializeStatus(status);
         this.description = description;
+        if (tags != null) {
+            this.tags.clear();
+            this.tags.addAll(tags);
+        }
 
         updateModifiedTime();
 
@@ -326,14 +339,37 @@ public class PromptTemplate extends BaseTimeEntity {
     }
 
     /**
-     * 도메인 유효성 검증
+     * 태그 전체 교체
      */
-    public void validate() {
-        if (StringUtils.isBlank(title))
-            throw new PromptValidationException("제목은 비어있을 수 없습니다");
-        if (createdById == null)
-            throw new PromptValidationException("생성자 ID는 필수입니다");
-        if (description != null && description.length() > 1000)
-            throw new PromptValidationException("설명은 1000자를 초과할 수 없습니다");
+    public void updateTags(Set<Tag> newTags) {
+        this.tags.clear();
+        if (newTags != null) {
+            this.tags.addAll(newTags);
+        }
+    }
+
+    /**
+     * 태그 추가
+     */
+    public void addTag(Tag tag) {
+        if (tag != null) {
+            this.tags.add(tag);
+        }
+    }
+
+    /**
+     * 태그 제거
+     */
+    public void removeTag(Tag tag) {
+        if (tag != null) {
+            this.tags.remove(tag);
+        }
+    }
+
+    /**
+     * 태그 목록 반환(불변)
+     */
+    public Set<Tag> getTags() {
+        return tags == null ? Set.of() : Set.copyOf(tags);
     }
 }
