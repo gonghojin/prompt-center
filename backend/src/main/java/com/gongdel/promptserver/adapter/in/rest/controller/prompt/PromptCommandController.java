@@ -2,10 +2,16 @@ package com.gongdel.promptserver.adapter.in.rest.controller.prompt;
 
 import com.gongdel.promptserver.adapter.in.rest.request.prompt.CreatePromptRequest;
 import com.gongdel.promptserver.adapter.in.rest.request.prompt.InputVariableDto;
+import com.gongdel.promptserver.adapter.in.rest.request.prompt.UpdatePromptRequest;
 import com.gongdel.promptserver.adapter.in.rest.response.prompt.CreatePromptResponse;
+import com.gongdel.promptserver.adapter.in.rest.response.prompt.DeletePromptResponse;
+import com.gongdel.promptserver.adapter.in.rest.response.prompt.UpdatePromptResponse;
 import com.gongdel.promptserver.application.dto.RegisterPromptResponse;
 import com.gongdel.promptserver.application.port.in.PromptCommandUseCase;
+import com.gongdel.promptserver.application.port.in.command.DeletePromptCommand;
 import com.gongdel.promptserver.application.port.in.command.RegisterPromptCommand;
+import com.gongdel.promptserver.application.port.in.command.UpdatePromptCommand;
+import com.gongdel.promptserver.application.port.in.result.UpdatePromptResult;
 import com.gongdel.promptserver.common.security.CurrentUserProvider;
 import com.gongdel.promptserver.domain.exception.PromptValidationException;
 import com.gongdel.promptserver.domain.model.InputVariable;
@@ -22,12 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -154,5 +158,84 @@ public class PromptCommandController {
             }
         }
         return PromptStatus.DRAFT;
+    }
+
+    /**
+     * 프롬프트를 논리적으로 삭제합니다.
+     *
+     * @param id 삭제할 프롬프트의 UUID
+     * @return 삭제 결과 정보
+     */
+    @Operation(summary = "프롬프트 삭제", description = "프롬프트를 논리적으로 삭제합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "프롬프트 삭제 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "401", description = "인증되지 않은 요청"),
+        @ApiResponse(responseCode = "403", description = "삭제 권한 없음"),
+        @ApiResponse(responseCode = "404", description = "프롬프트를 찾을 수 없음")
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<DeletePromptResponse> deletePrompt(@PathVariable("id") final UUID id) {
+        final User currentUser = currentUserProvider.getCurrentUser();
+        com.gongdel.promptserver.application.dto.DeletePromptResponse response = promptCommandUseCase.deletePrompt(
+            DeletePromptCommand.builder()
+                .uuid(id)
+                .currentUser(currentUser)
+                .build());
+        log.info("Prompt logically deleted. ID: {}", id);
+        return ResponseEntity.ok(DeletePromptResponse.from(response));
+    }
+
+    @Operation(summary = "프롬프트 수정", description = "프롬프트를 소프트 업데이트(수정)합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "프롬프트 수정 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "401", description = "인증되지 않은 요청"),
+        @ApiResponse(responseCode = "403", description = "수정 권한 없음"),
+        @ApiResponse(responseCode = "404", description = "프롬프트를 찾을 수 없음")
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<UpdatePromptResponse> updatePrompt(@PathVariable("id") final UUID id,
+                                                             @Valid @RequestBody final UpdatePromptRequest request) {
+        final User currentUser = currentUserProvider.getCurrentUser();
+        final UpdatePromptCommand command = buildUpdatePromptCommand(id, request, currentUser);
+        final UpdatePromptResult result = promptCommandUseCase.updatePrompt(command);
+        return ResponseEntity.ok(toUpdatePromptResponse(result));
+    }
+
+    private UpdatePromptCommand buildUpdatePromptCommand(
+        UUID id,
+        UpdatePromptRequest request,
+        User user) {
+        return UpdatePromptCommand.builder()
+            .promptTemplateId(id)
+            .editor(user)
+            .title(request.getTitle())
+            .content(request.getContent())
+            .description(request.getDescription())
+            .categoryId(request.getCategoryId())
+            .tags(request.getTags())
+            .inputVariables(mapInputVariables(request.getInputVariables()))
+            .visibility(parseVisibility(request.getVisibility(), user))
+            .status(parseStatus(request.getStatus()))
+            .build();
+    }
+
+    private UpdatePromptResponse toUpdatePromptResponse(
+        UpdatePromptResult result) {
+        return UpdatePromptResponse.builder()
+            .uuid(result.getUuid())
+            .title(result.getTitle())
+            .content(result.getContent())
+            .description(result.getDescription())
+            .categoryId(result.getCategoryId())
+            .tags(result.getTags())
+            .inputVariables(result.getInputVariables().stream()
+                .map(InputVariableDto::fromDomain)
+                .collect(Collectors.toList()))
+            .visibility(result.getVisibility())
+            .status(result.getStatus())
+            .updatedAt(result.getUpdatedAt())
+            .build();
     }
 }
