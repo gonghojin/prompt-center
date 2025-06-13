@@ -68,6 +68,11 @@ public class PromptSearchCondition {
 
     private final boolean isFavoritePrompts;
 
+    /**
+     * 삭제(논리 삭제) 포함 여부 (관리자/특수 조회용)
+     */
+    private final boolean includeDeleted;
+
     @Builder
     public PromptSearchCondition(
         String title,
@@ -82,7 +87,8 @@ public class PromptSearchCondition {
         String searchKeyword,
         Long userId,
         boolean isMyPrompts,
-        boolean isFavoritePrompts) {
+        boolean isFavoritePrompts,
+        boolean includeDeleted) {
         this.title = title;
         this.description = description;
         this.tag = tag;
@@ -96,6 +102,7 @@ public class PromptSearchCondition {
         this.userId = userId;
         this.isMyPrompts = isMyPrompts;
         this.isFavoritePrompts = isFavoritePrompts;
+        this.includeDeleted = includeDeleted;
     }
 
 }
