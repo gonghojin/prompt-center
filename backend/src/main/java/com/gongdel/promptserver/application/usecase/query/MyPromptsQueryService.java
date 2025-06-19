@@ -92,4 +92,19 @@ public class MyPromptsQueryService implements MyPromptsQueryUseCase {
             .isMyPrompts(true)
             .build();
     }
+
+    @Override
+    public long getMyTotalLikeCount(Long userId) {
+        Assert.notNull(userId, "userId must not be null");
+        try {
+            log.info("Loading my total prompt like count. userId={}", userId);
+            long count = loadPromptStatisticsPort.loadTotalLikeCountByUserId(userId);
+            log.info("Loaded my total prompt like count. userId={}, count={}", userId, count);
+            return count;
+        } catch (Exception e) {
+            log.error("Failed to load my total prompt like count. userId={}, error={}", userId, e.getMessage(), e);
+            throw new PromptOperationException(PromptErrorType.OPERATION_FAILED,
+                "Failed to load my total prompt like count", e);
+        }
+    }
 }

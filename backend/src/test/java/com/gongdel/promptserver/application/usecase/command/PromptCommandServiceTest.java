@@ -205,7 +205,6 @@ class PromptCommandServiceTest {
         assertThat(ex.getErrorCode()).isEqualTo(PromptErrorType.VALIDATION_ERROR);
     }
 
-
     @Nested
     @DisplayName("deletePrompt(DeletePromptCommand) 메서드는")
     class DeletePromptTest {
@@ -528,7 +527,8 @@ class PromptCommandServiceTest {
             PromptTemplate teamTemplate = PromptTemplate.of(
                 10L, UUID.randomUUID(), command.getTitle(),
                 1L, command.getCategoryId(), teamUser.getId(), Visibility.TEAM,
-                command.getStatus(), command.getDescription(), LocalDateTime.now(), LocalDateTime.now(), Set.of(Tag.create("Tag1")));
+                command.getStatus(), command.getDescription(), LocalDateTime.now(), LocalDateTime.now(),
+                Set.of(Tag.create("Tag1")));
             given(savePromptPort.savePrompt(any())).willReturn(teamTemplate);
             given(savePromptVersionPort.savePromptVersion(any())).willReturn(savedVersion);
             given(loadPromptPort.loadPromptByUuid(any())).willReturn(Optional.of(teamTemplate));

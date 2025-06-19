@@ -3,6 +3,7 @@ package com.gongdel.promptserver.adapter.in.rest.controller.prompt;
 import com.gongdel.promptserver.adapter.in.rest.response.PageResponse;
 import com.gongdel.promptserver.adapter.in.rest.response.favorite.FavoriteCountResponse;
 import com.gongdel.promptserver.adapter.in.rest.response.favorite.FavoritePromptResponse;
+import com.gongdel.promptserver.adapter.in.rest.response.prompt.MyPromptLikeStatisticsResponse;
 import com.gongdel.promptserver.adapter.in.rest.response.prompt.MyPromptListResponse;
 import com.gongdel.promptserver.adapter.in.rest.response.prompt.MyPromptStatisticsResponse;
 import com.gongdel.promptserver.application.port.in.MyPromptsQueryUseCase;
@@ -88,25 +89,25 @@ public class MyPromptQueryController {
         return ResponseEntity.ok(PageResponse.from(result));
     }
 
-    /**
-     * 내 프롬프트 통계를 조회합니다.
-     *
-     * @return 내 프롬프트 상태별 통계
-     */
-    @Operation(summary = "내 프롬프트 통계 조회", description = "내가 생성한 프롬프트의 상태별 통계를 조회합니다.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "프롬프트 통계 조회 성공"),
-        @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
-        @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
-    @GetMapping("/statistics")
-    public ResponseEntity<MyPromptStatisticsResponse> getMyPromptStatistics() {
-        Long userId = currentUserProvider.getCurrentUserId();
-        log.info("Request my prompt statistics: userId={}", userId);
-        PromptStatisticsResult result = myPromptsQueryUseCase.getMyPromptStatistics(userId);
-        log.info("My prompt statistics successfully retrieved for userId={}", userId);
-        return ResponseEntity.ok(MyPromptStatisticsResponse.from(result));
-    }
+        /**
+         * 내 프롬프트 통계를 조회합니다.
+         *
+         * @return 내 프롬프트 상태별 통계
+         */
+        @Operation(summary = "내 프롬프트 통계 조회", description = "내가 생성한 프롬프트의 상태별 통계를 조회합니다.")
+        @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "프롬프트 통계 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+        })
+        @GetMapping("/statistics")
+        public ResponseEntity<MyPromptStatisticsResponse> getMyPromptStatistics() {
+            Long userId = currentUserProvider.getCurrentUserId();
+            log.info("Request my prompt statistics: userId={}", userId);
+            PromptStatisticsResult result = myPromptsQueryUseCase.getMyPromptStatistics(userId);
+            log.info("My prompt statistics successfully retrieved for userId={}", userId);
+            return ResponseEntity.ok(MyPromptStatisticsResponse.from(result));
+        }
 
     /**
      * 내 즐겨찾기 프롬프트 목록을 조회합니다.
@@ -171,4 +172,27 @@ public class MyPromptQueryController {
         log.info("My favorite count for userId={}: {}", userId, count);
         return ResponseEntity.ok(FavoriteCountResponse.of(count));
     }
+
+    /**
+     * 내가 생성한 프롬프트의 총 좋아요 수를 조회합니다.
+     *
+     * @return 내 프롬프트 총 좋아요 수
+     * @throws IllegalArgumentException 사용자 ID가 null인 경우
+     */
+    @Operation(summary = "내 프롬프트 총 좋아요 수 조회", description = "내가 생성한 프롬프트의 총 좋아요 수를 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "총 좋아요 수 조회 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 필요"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @GetMapping("/like-statistics")
+    public ResponseEntity<MyPromptLikeStatisticsResponse> getMyPromptLikeStatistics() {
+        Long userId = currentUserProvider.getCurrentUserId();
+        log.info("Request my prompt total like count: userId={}", userId);
+        long totalLikeCount = myPromptsQueryUseCase.getMyTotalLikeCount(userId);
+        log.info("Successfully retrieved total like count for userId={}, totalLikeCount={}", userId,
+            totalLikeCount);
+        return ResponseEntity.ok(MyPromptLikeStatisticsResponse.of(totalLikeCount));
+
+        }
 }
