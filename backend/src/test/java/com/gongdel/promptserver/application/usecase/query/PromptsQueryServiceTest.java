@@ -70,6 +70,7 @@ class PromptsQueryServiceTest {
             .status(PromptStatus.PUBLISHED)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
+            .stats(new PromptStats(100, 50))
             .build();
         pageable = PageRequest.of(0, 20);
     }

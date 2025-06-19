@@ -3,6 +3,7 @@ package com.gongdel.promptserver.adapter.in.rest.controller.dashboard;
 import com.gongdel.promptserver.adapter.in.rest.BaseControllerTest;
 import com.gongdel.promptserver.application.port.in.PromptDashboardQueryUseCase;
 import com.gongdel.promptserver.domain.model.PromptSearchResult;
+import com.gongdel.promptserver.domain.model.PromptStats;
 import com.gongdel.promptserver.domain.model.PromptStatus;
 import com.gongdel.promptserver.domain.model.Visibility;
 import org.junit.jupiter.api.DisplayName;
@@ -52,6 +53,9 @@ class PromptDashboardControllerTest extends BaseControllerTest {
             .status(PromptStatus.PUBLISHED)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
+            .stats(new PromptStats())
+            .isFavorite(false)
+            .isLiked(false)
             .build();
     }
 
@@ -75,7 +79,6 @@ class PromptDashboardControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$[0].categoryId").value(1L))
                 .andExpect(jsonPath("$[0].title").value("title1"));
         }
-
 
         @Test
         @DisplayName("pageSize가 0 이하이면 기본값 4로 동작한다")

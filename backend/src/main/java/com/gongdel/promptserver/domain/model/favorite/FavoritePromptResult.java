@@ -102,11 +102,13 @@ public class FavoritePromptResult {
     @NonNull
     private final PromptStats stats;
 
+    private final boolean isLiked;
+
     @Builder
     public FavoritePromptResult(Long favoriteId, Long promptId, UUID promptUuid, String title, String description,
                                 List<String> tags, Long createdById, String createdByName, Long categoryId, String categoryName,
                                 Visibility visibility, PromptStatus status, LocalDateTime promptCreatedAt, LocalDateTime promptUpdatedAt,
-                                LocalDateTime favoriteCreatedAt, PromptStats stats) {
+                                LocalDateTime favoriteCreatedAt, PromptStats stats, boolean isLiked) {
         this.favoriteId = java.util.Objects.requireNonNull(favoriteId, "favoriteId must not be null");
         this.promptId = java.util.Objects.requireNonNull(promptId, "promptId must not be null");
         this.promptUuid = java.util.Objects.requireNonNull(promptUuid, "promptUuid must not be null");
@@ -124,5 +126,6 @@ public class FavoritePromptResult {
         this.favoriteCreatedAt = java.util.Objects.requireNonNull(favoriteCreatedAt,
             "favoriteCreatedAt must not be null");
         this.stats = java.util.Objects.requireNonNull(stats, "stats must not be null");
+        this.isLiked = isLiked;
     }
 }

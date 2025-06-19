@@ -115,47 +115,82 @@ public class PromptCommandService implements PromptCommandUseCase {
     }
 
     /**
-     * 프롬프트 템플릿을 수정(소프트 업데이트)합니다.
-     *
-     * @param command 프롬프트 수정 커맨드
-     * @return 수정된 프롬프트 결과
-     * @throws PromptOperationException 권한/상태/유효성 등 비즈니스 예외
+     * 프롬프트 템플릿을 수정합니다.
+     * 1. 입력값 검증
+     * 2. 권한 확인
+     * 3. 변경사항 적용
+     * 4. 버전 관리
      */
     @Override
     public UpdatePromptResult updatePrompt(UpdatePromptCommand command) {
-        log.info("Start prompt update. TemplateId: {}", command.getPromptTemplateId());
-        try {
-            // 1. 입력 유효성 검사
-            Assert.notNull(command, "UpdatePromptCommand must not be null");
+        log.info("Start prompt update process for template: {}", command.getPromptTemplateId());
+        validateUpdateCommand(command);
 
-            // 2. 프롬프트 조회 및 권한 확인
-            PromptTemplate template = loadPromptByUuidOrThrow(command.getPromptTemplateId());
-            if (!isEditableUser(template, command.getEditor())) {
-                log.warn("User {} has no permission to edit prompt {}", command.getEditor().getId(), template.getId());
-                throw new PromptOperationException(
+        PromptTemplate template = loadAndValidateTemplate(command);
+
+        // 트랜잭션 내에서 모든 업데이트 수행
+        return executeUpdate(template, command);
+    }
+
+    /**
+     * 업데이트 커맨드의 유효성을 검증합니다.
+     */
+    private void validateUpdateCommand(UpdatePromptCommand command) {
+        Assert.notNull(command, "UpdatePromptCommand must not be null");
+        log.debug("Validated update command - title: {}, categoryId: {}",
+            command.getTitle(), command.getCategoryId());
+    }
+
+    /**
+     * 템플릿을 로드하고 권한을 검증합니다.
+     */
+    private PromptTemplate loadAndValidateTemplate(UpdatePromptCommand command) {
+        PromptTemplate template = loadPromptByUuidOrThrow(command.getPromptTemplateId());
+
+        if (!isEditableUser(template, command.getEditor())) {
+            log.warn("Permission denied - user: {}, prompt: {}, created by: {}",
+                command.getEditor().getId(), template.getId(), template.getCreatedById());
+            throw new PromptOperationException(
                     com.gongdel.promptserver.domain.exception.PromptErrorType.INSUFFICIENT_PERMISSION,
                     "수정 권한이 없습니다.");
-            }
+        }
 
-            // 3. 변경 내용 적용 (title, content, description, categoryId, tags
-            // visibility, status 등)
+        log.debug("Permission check passed for user: {}", command.getEditor().getId());
+        return template;
+    }
+
+    /**
+     * 실제 업데이트를 수행합니다.
+     * 모든 데이터베이스 작업이 하나의 트랜잭션으로 처리됩니다.
+     */
+    private UpdatePromptResult executeUpdate(PromptTemplate template, UpdatePromptCommand command) {
+        try {
+            // 1. 변경 내용 적용
             applyPromptUpdate(template, command);
+            log.debug("Applied updates to prompt template: {}", template.getId());
 
-            // 4. 버전 이력 추가 (EDIT)
+            // 2. 새 버전 생성 및 저장
             PromptVersion newVersion = createAndSaveEditVersion(template, command);
+            log.info("Created new version: {} for prompt: {}", newVersion.getId(), template.getId());
 
-            // 5. 템플릿 엔티티 업데이트 (현재 버전 정보 갱신)
+            // 3. 템플릿 업데이트
             template.setCurrentVersionId(newVersion.getId());
-            savePromptPort.savePrompt(template);
+            PromptTemplate updatedTemplate = savePromptPort.savePrompt(template);
+            log.debug("Updated template with new version id: {}", newVersion.getId());
 
-            // 6. 결과 반환
-            Set<Tag> tags = promptTemplateTagRelationPort.findTagsByPromptTemplateId(template.getId());
-            return UpdatePromptResult.from(template, newVersion, tags);
+            // 4. 태그 조회 및 결과 반환
+            Set<Tag> tags = promptTemplateTagRelationPort.findTagsByPromptTemplateId(updatedTemplate.getId());
+            log.info("Successfully completed prompt update. Template id: {}, New version: {}",
+                updatedTemplate.getId(), newVersion.getId());
 
+            return UpdatePromptResult.from(updatedTemplate, newVersion, tags);
         } catch (PromptValidationException e) {
-            log.error("Prompt validation failed: {}", e.getMessage());
+            log.error("Prompt validation failed - template id: {}, error: {}",
+                command.getPromptTemplateId(), e.getMessage());
             throw new PromptOperationException(
-                com.gongdel.promptserver.domain.exception.PromptErrorType.VALIDATION_ERROR, e.getMessage(), e);
+                com.gongdel.promptserver.domain.exception.PromptErrorType.VALIDATION_ERROR,
+                String.format("프롬프트 수정 중 오류 발생: %s", e.getMessage()),
+                e);
         }
     }
 

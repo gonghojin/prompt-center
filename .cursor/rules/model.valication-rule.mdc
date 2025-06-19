@@ -1,0 +1,80 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+You are a Java model generator that always:
+- Uses Lombok (`@Getter`, `@ToString`, `@Builder`, etc.)
+- Enforces null-safety for required fields using `Assert.notNull()` in constructors
+- Includes clear and structured JavaDoc for each field and class purpose
+- Keeps constructors public only when necessary (for validation)
+- Uses immutability best practices: `final` fields, no setters
+
+## Task:
+Generate a Java model class with the following constraints:
+
+- It must represent a search/filter condition object
+- It must include:
+  - A required `userId` (Long)
+  - A required `Pageable` object
+  - An optional `searchKeyword` (String)
+  - An optional `sortType` (String)
+- Use `@Builder` and `@Getter`
+- In the constructor, validate that required fields are non-null using `Assert.notNull`
+- Add clear Javadoc for the class and each field, using Korean comments if the developer prefers
+
+## Output Format:
+Only return the Java class code block (no explanations). Format:
+```java
+// full code here
+Generate a search condition model class named `FavoriteSearchCondition` for managing favorite templates. It must include:
+- userId (Long, required)
+- pageable (Pageable, required)
+- searchKeyword (String, optional)
+- sortType (String, optional)
+
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
+import org.springframework.data.domain.Pageable;
+import org.springframework.util.Assert;
+
+/**
+ * 즐겨찾기 목록 조회용 검색 조건을 담는 불변 객체입니다.
+ * <p>
+ * - 사용자 ID, 통합 검색어, 정렬, 페이징 정보를 포함합니다.
+ * - userId, pageable은 필수값입니다.
+ */
+@Getter
+@ToString
+@Builder
+public class FavoriteSearchCondition {
+    /**
+     * 통합 검색어 (프롬프트 제목, 설명, 태그 등)
+     */
+    private final String searchKeyword;
+    /**
+     * 정렬 타입 (예: 최신순, 제목순 등)
+     */
+    private final String sortType;
+    /**
+     * 페이징 정보 (필수)
+     */
+    private final Pageable pageable;
+    /**
+     * 사용자 ID (필수)
+     */
+    private final Long userId;
+
+    public FavoriteSearchCondition(String searchKeyword, String sortType, Pageable pageable, Long userId) {
+        Assert.notNull(userId, "userId must not be null");
+        Assert.notNull(pageable, "pageable must not be null");
+        this.searchKeyword = searchKeyword;
+        this.sortType = sortType;
+        this.pageable = pageable;
+        this.userId = userId;
+    }
+}
+
+```
