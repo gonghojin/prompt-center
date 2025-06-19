@@ -8,6 +8,7 @@ import com.gongdel.promptserver.domain.model.PromptStatus;
 import com.gongdel.promptserver.domain.model.favorite.FavoritePromptResult;
 import com.gongdel.promptserver.domain.model.favorite.FavoriteSearchCondition;
 import com.gongdel.promptserver.domain.model.statistics.PromptStatisticsResult;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,7 @@ class MyPromptQueryControllerTest extends BaseControllerTest {
     @MockBean
     private FavoriteQueryUseCase favoriteQueryUseCase;
 
+
     @Nested
     @DisplayName("getMyPrompts()")
     class GetMyPrompts {
@@ -67,6 +69,7 @@ class MyPromptQueryControllerTest extends BaseControllerTest {
                 .status(com.gongdel.promptserver.domain.model.PromptStatus.PUBLISHED)
                 .createdAt(java.time.LocalDateTime.now())
                 .updatedAt(java.time.LocalDateTime.now())
+                .stats(new PromptStats(100, 50))
                 .build();
             org.springframework.data.domain.PageImpl<com.gongdel.promptserver.domain.model.PromptSearchResult> page = new org.springframework.data.domain.PageImpl<>(
                 Collections.singletonList(searchResult), PageRequest.of(0, 20), 1);
@@ -153,6 +156,7 @@ class MyPromptQueryControllerTest extends BaseControllerTest {
                 .status(com.gongdel.promptserver.domain.model.PromptStatus.PUBLISHED)
                 .createdAt(java.time.LocalDateTime.now())
                 .updatedAt(java.time.LocalDateTime.now())
+                .stats(new PromptStats(100, 50))
                 .build();
             org.springframework.data.domain.PageImpl<com.gongdel.promptserver.domain.model.PromptSearchResult> page = new org.springframework.data.domain.PageImpl<>(
                 Collections.singletonList(searchResult), PageRequest.of(0, 20), 1);
@@ -189,7 +193,6 @@ class MyPromptQueryControllerTest extends BaseControllerTest {
         @Test
         @DisplayName("서비스 예외 발생 시 500 반환")
         void givenServiceException_whenGetMyPromptStatistics_thenInternalServerError() throws Exception {
-            when(currentUserProvider.getCurrentUserId()).thenReturn(1L);
             when(myPromptsQueryUseCase.getMyPromptStatistics(1L)).thenThrow(new RuntimeException("error"));
             mockMvc.perform(get("/api/v1/prompts/my/statistics")
                     .contentType(MediaType.APPLICATION_JSON))
@@ -203,6 +206,7 @@ class MyPromptQueryControllerTest extends BaseControllerTest {
         @Test
         @DisplayName("정상 요청 시 즐겨찾기 목록 반환")
         void givenValidRequest_whenGetMyFavoritePrompts_thenReturnsFavoriteList() throws Exception {
+            // Given
             FavoritePromptResult result = FavoritePromptResult.builder()
                 .favoriteId(1L)
                 .promptId(1L)
@@ -220,7 +224,10 @@ class MyPromptQueryControllerTest extends BaseControllerTest {
                 .build();
             PageImpl<FavoritePromptResult> page = new PageImpl<>(Collections.singletonList(result),
                 PageRequest.of(0, 20), 1);
+            when(currentUserProvider.getCurrentUserId()).thenReturn(1L);
             when(favoriteQueryUseCase.searchFavorites(any(FavoriteSearchCondition.class))).thenReturn(page);
+
+            // When & Then
             mockMvc.perform(get("/api/v1/prompts/my/favorites")
                     .param("page", "0")
                     .param("size", "20")
@@ -235,32 +242,46 @@ class MyPromptQueryControllerTest extends BaseControllerTest {
         @Test
         @DisplayName("page가 음수면 400 Bad Request를 반환한다")
         void givenNegativePage_whenGetMyFavoritePrompts_thenBadRequest() throws Exception {
-            when(currentUserProvider.getCurrentUserId()).thenReturn(1L);
+            // When & Then
             mockMvc.perform(get("/api/v1/prompts/my/favorites")
                     .param("page", "-1")
-                    .param("size", "20"))
-                .andExpect(status().isBadRequest());
+                    .param("size", "20")
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("Page index must not be negative"))
+                .andExpect(jsonPath("$.error.type").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.error.description").value("잘못된 요청 파라미터"));
         }
 
         @Test
         @DisplayName("size가 0이면 400 Bad Request를 반환한다")
         void givenZeroSize_whenGetMyFavoritePrompts_thenBadRequest() throws Exception {
-            when(currentUserProvider.getCurrentUserId()).thenReturn(1L);
+            // When & Then
             mockMvc.perform(get("/api/v1/prompts/my/favorites")
                     .param("page", "0")
-                    .param("size", "0"))
-                .andExpect(status().isBadRequest());
+                    .param("size", "0")
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("Page size must be greater than zero"))
+                .andExpect(jsonPath("$.error.type").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.error.description").value("잘못된 요청 파라미터"));
         }
 
         @Test
         @DisplayName("서비스 예외 발생 시 500 반환")
         void givenServiceException_whenGetMyFavoritePrompts_thenInternalServerError() throws Exception {
+            // Given
             when(currentUserProvider.getCurrentUserId()).thenReturn(1L);
             when(favoriteQueryUseCase.searchFavorites(any(FavoriteSearchCondition.class)))
                 .thenThrow(new RuntimeException("error"));
+
+            // When & Then
             mockMvc.perform(get("/api/v1/prompts/my/favorites")
                     .param("page", "0")
-                    .param("size", "20"))
+                    .param("size", "20")
+                    .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
         }
     }
@@ -271,7 +292,6 @@ class MyPromptQueryControllerTest extends BaseControllerTest {
         @Test
         @DisplayName("정상 요청 시 즐겨찾기 개수 반환")
         void givenValidRequest_whenGetMyFavoriteCount_thenReturnsCount() throws Exception {
-            when(currentUserProvider.getCurrentUserId()).thenReturn(1L);
             when(favoriteQueryUseCase.countByUser(1L)).thenReturn(5L);
             mockMvc.perform(get("/api/v1/prompts/my/favorites/count"))
                 .andExpect(status().isOk())
@@ -281,9 +301,47 @@ class MyPromptQueryControllerTest extends BaseControllerTest {
         @Test
         @DisplayName("서비스 예외 발생 시 500 반환")
         void givenServiceException_whenGetMyFavoriteCount_thenInternalServerError() throws Exception {
-            when(currentUserProvider.getCurrentUserId()).thenReturn(1L);
-            when(favoriteQueryUseCase.countByUser(1L)).thenThrow(new RuntimeException("error"));
+            when(favoriteQueryUseCase.countByUser(any())).thenThrow(new RuntimeException("error"));
             mockMvc.perform(get("/api/v1/prompts/my/favorites/count"))
+                .andExpect(status().isInternalServerError());
+        }
+    }
+
+    @Nested
+    @DisplayName("getMyPromptLikeStatistics()")
+    class GetMyPromptLikeStatisticsTest {
+
+        private Long userId;
+
+        @BeforeEach
+        void setUp() {
+            userId = 1L;
+        }
+
+        @Test
+        @DisplayName("정상 요청 시 총 좋아요 수를 반환한다")
+        void givenValidRequest_whenGetMyPromptLikeStatistics_thenReturnsLikeCount() throws Exception {
+            // Given
+            long expectedLikeCount = 10L;
+            when(myPromptsQueryUseCase.getMyTotalLikeCount(userId)).thenReturn(expectedLikeCount);
+
+            // When & Then
+            mockMvc.perform(get("/api/v1/prompts/my/like-statistics")
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalLikeCount").value(expectedLikeCount));
+        }
+
+        @Test
+        @DisplayName("서비스 예외 발생 시 500을 반환한다")
+        void givenServiceException_whenGetMyPromptLikeStatistics_thenInternalServerError() throws Exception {
+            // Given
+            when(myPromptsQueryUseCase.getMyTotalLikeCount(userId))
+                .thenThrow(new RuntimeException("Failed to get like count"));
+
+            // When & Then
+            mockMvc.perform(get("/api/v1/prompts/my/like-statistics")
+                    .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
         }
     }

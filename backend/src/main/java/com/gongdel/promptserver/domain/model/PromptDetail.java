@@ -29,6 +29,7 @@ public class PromptDetail {
     private final String visibility;
     private final String status;
     private final boolean isFavorite;
+    private final boolean isLiked;
 
     @Builder
     public PromptDetail(
@@ -46,7 +47,8 @@ public class PromptDetail {
         Long categoryId,
         String visibility,
         String status,
-        boolean isFavorite) {
+        boolean isFavorite,
+        boolean isLiked) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -62,5 +64,6 @@ public class PromptDetail {
         this.visibility = visibility;
         this.status = status;
         this.isFavorite = isFavorite;
+        this.isLiked = isLiked;
     }
 }

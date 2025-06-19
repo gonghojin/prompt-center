@@ -88,9 +88,19 @@ public class PromptSearchResult {
     @NonNull
     private final LocalDateTime updatedAt;
     /**
+     * 통계 정보(조회수, 좋아요 수 등)
+     */
+    @NonNull
+    private final PromptStats stats;
+    /**
      * 내가 즐겨찾기한 프롬프트 여부
      */
     private final boolean isFavorite;
+
+    /**
+     * 내가 좋아요한 프롬프트 여부
+     */
+    private final boolean isLiked;
 
     @Builder
     public PromptSearchResult(
@@ -101,7 +111,9 @@ public class PromptSearchResult {
         Long createdById, String createdByName,
         List<String> tags, Visibility visibility, PromptStatus status,
         LocalDateTime createdAt, LocalDateTime updatedAt,
-        boolean isFavorite) {
+        PromptStats stats,
+        boolean isFavorite,
+        boolean isLiked) {
         this.id = java.util.Objects.requireNonNull(id, "id must not be null");
         this.uuid = java.util.Objects.requireNonNull(uuid, "uuid must not be null");
         this.title = title == null ? "" : title;
@@ -116,6 +128,8 @@ public class PromptSearchResult {
         this.status = java.util.Objects.requireNonNull(status, "status must not be null");
         this.createdAt = java.util.Objects.requireNonNull(createdAt, "createdAt must not be null");
         this.updatedAt = java.util.Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+        this.stats = java.util.Objects.requireNonNull(stats, "stats must not be null");
         this.isFavorite = isFavorite;
+        this.isLiked = isLiked;
     }
 }

@@ -3,10 +3,7 @@ package com.gongdel.promptserver.adapter.in.rest.controller.prompt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gongdel.promptserver.adapter.in.rest.BaseControllerTest;
 import com.gongdel.promptserver.application.port.in.PromptsQueryUseCase;
-import com.gongdel.promptserver.domain.model.PromptDetail;
-import com.gongdel.promptserver.domain.model.PromptSearchResult;
-import com.gongdel.promptserver.domain.model.PromptStatus;
-import com.gongdel.promptserver.domain.model.Visibility;
+import com.gongdel.promptserver.domain.model.*;
 import com.gongdel.promptserver.domain.user.Email;
 import com.gongdel.promptserver.domain.user.User;
 import com.gongdel.promptserver.domain.user.UserId;
@@ -107,6 +104,7 @@ class PromptQueryControllerTest extends BaseControllerTest {
                 .status(PromptStatus.PUBLISHED)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .stats(new PromptStats(100, 50))
                 .build();
             Pageable pageable = PageRequest.of(0, 20);
             when(promptsQueryUseCase.searchPrompts(any()))
@@ -136,6 +134,7 @@ class PromptQueryControllerTest extends BaseControllerTest {
                 .status(PromptStatus.PUBLISHED)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .stats(new PromptStats(100, 50))
                 .build();
             Pageable pageable = PageRequest.of(0, 20);
             when(promptsQueryUseCase.searchPrompts(any()))
@@ -165,6 +164,7 @@ class PromptQueryControllerTest extends BaseControllerTest {
                 .status(PromptStatus.PUBLISHED)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .stats(new PromptStats(100, 50))
                 .build();
             Pageable pageable = PageRequest.of(0, 20);
             when(promptsQueryUseCase.searchPrompts(any()))

@@ -47,8 +47,11 @@ public class FavoritePromptResponse {
     private final LocalDateTime favoriteCreatedAt;
     @Schema(description = "프롬프트 조회수", example = "123")
     private final int viewCount;
-    @Schema(description = "프롬프트 즐겨찾기 수", example = "10")
+    @Schema(description = "프롬프트 좋아요 수", example = "10")
     private final int favoriteCount;
+
+    @Schema(description = "내가 좋아요한 프롬프트 여부", example = "true")
+    private final boolean isLiked;
 
     /**
      * 도메인 객체(FavoritePromptResult)로부터 응답 DTO를 생성합니다.
@@ -73,6 +76,7 @@ public class FavoritePromptResponse {
             .favoriteCreatedAt(result.getFavoriteCreatedAt())
             .viewCount(result.getStats() != null ? result.getStats().getViewCount() : 0)
             .favoriteCount(result.getStats() != null ? result.getStats().getFavoriteCount() : 0)
+            .isLiked(result.isLiked())
             .build();
     }
 }

@@ -24,4 +24,12 @@ public interface MyPromptsQueryUseCase {
      * @return 프롬프트 통계 결과
      */
     PromptStatisticsResult getMyPromptStatistics(Long userId);
+
+    /**
+     * 내가 생성한 프롬프트의 총 좋아요 수를 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @return 총 좋아요 수
+     */
+    long getMyTotalLikeCount(Long userId);
 }
