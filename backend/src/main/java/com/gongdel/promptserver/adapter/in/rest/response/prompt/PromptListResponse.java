@@ -43,6 +43,8 @@ public class PromptListResponse {
     private final int viewCount;
     @Schema(description = "내가 즐겨찾기한 프롬프트 여부", example = "true")
     private final boolean isFavorite;
+    @Schema(description = "내가 좋아요한 프롬프트 여부", example = "true")
+    private final boolean isLiked;
 
     /**
      * PromptSearchResult 객체로부터 응답 DTO를 생성합니다.
@@ -64,9 +66,10 @@ public class PromptListResponse {
                 && result.getVisibility() == com.gongdel.promptserver.domain.model.Visibility.PUBLIC)
             .createdAt(result.getCreatedAt())
             .updatedAt(result.getUpdatedAt())
-            .favoriteCount(0) // TODO: 실제 값으로 교체 필요
-            .viewCount(0) // TODO: 실제 값으로 교체 필요
+            .favoriteCount(result.getStats() != null ? result.getStats().getFavoriteCount() : 0)
+            .viewCount(result.getStats() != null ? result.getStats().getViewCount() : 0)
             .isFavorite(result.isFavorite())
+            .isLiked(result.getStats() != null && result.getStats().getFavoriteCount() > 0)
             .build();
     }
 }

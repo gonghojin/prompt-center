@@ -38,7 +38,6 @@ public class PromptDetailResponse {
     @Schema(description = "공개 여부", example = "true")
     private final boolean isPublic;
 
-
     @Schema(description = "생성일시", example = "2024-05-01T12:34:56")
     private final LocalDateTime createdAt;
 
@@ -63,6 +62,9 @@ public class PromptDetailResponse {
     @Schema(description = "내가 즐겨찾기한 프롬프트 여부", example = "true")
     private final boolean isFavorite;
 
+    @Schema(description = "내가 좋아요한 프롬프트 여부", example = "true")
+    private final boolean isLiked;
+
     /**
      * <b>여러 도메인 객체로부터 상세 조회 응답 DTO를 생성합니다.</b><br>
      * 이 메서드는 다양한 소스에서 받은 데이터를 명확하게 매핑하여, API 응답에 필요한 모든 정보를 담은 DTO를 생성합니다.
@@ -81,6 +83,8 @@ public class PromptDetailResponse {
      * @param categoryId    카테고리 ID
      * @param visibility    공개 범위
      * @param status        상태
+     * @param isFavorite    내가 즐겨찾기한 프롬프트 여부
+     * @param isLiked       내가 좋아요한 프롬프트 여부
      * @return 프롬프트 상세 응답 DTO
      */
     public static PromptDetailResponse from(
@@ -98,8 +102,8 @@ public class PromptDetailResponse {
         Long categoryId,
         String visibility,
         String status,
-        boolean isFavorite
-    ) {
+        boolean isFavorite,
+        boolean isLiked) {
         return PromptDetailResponse.builder()
             .id(id)
             .title(title)
@@ -116,6 +120,7 @@ public class PromptDetailResponse {
             .visibility(visibility)
             .status(status)
             .isFavorite(isFavorite)
+            .isLiked(isLiked)
             .build();
     }
 
@@ -143,7 +148,7 @@ public class PromptDetailResponse {
             detail.getCategoryId(),
             detail.getVisibility(),
             detail.getStatus(),
-            detail.isFavorite()
-        );
+            detail.isFavorite(),
+            detail.isLiked());
     }
 }

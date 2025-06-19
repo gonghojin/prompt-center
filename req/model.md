@@ -335,6 +335,16 @@ PromptTemplate의 visibility(공개 범위)와 PromptVersion의 actionType(작�
 
 > **유니크 제약:** (userId, promptTemplateId)
 
+### 💯 PromptLikeCount (프롬프트 좋아요 집계)
+
+프롬프트별 좋아요 수를 집계하는 Projection 테이블입니다.
+
+| 필드               | 타입       | 설명          | 제약조건                     |
+|------------------|----------|-------------|--------------------------|
+| promptTemplateId | BigInt   | 템플릿 ID      | Primary Key, Foreign Key |
+| likeCount        | Long     | 좋아요 수       | Default: 0               |
+| updatedAt        | DateTime | 마지막 업데이트 일시 | Not Null                 |
+
 ### 👁️ PromptViewCount (프롬프트 조회수 집계)
 
 프롬프트에 대한 누적 조회 수를 관리하는 집계용 테이블입니다.

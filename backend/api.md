@@ -257,7 +257,10 @@ Authorization: Bearer {accessToken}
       "visibility": "PUBLIC",
       "createdAt": "2024-06-01T12:00:00",
       "updatedAt": "2024-06-02T12:00:00",
-      "isFavorite": true
+      "isFavorite": true,
+      "isLiked": true,
+      "favoriteCount": 10,
+      "viewCount": 123
     }
   ],
   "pageable": {
@@ -293,6 +296,33 @@ Authorization: Bearer {accessToken}
   }
 }
 ```
+
+---
+
+### 내 프롬프트 총 좋아요 수 통계 조회
+
+#### 요청 예시
+
+```
+GET /api/v1/prompts/my/like-statistics
+Authorization: Bearer {accessToken}
+```
+
+#### 응답 예시
+
+```json
+{
+  "totalLikeCount": 57
+}
+```
+
+| 기능                | HTTP Method | 엔드포인트                                | 설명                      | 주요 파라미터/Body                  | 응답 코드 | 예외/특이사항            |
+|-------------------|-------------|--------------------------------------|-------------------------|-------------------------------|-------|--------------------|
+| 내 프롬프트 총 좋아요 수 조회 | GET         | `/api/v1/prompts/my/like-statistics` | 내가 생성한 프롬프트의 총 좋아요 수 조회 | header: Authorization(Bearer) | 200   | 인증 필요, 서버 오류 시 500 |
+
+| 응답 필드명         | 타입   | 설명                   |
+|----------------|------|----------------------|
+| totalLikeCount | Long | 내가 생성한 프롬프트의 총 좋아요 수 |
 
 ---
 
@@ -528,4 +558,55 @@ Authorization: Bearer {accessToken}
 
 ```json
 5
+```
+
+---
+
+## 프롬프트 좋아요(Like) API
+
+| 기능            | HTTP Method | 엔드포인트                              | 설명                             | 주요 파라미터/Body                                     | 응답 코드 | 예외/특이사항             |
+|---------------|-------------|------------------------------------|--------------------------------|--------------------------------------------------|-------|---------------------|
+| 좋아요 추가        | POST        | `/api/v1/prompts/{id}/like`        | 프롬프트에 좋아요 추가 (Command)         | path: id, header: Authorization(Bearer)          | 200   |                     |
+| 좋아요 취소        | DELETE      | `/api/v1/prompts/{id}/like`        | 프롬프트 좋아요 취소 (Command)          | path: id, header: Authorization(Bearer)          | 200   |                     |
+| 좋아요 상태/카운트 조회 | GET         | `/api/v1/prompts/{id}/like-status` | 내 좋아요 여부 및 전체 좋아요 수 조회 (Query) | path: id, header: Authorization(Bearer)          | 200   |                     |
+| 내가 좋아요한 목록 조회 | GET         | `/api/v1/prompts/liked`            | 내가 좋아요한 프롬프트 목록 조회 (Query)     | query: page, size, header: Authorization(Bearer) | 200   | PageResponse 페이징 반환 |
+
+### 요청/응답 예시
+
+**좋아요 추가/취소 응답**
+
+```json
+{
+  "success": true,
+  "likeCount": 12
+}
+```
+
+**좋아요 상태/카운트 조회 응답**
+
+```json
+{
+  "liked": true,
+  "likeCount": 12
+}
+```
+
+**내가 좋아요한 프롬프트 목록 조회 응답**
+
+```json
+{
+  "content": [
+    {
+      "promptId": 123,
+      "title": "AI 추천 프롬프트",
+      "description": "이미지 생성에 최적화된 프롬프트"
+    }
+  ],
+  "page": 0,
+  "size": 20,
+  "totalElements": 100,
+  "totalPages": 5,
+  "hasNext": true,
+  "hasPrevious": false
+}
 ```
