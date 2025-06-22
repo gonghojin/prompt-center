@@ -26,6 +26,16 @@ spring:
   redis:
     host: localhost
     port: 6379
+    password: # 비밀번호가 있는 경우 설정
+    database: 0
+    timeout: 3000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1ms
+      shutdown-timeout: 100ms
   elasticsearch:
     uris: http://localhost:9200
 
@@ -61,3 +71,15 @@ jwt:
   secret: ${JWT_SECRET:c2VjcmV0LWtleS1tdXN0LWJlLWF0LWxlYXN0LTI1Ni1iaXRzLWxvbmctZm9yLWp3dC1zaWduaW5n}
   access-token-validity-in-ms: 3600000  # 1시간
   refresh-token-validity-in-ms: 604800000  # 7일
+
+# 조회수 기능 Redis 설정
+redis:
+  view:
+    # 중복 체크 키 TTL (시간)
+    duplication-check-ttl-hours: 1
+    # 조회수 캐시 키 TTL (시간)
+    count-cache-ttl-hours: 24
+    # 일별 통계 키 TTL (일)
+    daily-stats-ttl-days: 7
+    # 배치 락 키 TTL (분)
+    batch-lock-ttl-minutes: 5
