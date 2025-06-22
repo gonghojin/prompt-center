@@ -217,6 +217,141 @@ Authorization: Bearer {accessToken}
 
 ---
 
+## 프롬프트 조회수(View) API
+
+### Command (조회수 기록)
+
+| 기능     | HTTP Method | 엔드포인트                       | 설명                      | 주요 파라미터/Body                          | 응답 코드         | 예외/특이사항                  |
+|--------|-------------|-----------------------------|-------------------------|---------------------------------------|---------------|--------------------------|
+| 조회수 기록 | POST        | `/api/v1/prompts/{id}/view` | 프롬프트 조회수를 기록하고 총 조회수 반환 | path: id(UUID), body: anonymousId(선택) | 200, 400, 404 | 1시간 내 중복 방지, 로그인/비로그인 지원 |
+
+#### 조회수 기록 요청 예시
+
+```json
+{
+  "anonymousId": "anonymous_123456"
+}
+```
+
+#### 조회수 기록 응답 예시
+
+```json
+{
+  "success": true,
+  "totalViewCount": 1025,
+  "isNewView": true
+}
+```
+
+### Query (조회수 조회)
+
+| 기능          | HTTP Method | 엔드포인트                                   | 설명                 | 주요 파라미터        | 응답 코드    | 예외/특이사항   |
+|-------------|-------------|-----------------------------------------|--------------------|----------------|----------|-----------|
+| 조회수 상세 조회   | GET         | `/api/v1/prompts/{id}/view-count`       | 프롬프트의 상세 조회수 정보 조회 | path: id(UUID) | 200, 404 | 미존재 시 404 |
+| 총 조회수 간단 조회 | GET         | `/api/v1/prompts/{id}/view-count/total` | 프롬프트의 총 조회수만 조회    | path: id(UUID) | 200, 404 | 미존재 시 404 |
+
+#### 조회수 상세 조회 응답 예시
+
+```json
+{
+  "promptId": "123e4567-e89b-12d3-a456-426614174000",
+  "promptTemplateId": 123,
+  "totalViewCount": 1025,
+  "createdAt": "2024-01-01T10:00:00",
+  "updatedAt": "2024-01-15T14:30:00"
+}
+```
+
+#### 총 조회수 간단 조회 응답 예시
+
+```json
+1025
+```
+
+### Statistics (조회수 통계)
+
+| 기능           | HTTP Method | 엔드포인트                                      | 설명                     | 주요 파라미터                                          | 응답 코드    | 예외/특이사항       |
+|--------------|-------------|--------------------------------------------|------------------------|--------------------------------------------------|----------|---------------|
+| 인기 프롬프트 조회   | GET         | `/api/v1/view-statistics/top-prompts`      | 조회수 기준 인기 프롬프트 목록 조회   | query: startDate, endDate, categoryIds, limit    | 200, 400 | 기본 limit: 10  |
+| 일별 조회수 통계 조회 | GET         | `/api/v1/view-statistics/daily/{promptId}` | 특정 프롬프트의 일별 조회수 통계 조회  | path: promptId, query: startDate, endDate        | 200, 400 | 기본 기간: 최근 30일 |
+| 조회수 분포 통계 조회 | GET         | `/api/v1/view-statistics/distribution`     | 전체 프롬프트들의 조회수 분포 통계 조회 | query: categoryIds                               | 200, 400 |               |
+| 기간별 총 조회수 조회 | GET         | `/api/v1/view-statistics/total`            | 특정 기간 내 총 조회수 조회       | query: startDate(필수), endDate(필수), categoryIds   | 200, 400 | 시작일/종료일 필수    |
+| 일괄 조회수 조회    | GET         | `/api/v1/view-statistics/batch`            | 여러 프롬프트의 조회수를 한 번에 조회  | query: promptTemplateIds(필수), startDate, endDate | 200, 400 | 프롬프트 ID 목록 필수 |
+
+#### 인기 프롬프트 조회 응답 예시
+
+```json
+[
+  {
+    "promptTemplateId": 123,
+    "promptId": "123e4567-e89b-12d3-a456-426614174000",
+    "title": "AI 프롬프트 작성 가이드",
+    "totalViewCount": 2500,
+    "rank": 1
+  },
+  {
+    "promptTemplateId": 456,
+    "promptId": "456e7890-e89b-12d3-a456-426614174001",
+    "title": "코드 리뷰 프롬프트",
+    "totalViewCount": 1800,
+    "rank": 2
+  }
+]
+```
+
+#### 일별 조회수 통계 응답 예시
+
+```json
+[
+  {
+    "date": "2024-01-15",
+    "viewCount": 45,
+    "promptTemplateId": 123
+  },
+  {
+    "date": "2024-01-16",
+    "viewCount": 52,
+    "promptTemplateId": 123
+  }
+]
+```
+
+#### 조회수 분포 통계 응답 예시
+
+```json
+[
+  {
+    "range": "0-10",
+    "minViewCount": 0,
+    "maxViewCount": 10,
+    "promptCount": 150
+  },
+  {
+    "range": "11-50",
+    "minViewCount": 11,
+    "maxViewCount": 50,
+    "promptCount": 85
+  },
+  {
+    "range": "51-100",
+    "minViewCount": 51,
+    "maxViewCount": 100,
+    "promptCount": 42
+  }
+]
+```
+
+### 주요 특징 및 주의사항
+
+- **중복 방지**: 동일한 사용자/IP로부터 1시간 내 중복 조회는 기록되지 않음
+- **익명 지원**: 로그인하지 않은 사용자도 조회수 기록 가능 (IP 기반)
+- **실시간 집계**: 조회수 기록 시 즉시 총 조회수에 반영
+- **캐싱**: 통계 데이터는 성능을 위해 캐싱 적용 가능
+- **날짜 형식**: ISO 8601 형식 (yyyy-MM-dd'T'HH:mm:ss) 사용
+- **페이징**: 통계 조회 API는 limit 파라미터로 결과 수 제한
+
+---
+
 ## 내 프롬프트(My Prompt) API
 
 | 기능           | HTTP Method | 엔드포인트                           | 설명                    | 주요 파라미터/Body                                                                                                | 응답 코드         | 예외/특이사항        |
@@ -326,6 +461,33 @@ Authorization: Bearer {accessToken}
 
 ---
 
+### 내 프롬프트 총 조회수 통계 조회
+
+#### 요청 예시
+
+```
+GET /api/v1/prompts/my/view-statistics
+Authorization: Bearer {accessToken}
+```
+
+#### 응답 예시
+
+```json
+{
+  "totalViewCount": 1234
+}
+```
+
+| 기능              | HTTP Method | 엔드포인트                                | 설명                    | 주요 파라미터/Body                  | 응답 코드 | 예외/특이사항            |
+|-----------------|-------------|--------------------------------------|-----------------------|-------------------------------|-------|--------------------|
+| 내 프롬프트 총 조회수 조회 | GET         | `/api/v1/prompts/my/view-statistics` | 내가 생성한 프롬프트의 총 조회수 조회 | header: Authorization(Bearer) | 200   | 인증 필요, 서버 오류 시 500 |
+
+| 응답 필드명         | 타입   | 설명                 |
+|----------------|------|--------------------|
+| totalViewCount | Long | 내가 생성한 프롬프트의 총 조회수 |
+
+---
+
 ## 프롬프트 통계(Prompt Statistics) API
 
 | 기능    | HTTP Method | 엔드포인트                                 | 설명                  | 주요 파라미터                                                                 | 응답 코드         | 예외/특이사항                              |
@@ -360,11 +522,14 @@ GET /api/v1/dashboard/prompt-statistics?startDate=2024-06-01T00:00:00&endDate=20
 
 ## 대시보드(Dashboard) API
 
-| 기능                  | HTTP Method | 엔드포인트                                                       | 설명                         | 주요 파라미터/Body          | 응답 코드 | 예외/특이사항              |
-|---------------------|-------------|-------------------------------------------------------------|----------------------------|-----------------------|-------|----------------------|
-| 최근 프롬프트 조회          | GET         | `/api/v1/dashboard/prompts/recent`                          | 대시보드에서 최근 N개의 프롬프트 조회      | query: pageSize(기본 4) | 200   | pageSize ≤ 0 시 4로 대체 |
-| 루트 카테고리별 프롬프트 통계 조회 | GET         | `/api/v1/dashboard/categories/root/statistics`              | 루트 카테고리별 프롬프트 개수 조회        | 없음                    | 200   |                      |
-| 하위 카테고리별 프롬프트 통계 조회 | GET         | `/api/v1/dashboard/categories/{rootId}/children/statistics` | 특정 루트의 하위 카테고리별 프롬프트 개수 조회 | path: rootId          | 200   |                      |
+| 기능                  | HTTP Method | 엔드포인트                                                       | 설명                         | 주요 파라미터/Body                  | 응답 코드 | 예외/특이사항              |
+|---------------------|-------------|-------------------------------------------------------------|----------------------------|-------------------------------|-------|----------------------|
+| 최근 프롬프트 조회          | GET         | `/api/v1/dashboard/prompts/recent`                          | 대시보드에서 최근 N개의 프롬프트 조회      | query: pageSize(기본 4)         | 200   | pageSize ≤ 0 시 4로 대체 |
+| 루트 카테고리별 프롬프트 통계 조회 | GET         | `/api/v1/dashboard/categories/root/statistics`              | 루트 카테고리별 프롬프트 개수 조회        | 없음                            | 200   |                      |
+| 하위 카테고리별 프롬프트 통계 조회 | GET         | `/api/v1/dashboard/categories/{rootId}/children/statistics` | 특정 루트의 하위 카테고리별 프롬프트 개수 조회 | path: rootId                  | 200   |                      |
+| 주간 조회수 통계 조회        | GET         | `/api/v1/dashboard/view-statistics/weekly`                  | 이번주와 지난주 조회수 비교 통계 조회      | header: Authorization(Bearer) | 200   | 서버 오류 시 500          |
+| 유저 통계 조회            | GET         | `/api/v1/dashboard/user-statistics`                         | 전체 활성 유저 수 조회              | 없음                            | 200   | 서버 오류 시 500          |
+| 즐겨찾기 통계 조회          | GET         | `/api/v1/dashboard/favorite-statistics`                     | 전체 즐겨찾기 수 조회               | 없음                            | 200   | 서버 오류 시 500          |
 
 ### 루트 카테고리별 프롬프트 통계 조회
 
@@ -430,6 +595,102 @@ GET /api/v1/dashboard/categories/1/children/statistics
 
 - 응답은 `CategoryStatisticsResponse` 객체입니다.
 - 각 카테고리별로 `categoryId`, `categoryName`, `promptCount` 필드를 포함합니다.
+
+---
+
+### 주간 조회수 통계 조회
+
+#### 요청 예시
+
+```
+GET /api/v1/dashboard/view-statistics/weekly
+Authorization: Bearer {accessToken}
+```
+
+#### 응답 예시
+
+```json
+{
+  "thisWeekViewCount": 3891,
+  "lastWeekViewCount": 3295,
+  "changeCount": 596,
+  "changeRate": 18.1
+}
+```
+
+| 응답 필드명            | 타입     | 설명                  |
+|-------------------|--------|---------------------|
+| thisWeekViewCount | Long   | 이번주 총 조회수           |
+| lastWeekViewCount | Long   | 지난주 총 조회수           |
+| changeCount       | Long   | 조회수 변화량 (이번주 - 지난주) |
+| changeRate        | Double | 조회수 증감률 (%)         |
+
+- 주간 기간: 월요일 00:00:00 ~ 일요일 23:59:59
+- 이번주: 현재 주차, 지난주: 이전 주차
+- 증감률 계산: ((이번주 - 지난주) / 지난주) * 100
+- 지난주 조회수가 0인 경우 증감률은 0.0으로 반환
+
+---
+
+### 유저 통계 조회
+
+#### 요청 예시
+
+```
+GET /api/v1/dashboard/user-statistics
+```
+
+#### 응답 예시
+
+```json
+{
+  "totalCount": 1500,
+  "currentCount": 120,
+  "previousCount": 100,
+  "percentageChange": 20.0
+}
+```
+
+| 응답 필드명           | 타입     | 설명              |
+|------------------|--------|-----------------|
+| totalCount       | Long   | 전체 활성 유저 수      |
+| currentCount     | Long   | 현재 기간의 신규 유저 수  |
+| previousCount    | Long   | 이전 기간의 신규 유저 수  |
+| percentageChange | Double | 이전 기간 대비 변동률(%) |
+
+- 활성 상태(ACTIVE)의 유저만 집계
+- 대시보드 통계 카드에서 "1,250 사용자" 형태로 표시
+
+---
+
+### 즐겨찾기 통계 조회
+
+#### 요청 예시
+
+```
+GET /api/v1/dashboard/favorite-statistics
+```
+
+#### 응답 예시
+
+```json
+{
+  "totalCount": 3500,
+  "currentCount": 280,
+  "previousCount": 220,
+  "percentageChange": 27.3
+}
+```
+
+| 응답 필드명           | 타입     | 설명               |
+|------------------|--------|------------------|
+| totalCount       | Long   | 전체 즐겨찾기 수        |
+| currentCount     | Long   | 현재 기간의 신규 즐겨찾기 수 |
+| previousCount    | Long   | 이전 기간의 신규 즐겨찾기 수 |
+| percentageChange | Double | 이전 기간 대비 변동률(%)  |
+
+- 시스템 전체의 즐겨찾기 개수 집계
+- 대시보드 통계 카드에서 "3,420 즐겨찾기" 형태로 표시
 
 ## 공통 안내
 
@@ -610,3 +871,5 @@ Authorization: Bearer {accessToken}
   "hasPrevious": false
 }
 ```
+
+---
