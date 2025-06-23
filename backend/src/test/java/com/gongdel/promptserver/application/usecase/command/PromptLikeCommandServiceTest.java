@@ -90,7 +90,7 @@ class PromptLikeCommandServiceTest {
             // When & Then
             assertThatThrownBy(() -> promptLikeCommandService.addLike(userId, promptTemplateUuid))
                 .isInstanceOf(LikeOperationException.class)
-                .hasMessageContaining("not found");
+                .hasMessageContaining("Failed to add like");
         }
 
         @Test
@@ -149,7 +149,7 @@ class PromptLikeCommandServiceTest {
             // When & Then
             assertThatThrownBy(() -> promptLikeCommandService.removeLike(userId, promptTemplateUuid))
                 .isInstanceOf(LikeOperationException.class)
-                .hasMessageContaining("not found");
+                .hasMessageContaining("Failed to remove like");
         }
 
         @Test
