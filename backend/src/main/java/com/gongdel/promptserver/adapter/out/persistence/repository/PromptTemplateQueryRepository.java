@@ -18,15 +18,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.gongdel.promptserver.adapter.out.persistence.entity.QPromptTemplateEntity.promptTemplateEntity;
 import static com.gongdel.promptserver.adapter.out.persistence.entity.QPromptTemplateTagEntity.promptTemplateTagEntity;
 import static com.gongdel.promptserver.adapter.out.persistence.entity.QTagEntity.tagEntity;
+import static com.gongdel.promptserver.adapter.out.persistence.entity.like.QPromptLikeCountEntity.promptLikeCountEntity;
+import static com.gongdel.promptserver.adapter.out.persistence.entity.view.QPromptViewCountEntity.promptViewCountEntity;
 
 /**
  * 프롬프트 템플릿 검색 쿼리 리포지토리
@@ -57,35 +56,152 @@ public class PromptTemplateQueryRepository {
             condition.getCategoryId(), condition.getStatus(), condition.getSortType(), condition.getPageable());
 
         BooleanExpression[] predicates = buildPredicates(condition);
-        OrderSpecifier<?>[] orderSpecifiers = createOrderSpecifiers(condition.getSortType());
 
-        List<PromptTemplateEntity> content = queryFactory
+        // 통계 정보가 필요한 정렬의 경우 두 단계 쿼리 사용
+        if (condition.getSortType() == PromptSortType.MOST_FAVORITE
+            || condition.getSortType() == PromptSortType.MOST_VIEWS) {
+            return searchPromptsWithStatistics(condition, predicates);
+        }
+
+        // 기본 정렬의 경우 단일 쿼리 사용
+        return searchPromptsBasic(condition, predicates);
+    }
+
+    /**
+     * 기본 정렬을 위한 단일 쿼리 검색
+     */
+    private Page<PromptTemplateEntity> searchPromptsBasic(PromptSearchCondition condition,
+                                                          BooleanExpression[] predicates) {
+        OrderSpecifier<?>[] orderSpecifiers = createBasicOrderSpecifiers(condition.getSortType());
+
+        var query = queryFactory
             .selectDistinct(promptTemplateEntity)
             .from(promptTemplateEntity)
             .leftJoin(promptTemplateEntity.createdBy).fetchJoin()
             .leftJoin(promptTemplateEntity.category).fetchJoin()
             .leftJoin(promptTemplateEntity.tagRelations, promptTemplateTagEntity).fetchJoin()
-            .leftJoin(promptTemplateTagEntity.tag, tagEntity).fetchJoin()
+            .leftJoin(promptTemplateTagEntity.tag, tagEntity).fetchJoin();
+
+        List<PromptTemplateEntity> content = query
             .where(predicates)
             .orderBy(orderSpecifiers)
             .offset(condition.getPageable().getOffset())
             .limit(condition.getPageable().getPageSize())
             .fetch();
 
+        // Count 쿼리
         Long total = queryFactory
             .select(promptTemplateEntity.countDistinct())
             .from(promptTemplateEntity)
-            .leftJoin(promptTemplateEntity.createdBy)
-            .leftJoin(promptTemplateEntity.category)
             .leftJoin(promptTemplateEntity.tagRelations, promptTemplateTagEntity)
             .leftJoin(promptTemplateTagEntity.tag, tagEntity)
             .where(predicates)
             .fetchOne();
 
         long totalCount = Optional.ofNullable(total).orElse(0L);
-        log.info("Prompt search result: {} entities found", totalCount);
+        log.info("Basic prompt search result: {} entities found", totalCount);
 
         return new PageImpl<>(content, condition.getPageable(), totalCount);
+    }
+
+    /**
+     * 통계 정보 정렬을 위한 두 단계 쿼리 검색
+     */
+    private Page<PromptTemplateEntity> searchPromptsWithStatistics(PromptSearchCondition condition,
+                                                                   BooleanExpression[] predicates) {
+        // 1단계: 통계 정보와 함께 ID 목록 조회
+        List<Long> orderedIds = getOrderedPromptIds(condition, predicates);
+
+        if (orderedIds.isEmpty()) {
+            return new PageImpl<>(List.of(), condition.getPageable(), 0);
+        }
+
+        // 페이징 적용
+        int offset = (int) condition.getPageable().getOffset();
+        int pageSize = condition.getPageable().getPageSize();
+        int endIndex = Math.min(offset + pageSize, orderedIds.size());
+
+        if (offset >= orderedIds.size()) {
+            return new PageImpl<>(List.of(), condition.getPageable(), orderedIds.size());
+        }
+
+        List<Long> pagedIds = orderedIds.subList(offset, endIndex);
+
+        // 2단계: ID 목록으로 엔티티 조회 (순서 유지)
+        List<PromptTemplateEntity> entities = queryFactory
+            .selectDistinct(promptTemplateEntity)
+            .from(promptTemplateEntity)
+            .leftJoin(promptTemplateEntity.createdBy).fetchJoin()
+            .leftJoin(promptTemplateEntity.category).fetchJoin()
+            .leftJoin(promptTemplateEntity.tagRelations, promptTemplateTagEntity).fetchJoin()
+            .leftJoin(promptTemplateTagEntity.tag, tagEntity).fetchJoin()
+            .where(promptTemplateEntity.id.in(pagedIds))
+            .fetch();
+
+        // 원래 순서대로 정렬
+        Map<Long, PromptTemplateEntity> entityMap = entities.stream()
+            .collect(Collectors.toMap(PromptTemplateEntity::getId, entity -> entity));
+
+        List<PromptTemplateEntity> orderedEntities = pagedIds.stream()
+            .map(entityMap::get)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        log.info("Statistics-based prompt search result: {} entities found", orderedIds.size());
+
+        return new PageImpl<>(orderedEntities, condition.getPageable(), orderedIds.size());
+    }
+
+    /**
+     * 통계 정보 기반으로 정렬된 프롬프트 ID 목록 조회
+     */
+    private List<Long> getOrderedPromptIds(PromptSearchCondition condition, BooleanExpression[] predicates) {
+        if (condition.getSortType() == PromptSortType.MOST_FAVORITE) {
+            return queryFactory
+                .select(promptTemplateEntity.id)
+                .from(promptTemplateEntity)
+                .leftJoin(promptTemplateEntity.tagRelations, promptTemplateTagEntity)
+                .leftJoin(promptTemplateTagEntity.tag, tagEntity)
+                .leftJoin(promptLikeCountEntity)
+                .on(promptLikeCountEntity.promptTemplateId.eq(promptTemplateEntity.id))
+                .where(predicates)
+                .groupBy(promptTemplateEntity.id, promptTemplateEntity.updatedAt)
+                .orderBy(promptLikeCountEntity.likeCount.max().coalesce(0L).desc(),
+                    promptTemplateEntity.updatedAt.desc())
+                .fetch();
+        } else if (condition.getSortType() == PromptSortType.MOST_VIEWS) {
+            log.debug("Executing MOST_VIEWS sort query");
+
+            // 먼저 조회수 데이터 존재 여부 확인
+            Long viewCountTotal = queryFactory
+                .select(promptViewCountEntity.count())
+                .from(promptViewCountEntity)
+                .fetchOne();
+            log.debug("Total view count records in database: {}", viewCountTotal);
+
+            // 조회수 순 정렬 쿼리 실행 (인기순과 동일한 패턴)
+            List<Long> result = queryFactory
+                .select(promptTemplateEntity.id)
+                .from(promptTemplateEntity)
+                .leftJoin(promptTemplateEntity.tagRelations, promptTemplateTagEntity)
+                .leftJoin(promptTemplateTagEntity.tag, tagEntity)
+                .leftJoin(promptViewCountEntity)
+                .on(promptViewCountEntity.promptTemplateId.eq(promptTemplateEntity.id))
+                .where(predicates)
+                .groupBy(promptTemplateEntity.id, promptTemplateEntity.updatedAt)
+                .orderBy(promptViewCountEntity.totalViewCount.max().coalesce(0L).desc(),
+                    promptTemplateEntity.updatedAt.desc())
+                .fetch();
+
+            log.debug("MOST_VIEWS sort query returned {} results", result.size());
+            if (!result.isEmpty()) {
+                log.debug("First 5 prompt IDs in MOST_VIEWS order: {}",
+                    result.stream().limit(5).toList());
+            }
+
+            return result;
+        }
+        return List.of();
     }
 
     /**
@@ -173,13 +289,16 @@ public class PromptTemplateQueryRepository {
         return promptTemplateEntity.status.ne(PromptStatus.DELETED);
     }
 
-    private OrderSpecifier<?>[] createOrderSpecifiers(PromptSortType sortType) {
+    private OrderSpecifier<?>[] createBasicOrderSpecifiers(PromptSortType sortType) {
         if (sortType == null) {
             return new OrderSpecifier[]{promptTemplateEntity.updatedAt.desc()};
         }
         return switch (sortType) {
             case LATEST_MODIFIED -> new OrderSpecifier[]{promptTemplateEntity.updatedAt.desc()};
             case TITLE -> new OrderSpecifier[]{promptTemplateEntity.title.asc()};
+            case TITLE_ASC -> new OrderSpecifier[]{promptTemplateEntity.title.asc()};
+            // 통계 정렬은 별도 메서드에서 처리하므로 기본 정렬로 대체
+            case MOST_FAVORITE, MOST_VIEWS -> new OrderSpecifier[]{promptTemplateEntity.updatedAt.desc()};
         };
     }
 

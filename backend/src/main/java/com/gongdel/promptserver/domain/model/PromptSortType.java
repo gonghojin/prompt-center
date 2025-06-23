@@ -11,7 +11,19 @@ public enum PromptSortType {
     /**
      * 프롬프트 이름순 정렬
      */
-    TITLE("프롬프트 이름순", "title");
+    TITLE("프롬프트 이름순", "title"),
+    /**
+     * 프롬프트 이름 오름차순 정렬
+     */
+    TITLE_ASC("프롬프트 이름 오름차순", "title"),
+    /**
+     * 인기순 정렬 (즐겨찾기 수 기준)
+     */
+    MOST_FAVORITE("인기순", "favoriteCount"),
+    /**
+     * 조회수순 정렬
+     */
+    MOST_VIEWS("조회수순", "viewCount");
 
     private final String description;
     private final String field;
