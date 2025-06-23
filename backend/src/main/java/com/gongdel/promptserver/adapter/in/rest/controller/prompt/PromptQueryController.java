@@ -85,7 +85,7 @@ public class PromptQueryController {
         @Parameter(description = "태그", example = "stable-diffusion") @RequestParam(required = false) String tag,
         @Parameter(description = "카테고리 ID", example = "1") @RequestParam(required = false) Long categoryId,
         @Parameter(description = "프롬프트 상태", example = "PUBLISHED", required = false) @RequestParam(required = false, defaultValue = "PUBLISHED") String status,
-        @Parameter(description = "정렬 기준 (LATEST_MODIFIED: 최근 수정순, TITLE: 프롬프트 이름순)", example = "LATEST_MODIFIED", required = false) @RequestParam(required = false, defaultValue = "LATEST_MODIFIED") PromptSortType sortType,
+        @Parameter(description = "정렬 기준 (LATEST_MODIFIED: 최근 수정순, TITLE: 프롬프트 이름순, TITLE_ASC: 프롬프트 이름 오름차순, MOST_FAVORITE: 인기순, MOST_VIEWS: 조회수순)", example = "LATEST_MODIFIED", required = false) @RequestParam(required = false, defaultValue = "LATEST_MODIFIED") PromptSortType sortType,
         @Parameter(description = "검색어", required = false) @RequestParam(required = false) String searchKeyword,
         Pageable pageable) {
         Assert.notNull(pageable, "Pageable 정보는 null일 수 없습니다.");
