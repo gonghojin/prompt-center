@@ -14,6 +14,7 @@ CREATE INDEX idx_user_auth_user ON user_authentication (user_id);
 -- 로그인 이력 테이블 생성
 CREATE TABLE login_history (
     id          BIGSERIAL PRIMARY KEY,
+    uuid UUID NOT NULL UNIQUE,
     user_id     BIGINT       NOT NULL,
     login_at    TIMESTAMP    NOT NULL,
     ip_address  VARCHAR(45),
@@ -26,3 +27,4 @@ CREATE TABLE login_history (
 
 CREATE INDEX idx_login_history_user ON login_history (user_id);
 CREATE INDEX idx_login_history_login_at ON login_history (login_at);
+CREATE INDEX idx_login_history_uuid ON login_history (uuid);

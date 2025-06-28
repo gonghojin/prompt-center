@@ -47,8 +47,8 @@ public class PromptPersistenceAdapter implements SavePromptPort {
             PromptTemplateEntity entity = promptTemplateMapper.toEntity(promptTemplate);
 
             // 기존 프롬프트라면 기존 태그 관계를 먼저 삭제(관계 테이블 중복 방지)
-            if (entity.getUuid() != null) {
-                PromptTemplateEntity managedEntity = promptTemplateRepository.findByUuid(entity.getUuid())
+            if (entity.getId() != null) {
+                PromptTemplateEntity managedEntity = promptTemplateRepository.findById(entity.getId())
                     .orElseThrow(() -> new PromptOperationException(
                         PromptErrorType.NOT_FOUND, "Prompt template not found: " + entity.getUuid()));
                 managedEntity.clearTags(); // 기존 태그 관계 제거

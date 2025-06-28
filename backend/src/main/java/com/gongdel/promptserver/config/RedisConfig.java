@@ -27,16 +27,16 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Slf4j
 public class RedisConfig {
 
-    @Value("${spring.redis.host:localhost}")
+    @Value("${spring.data.redis.host:localhost}")
     private String redisHost;
 
-    @Value("${spring.redis.port:6379}")
+    @Value("${spring.data.redis.port:6379}")
     private int redisPort;
 
-    @Value("${spring.redis.password:}")
+    @Value("${spring.data.redis.password:}")
     private String redisPassword;
 
-    @Value("${spring.redis.database:0}")
+    @Value("${spring.data.redis.database:0}")
     private int database;
 
     /**
@@ -57,9 +57,12 @@ public class RedisConfig {
         }
 
         LettuceConnectionFactory factory = new LettuceConnectionFactory(config);
+        factory.setValidateConnection(true);
+        factory.afterPropertiesSet();
 
-        log.info("Redis connection configured - host: {}, port: {}, database: {}",
-            redisHost, redisPort, database);
+        log.info("Redis connection configured - host: {}, port: {}, database: {}, password: {}",
+            redisHost, redisPort, database,
+            redisPassword != null && !redisPassword.trim().isEmpty() ? "***" : "none");
 
         return factory;
     }
