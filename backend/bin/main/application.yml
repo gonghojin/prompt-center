@@ -1,0 +1,92 @@
+spring:
+  profiles:
+    active: local
+  application:
+    name: prompt-center
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/prompt_center_dev}
+    username: ${SPRING_DATASOURCE_USERNAME:prompth_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:dev_password_123}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  # 현재는 jpa-ddl-auto: validate 사용중 - local.yml 에서 설정
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
+    validate-on-migrate: true
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:} # 비밀번호가 있는 경우 설정
+      database: 0
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+        shutdown-timeout: 100ms
+  elasticsearch:
+    uris: ${SPRING_ELASTICSEARCH_URIS:http://localhost:9200}
+
+server:
+  port: 8080
+  # 보안 설정 추가
+  error:
+    include-message: on-param  # local 환경에서만 에러 메시지 포함
+    include-binding-errors: on-param
+    include-stacktrace: on-param
+    include-exception: false
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+logging:
+  level:
+    root: INFO
+    com.promptcenter: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+
+management:
+  server:
+    base-path: /actuator
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+jwt:
+  secret: ${JWT_SECRET:c2VjcmV0LWtleS1tdXN0LWJlLWF0LWxlYXN0LTI1Ni1iaXRzLWxvbmctZm9yLWp3dC1zaWduaW5n}  # 환경변수 우선, 기본값 유지
+  access-token-validity-in-ms: 3600000  # 1시간
+  refresh-token-validity-in-ms: 604800000  # 7일
+
+# 조회수 기능 Redis 설정
+redis:
+  view:
+    # 중복 체크 키 TTL (시간)
+    duplication-check-ttl-hours: 1
+    # 조회수 캐시 키 TTL (시간)
+    count-cache-ttl-hours: 24
+    # 일별 통계 키 TTL (일)
+    daily-stats-ttl-days: 7
+    # 배치 락 키 TTL (분)
+    batch-lock-ttl-minutes: 5

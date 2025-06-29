@@ -1,0 +1,59 @@
+spring:
+  # Docker Compose 환경용 인프라 설정 (환경변수 우선)
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/prompt_center_dev}
+    username: ${SPRING_DATASOURCE_USERNAME:prompth_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:dev_password_123}
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:redis}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:dev_redis_123}
+  elasticsearch:
+    uris: ${SPRING_ELASTICSEARCH_URIS:http://elasticsearch:9200}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false  # 운영에서는 SQL 로깅 최소화
+    properties:
+      hibernate:
+        format_sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    validate-on-migrate: true  # 검증 비활성화
+
+server:
+  error:
+    include-message: never  # 에러 메시지 노출 방지
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
+
+logging:
+  level:
+    root: INFO
+    com.gongdel.promptserver: INFO  # DEBUG → INFO로 변경
+    org.hibernate.SQL: WARN  # SQL 로깅 최소화
+    org.springframework.security: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: /app/logs/prompt-center.log
+    max-size: 100MB
+    max-history: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus  # 모니터링용 엔드포인트 추가
+  endpoint:
+    health:
+      show-details: when-authorized  # 인증된 사용자에게만 상세 정보 제공
+
+jwt:
+  secret: ${JWT_SECRET}  # 환경변수로만 관리
