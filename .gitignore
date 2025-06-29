@@ -202,3 +202,10 @@ backup/
 # 임시 파일들
 tmp/
 temp/
+
+# SSL 인증서
+deploy/config/nginx/ssl/*.pem
+deploy/config/nginx/ssl/*.key
+deploy/config/nginx/ssl/*.crt
+deploy/config/nginx/ssl/*.csr
+deploy/config/nginx/ssl/*.conf
