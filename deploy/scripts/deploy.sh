@@ -159,7 +159,7 @@ docker-compose -f deploy/docker-compose.yml --env-file "$ENV_FILE" down 2>/dev/n
 
 # 네트워크 정리
 log_info "네트워크 정리 중..."
-x 
+docker network prune -f 2>/dev/null || true
 
 # Docker 이미지 빌드
 log_info "Docker 이미지를 빌드합니다..."
