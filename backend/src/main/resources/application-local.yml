@@ -1,9 +1,9 @@
 spring:
   # 로컬 개발환경용 인프라 설정
   datasource:
-    url: jdbc:postgresql://localhost:5432/prompt_center_dev
-    username: prompth_user
-    password: dev_password_123
+    url: jdbc:postgresql://localhost:5432/prompt_center
+    username: postgres
+    password: postgres
   data:
     redis:
       host: localhost

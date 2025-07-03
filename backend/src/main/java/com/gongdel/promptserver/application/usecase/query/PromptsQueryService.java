@@ -152,6 +152,7 @@ public class PromptsQueryService implements PromptsQueryUseCase {
             .status(original.getStatus())
             .isFavorite(original.isFavorite())
             .isLiked(original.isLiked())
+            .inputVariables(original.getInputVariables())
             .build();
     }
 

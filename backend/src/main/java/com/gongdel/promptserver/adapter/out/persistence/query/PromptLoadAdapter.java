@@ -138,6 +138,7 @@ public class PromptLoadAdapter implements LoadPromptPort, LoadPromptTemplateIdPo
             .status(template.getStatus() != null ? template.getStatus().name() : null)
             .isFavorite(isFavorite)
             .isLiked(isLiked)
+            .inputVariables(version != null ? version.getInputVariables() : java.util.Collections.emptyList())
             .build();
     }
 

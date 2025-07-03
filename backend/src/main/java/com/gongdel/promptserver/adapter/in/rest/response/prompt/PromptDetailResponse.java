@@ -1,5 +1,6 @@
 package com.gongdel.promptserver.adapter.in.rest.response.prompt;
 
+import com.gongdel.promptserver.adapter.in.rest.request.prompt.InputVariableDto;
 import com.gongdel.promptserver.adapter.in.rest.response.auth.UserResponse;
 import com.gongdel.promptserver.domain.model.PromptDetail;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,8 +8,11 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * <b>프롬프트 상세 조회 결과 정보를 클라이언트에 응답하기 위한 DTO 클래스입니다.
@@ -65,26 +69,30 @@ public class PromptDetailResponse {
     @Schema(description = "내가 좋아요한 프롬프트 여부", example = "true")
     private final boolean isLiked;
 
+    @Schema(description = "입력 변수 목록", example = "[{\"name\":\"userName\",\"type\":\"String\",\"description\":\"사용자 이름\",\"required\":true,\"defaultValue\":\"\"}]")
+    private final List<InputVariableDto> inputVariables;
+
     /**
      * <b>여러 도메인 객체로부터 상세 조회 응답 DTO를 생성합니다.</b><br>
      * 이 메서드는 다양한 소스에서 받은 데이터를 명확하게 매핑하여, API 응답에 필요한 모든 정보를 담은 DTO를 생성합니다.
      *
-     * @param id            프롬프트 UUID
-     * @param title         제목
-     * @param description   설명
-     * @param content       본문(최신 버전)
-     * @param author        작성자 정보
-     * @param tags          태그 목록
-     * @param isPublic      공개 여부
-     * @param createdAt     생성일
-     * @param updatedAt     수정일
-     * @param viewCount     조회수
-     * @param favoriteCount 좋아요 수
-     * @param categoryId    카테고리 ID
-     * @param visibility    공개 범위
-     * @param status        상태
-     * @param isFavorite    내가 즐겨찾기한 프롬프트 여부
-     * @param isLiked       내가 좋아요한 프롬프트 여부
+     * @param id             프롬프트 UUID
+     * @param title          제목
+     * @param description    설명
+     * @param content        본문(최신 버전)
+     * @param author         작성자 정보
+     * @param tags           태그 목록
+     * @param isPublic       공개 여부
+     * @param createdAt      생성일
+     * @param updatedAt      수정일
+     * @param viewCount      조회수
+     * @param favoriteCount  좋아요 수
+     * @param categoryId     카테고리 ID
+     * @param visibility     공개 범위
+     * @param status         상태
+     * @param isFavorite     내가 즐겨찾기한 프롬프트 여부
+     * @param isLiked        내가 좋아요한 프롬프트 여부
+     * @param inputVariables 입력 변수 목록
      * @return 프롬프트 상세 응답 DTO
      */
     public static PromptDetailResponse from(
@@ -103,7 +111,8 @@ public class PromptDetailResponse {
         String visibility,
         String status,
         boolean isFavorite,
-        boolean isLiked) {
+        boolean isLiked,
+        List<InputVariableDto> inputVariables) {
         return PromptDetailResponse.builder()
             .id(id)
             .title(title)
@@ -121,6 +130,7 @@ public class PromptDetailResponse {
             .status(status)
             .isFavorite(isFavorite)
             .isLiked(isLiked)
+            .inputVariables(inputVariables != null ? inputVariables : Collections.emptyList())
             .build();
     }
 
@@ -133,6 +143,12 @@ public class PromptDetailResponse {
      * @return 프롬프트 상세 응답 DTO
      */
     public static PromptDetailResponse from(PromptDetail detail) {
+        List<InputVariableDto> inputVariables = detail.getInputVariables() != null
+            ? detail.getInputVariables().stream()
+            .map(InputVariableDto::fromDomain)
+            .collect(Collectors.toList())
+            : Collections.emptyList();
+
         return new PromptDetailResponse(
             detail.getId(),
             detail.getTitle(),
@@ -149,6 +165,7 @@ public class PromptDetailResponse {
             detail.getVisibility(),
             detail.getStatus(),
             detail.isFavorite(),
-            detail.isLiked());
+            detail.isLiked(),
+            inputVariables);
     }
 }

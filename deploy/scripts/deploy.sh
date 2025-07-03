@@ -116,11 +116,11 @@ if [[ -d "$PROJECT_ROOT/frontend" ]]; then
     log_info "프론트엔드 의존성을 업데이트합니다..."
     cd "$PROJECT_ROOT/frontend"
 
-    # package-lock.json 삭제 (의존성 충돌 방지)
-    if [[ -f "package-lock.json" ]]; then
-        rm package-lock.json
-        log_info "기존 package-lock.json 삭제됨"
-    fi
+#    # package-lock.json 삭제 (의존성 충돌 방지)
+#    if [[ -f "package-lock.json" ]]; then
+#        rm package-lock.json
+#        log_info "기존 package-lock.json 삭제됨"
+#    fi
 
     # node_modules 삭제 (깨끗한 설치)
     if [[ -d "node_modules" ]]; then
@@ -130,7 +130,7 @@ if [[ -d "$PROJECT_ROOT/frontend" ]]; then
 
     # 의존성 설치
     log_info "npm 의존성 설치 중..."
-    npm install
+    npm ci
     if [[ $? -ne 0 ]]; then
         log_error "npm 의존성 설치 실패"
         exit 1

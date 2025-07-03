@@ -116,6 +116,59 @@
 - `status`: 프롬프트 상태
 - `createdBy`: 작성자 정보
 
+### 프롬프트 단건 조회 응답 예시
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "AI 프롬프트 예시",
+  "description": "ChatGPT를 효과적으로 활용하는 방법을 안내합니다.",
+  "content": "당신은 전문적인 AI 어시스턴트입니다. 사용자의 {목적}에 맞춰 {톤앤매너}로 답변해주세요.",
+  "author": {
+    "id": 1,
+    "name": "홍길동",
+    "email": "user@example.com"
+  },
+  "tags": ["AI", "ChatGPT", "활용법"],
+  "isPublic": true,
+  "createdAt": "2024-05-01T12:34:56",
+  "updatedAt": "2024-05-02T15:00:00",
+  "viewCount": 123,
+  "favoriteCount": 45,
+  "categoryId": 1,
+  "visibility": "PUBLIC",
+  "status": "PUBLISHED",
+  "isFavorite": true,
+  "isLiked": true,
+  "inputVariables": [
+    {
+      "name": "목적",
+      "type": "string",
+      "description": "사용자가 달성하고자 하는 목적",
+      "required": true,
+      "defaultValue": ""
+    },
+    {
+      "name": "톤앤매너",
+      "type": "string",
+      "description": "답변 시 사용할 톤앤매너",
+      "required": false,
+      "defaultValue": "친근하고 전문적인"
+    }
+  ]
+}
+```
+
+### InputVariable 필드 구조
+
+| 필드명          | 타입      | 설명         | 예시값        |
+|--------------|---------|------------|------------|
+| name         | String  | 변수 이름      | "userName" |
+| type         | String  | 변수 타입      | "string"   |
+| description  | String  | 변수 설명      | "사용자 이름"   |
+| required     | Boolean | 필수 여부      | true       |
+| defaultValue | String  | 기본값 (선택사항) | "홍길동"      |
+
 ### 프롬프트 복합 검색 파라미터
 
 - `title` (선택): 프롬프트 제목
@@ -170,7 +223,9 @@ Authorization: Bearer {accessToken}
     {
       "name": "userName",
       "type": "string",
-      "description": "사용자 이름"
+      "description": "사용자 이름",
+      "required": true,
+      "defaultValue": ""
     }
   ],
   "tags": [
@@ -195,7 +250,9 @@ Authorization: Bearer {accessToken}
     {
       "name": "userName",
       "type": "string",
-      "description": "사용자 이름"
+      "description": "사용자 이름",
+      "required": true,
+      "defaultValue": ""
     }
   ],
   "tags": [

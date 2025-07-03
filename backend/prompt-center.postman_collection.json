@@ -507,7 +507,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"예시 프롬프트\",\n  \"content\": \"프롬프트 내용\",\n  \"description\": \"프롬프트 설명\",\n  \"categoryId\": 1,\n  \"inputVariables\": [],\n  \"tags\": [],\n  \"visibility\": \"PUBLIC\",\n  \"status\": \"PUBLISHED\",\n  \"createdBy\": \"userId\"\n}"
+              "raw": "{\n  \"title\": \"AI 어시스턴트 프롬프트\",\n  \"content\": \"당신은 전문적인 AI 어시스턴트입니다. 사용자의 {목적}에 맞춰 {톤앤매너}로 답변해주세요.\",\n  \"description\": \"사용자의 목적과 톤앤매너에 맞춰 응답하는 프롬프트\",\n  \"categoryId\": 1,\n  \"inputVariables\": [\n    {\n      \"name\": \"목적\",\n      \"type\": \"string\",\n      \"description\": \"사용자가 달성하고자 하는 목적\",\n      \"required\": true,\n      \"defaultValue\": \"\"\n    },\n    {\n      \"name\": \"톤앤매너\",\n      \"type\": \"string\",\n      \"description\": \"답변 시 사용할 톤앤매너\",\n      \"required\": false,\n      \"defaultValue\": \"친근하고 전문적인\"\n    }\n  ],\n  \"tags\": [\"AI\", \"어시스턴트\"],\n  \"visibility\": \"PUBLIC\",\n  \"status\": \"PUBLISHED\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/prompts",
@@ -528,7 +528,7 @@
               "originalRequest": {},
               "status": "Created",
               "code": 201,
-              "body": "프롬프트 생성 성공 시 PromptResponse 반환"
+              "body": "{\n  \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"title\": \"AI 어시스턴트 프롬프트\",\n  \"description\": \"사용자의 목적과 톤앤매너에 맞춰 응답하는 프롬프트\",\n  \"content\": \"당신은 전문적인 AI 어시스턴트입니다. 사용자의 {목적}에 맞춰 {톤앤매너}로 답변해주세요.\",\n  \"author\": {\n    \"id\": 1,\n    \"name\": \"홍길동\",\n    \"email\": \"user@example.com\"\n  },\n  \"tags\": [\"AI\", \"어시스턴트\"],\n  \"isPublic\": true,\n  \"createdAt\": \"2024-05-01T12:34:56\",\n  \"updatedAt\": \"2024-05-02T15:00:00\",\n  \"viewCount\": 123,\n  \"favoriteCount\": 45,\n  \"categoryId\": 1,\n  \"visibility\": \"PUBLIC\",\n  \"status\": \"PUBLISHED\",\n  \"isFavorite\": true,\n  \"isLiked\": true,\n  \"inputVariables\": [\n    {\n      \"name\": \"목적\",\n      \"type\": \"string\",\n      \"description\": \"사용자가 달성하고자 하는 목적\",\n      \"required\": true,\n      \"defaultValue\": \"\"\n    },\n    {\n      \"name\": \"톤앤매너\",\n      \"type\": \"string\",\n      \"description\": \"답변 시 사용할 톤앤매너\",\n      \"required\": false,\n      \"defaultValue\": \"친근하고 전문적인\"\n    }\n  ]\n}"
             },
             {
               "name": "400 Bad Request",
@@ -569,7 +569,7 @@
               "originalRequest": {},
               "status": "OK",
               "code": 200,
-              "body": "PromptResponse 예시 반환"
+              "body": "{\n  \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"title\": \"AI 어시스턴트 프롬프트\",\n  \"description\": \"사용자의 목적과 톤앤매너에 맞춰 응답하는 프롬프트\",\n  \"content\": \"당신은 전문적인 AI 어시스턴트입니다. 사용자의 {목적}에 맞춰 {톤앤매너}로 답변해주세요.\",\n  \"author\": {\n    \"id\": 1,\n    \"name\": \"홍길동\",\n    \"email\": \"user@example.com\"\n  },\n  \"tags\": [\"AI\", \"어시스턴트\"],\n  \"isPublic\": true,\n  \"createdAt\": \"2024-05-01T12:34:56\",\n  \"updatedAt\": \"2024-05-02T15:00:00\",\n  \"viewCount\": 123,\n  \"favoriteCount\": 45,\n  \"categoryId\": 1,\n  \"visibility\": \"PUBLIC\",\n  \"status\": \"PUBLISHED\",\n  \"isFavorite\": true,\n  \"isLiked\": true,\n  \"inputVariables\": [\n    {\n      \"name\": \"목적\",\n      \"type\": \"string\",\n      \"description\": \"사용자가 달성하고자 하는 목적\",\n      \"required\": true,\n      \"defaultValue\": \"\"\n    },\n    {\n      \"name\": \"톤앤매너\",\n      \"type\": \"string\",\n      \"description\": \"답변 시 사용할 톤앤매너\",\n      \"required\": false,\n      \"defaultValue\": \"친근하고 전문적인\"\n    }\n  ]\n}"
             },
             {
               "name": "404 Not Found",
@@ -725,7 +725,7 @@
               "originalRequest": {},
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"title\": \"예시 프롬프트\",\n      \"description\": \"설명\",\n      \"status\": \"PUBLISHED\",\n      \"visibility\": \"PUBLIC\",\n      \"createdAt\": \"2024-06-01T12:00:00\",\n      \"updatedAt\": \"2024-06-02T12:00:00\",\n      \"isFavorite\": true\n    }\n  ],\n  \"pageable\": {\n    \"pageNumber\": 0,\n    \"pageSize\": 20\n  },\n  \"totalElements\": 100,\n  \"totalPages\": 5,\n  \"size\": 20,\n  \"number\": 0\n}"
+              "body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"title\": \"AI 어시스턴트 프롬프트\",\n      \"description\": \"사용자의 목적과 톤앤매너에 맞춰 응답하는 프롬프트\",\n      \"status\": \"PUBLISHED\",\n      \"visibility\": \"PUBLIC\",\n      \"createdAt\": \"2024-05-01T12:34:56\",\n      \"updatedAt\": \"2024-05-02T15:00:00\",\n      \"isFavorite\": true\n    }\n  ],\n  \"pageable\": {\n    \"pageNumber\": 0,\n    \"pageSize\": 20\n  },\n  \"totalElements\": 100,\n  \"totalPages\": 5,\n  \"size\": 20,\n  \"number\": 0\n}"
             },
             {
               "name": "400 Bad Request",
@@ -884,7 +884,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"수정된 프롬프트 제목\",\n  \"content\": \"수정된 프롬프트 내용\",\n  \"description\": \"수정된 설명\",\n  \"categoryId\": 2,\n  \"inputVariables\": [\n    { \"name\": \"userName\", \"type\": \"string\", \"description\": \"사용자 이름\" }\n  ],\n  \"tags\": [\"ai\", \"gpt\"],\n  \"visibility\": \"PUBLIC\",\n  \"status\": \"DRAFT\"\n}"
+              "raw": "{\n  \"title\": \"수정된 프롬프트 제목\",\n  \"content\": \"수정된 프롬프트 내용\",\n  \"description\": \"수정된 설명\",\n  \"categoryId\": 2,\n  \"inputVariables\": [\n    {\n      \"name\": \"userName\",\n      \"type\": \"string\",\n      \"description\": \"사용자 이름\",\n      \"required\": true,\n      \"defaultValue\": \"\"\n    }\n  ],\n  \"tags\": [\"ai\", \"gpt\"],\n  \"visibility\": \"PUBLIC\",\n  \"status\": \"DRAFT\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/prompts/:id",
@@ -905,7 +905,7 @@
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"title\": \"수정된 프롬프트 제목\",\n  \"content\": \"수정된 프롬프트 내용\",\n  \"description\": \"수정된 설명\",\n  \"categoryId\": 2,\n  \"inputVariables\": [\n    { \"name\": \"userName\", \"type\": \"string\", \"description\": \"사용자 이름\" }\n  ],\n  \"tags\": [\"ai\", \"gpt\"],\n  \"visibility\": \"PUBLIC\",\n  \"status\": \"DRAFT\",\n  \"updatedAt\": \"2024-06-10T12:00:00\"\n}"
+              "body": "{\n  \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"title\": \"수정된 프롬프트 제목\",\n  \"description\": \"수정된 설명\",\n  \"content\": \"수정된 프롬프트 내용\",\n  \"categoryId\": 2,\n  \"inputVariables\": [\n    {\n      \"name\": \"userName\",\n      \"type\": \"string\",\n      \"description\": \"사용자 이름\",\n      \"required\": true,\n      \"defaultValue\": \"\"\n    }\n  ],\n  \"tags\": [\"ai\", \"gpt\"],\n  \"visibility\": \"PUBLIC\",\n  \"status\": \"DRAFT\",\n  \"updatedAt\": \"2024-06-10T12:00:00\"\n}"
             },
             {
               "name": "400 Bad Request",
@@ -1134,7 +1134,7 @@
               "name": "200 OK",
               "status": "OK",
               "code": 200,
-              "body": "{\n  \"content\": [\n    {\n      \"favoriteId\": 1001,\n      \"promptUuid\": \"123e4567-e89b-12d3-a456-426614174000\",\n      \"title\": \"예시 프롬프트\",\n      \"description\": \"설명\",\n      \"tags\": [\"ai\", \"stable-diffusion\"],\n      \"createdById\": 1,\n      \"createdByName\": \"홍길동\",\n      \"categoryId\": 2,\n      \"visibility\": \"PUBLIC\",\n      \"status\": \"PUBLISHED\",\n      \"promptCreatedAt\": \"2024-06-01T12:00:00\",\n      \"promptUpdatedAt\": \"2024-06-02T12:00:00\",\n      \"favoriteCreatedAt\": \"2024-06-03T10:00:00\",\n      \"viewCount\": 123,\n      \"favoriteCount\": 10,\n      \"isFavorite\": true\n    }\n  ],\n  \"page\": 0,\n  \"size\": 20,\n  \"totalElements\": 100,\n  \"totalPages\": 5,\n  \"hasNext\": true,\n  \"hasPrevious\": false\n}"
+              "body": "{\n  \"content\": [\n    {\n      \"favoriteId\": 1001,\n      \"promptUuid\": \"123e4567-e89b-12d3-a456-426614174000\",\n      \"title\": \"AI 어시스턴트 프롬프트\",\n      \"description\": \"사용자의 목적과 톤앤매너에 맞춰 응답하는 프롬프트\",\n      \"tags\": [\"AI\", \"어시스턴트\"],\n      \"createdById\": 1,\n      \"createdByName\": \"홍길동\",\n      \"categoryId\": 1,\n      \"visibility\": \"PUBLIC\",\n      \"status\": \"PUBLISHED\",\n      \"promptCreatedAt\": \"2024-05-01T12:34:56\",\n      \"promptUpdatedAt\": \"2024-05-02T15:00:00\",\n      \"favoriteCreatedAt\": \"2024-06-03T10:00:00\",\n      \"viewCount\": 123,\n      \"favoriteCount\": 10,\n      \"isFavorite\": true\n    }\n  ],\n  \"page\": 0,\n  \"size\": 20,\n  \"totalElements\": 100,\n  \"totalPages\": 5,\n  \"hasNext\": true,\n  \"hasPrevious\": false\n}"
             }
           ]
         },

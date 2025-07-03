@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -30,6 +32,7 @@ public class PromptDetail {
     private final String status;
     private final boolean isFavorite;
     private final boolean isLiked;
+    private final List<InputVariable> inputVariables;
 
     @Builder
     public PromptDetail(
@@ -48,7 +51,8 @@ public class PromptDetail {
         String visibility,
         String status,
         boolean isFavorite,
-        boolean isLiked) {
+        boolean isLiked,
+        List<InputVariable> inputVariables) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -65,5 +69,6 @@ public class PromptDetail {
         this.status = status;
         this.isFavorite = isFavorite;
         this.isLiked = isLiked;
+        this.inputVariables = inputVariables != null ? inputVariables : Collections.emptyList();
     }
 }
